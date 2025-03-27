@@ -46,22 +46,6 @@ const Dashboard = () => {
     },
   ];
 
-  const receivablesPayables = [
-    {
-      type: 'Receivable',
-      party_name: 'Client A',
-      amount: 10000,
-      due_date: '2025-04-01',
-      status: 'due',
-    },
-    {
-      type: 'Payable',
-      party_name: 'Supplier X',
-      amount: 5000,
-      due_date: '2025-03-28',
-      status: 'overdue',
-    },
-  ];
 
   if (isLoading) return <div className="p-6">Loading...</div>;
   if (error) return <div className="p-6 text-red-600">Error loading orders</div>;

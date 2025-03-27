@@ -51,7 +51,7 @@ const OrderFormModal = ({ isOpen, onClose, onSubmit, initialData }: OrderFormMod
           },
         };
 
-        const [tenantRes, yarnRes] = await Promise.all([
+        const [yarnRes] = await Promise.all([
           axios.get('http://localhost:5001/tenants', config),
           axios.get('http://localhost:5001/yarns', config),
         ]);

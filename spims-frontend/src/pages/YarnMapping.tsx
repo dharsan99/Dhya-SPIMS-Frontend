@@ -1,29 +1,20 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   getYarnMappings,
-  createYarnMapping,
-  updateYarnMapping,
   deleteYarnMapping,
 } from '../api/yarnMapping';
-import { YarnMappingForm, YarnMapping } from '../types/yarnMapping';
+import { YarnMapping } from '../types/yarnMapping';
 import useAuthStore from '../hooks/auth';
 
 const YarnMappingPage = () => {
   const queryClient = useQueryClient();
-  const { user } = useAuthStore();
+  useAuthStore();
 
   const { data: yarnMappings, isLoading } = useQuery({
     queryKey: ['yarn-mappings'],
     queryFn: getYarnMappings,
   });
 
-  const mutation = useMutation({
-    mutationFn: async ({ data, isEdit, id }: { data: YarnMappingForm; isEdit: boolean; id?: string }) =>
-      isEdit && id ? updateYarnMapping(id, data) : createYarnMapping(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['yarn-mappings'] });
-    },
-  });
 
   const handleDelete = (id: string) => {
     if (confirm('Delete this yarn?')) {

@@ -9,7 +9,6 @@ import {
   FiPackage,
   FiTag,
   FiMapPin,
-  FiUsers,
 } from 'react-icons/fi';
 
 const Sidebar = () => {

@@ -26,7 +26,6 @@ const YarnMappingModal = ({
   initialData,
   yarns,
   shades,
-  blends,
 }: YarnMappingModalProps) => {
   const [form, setForm] = useState<YarnMappingForm>({
     yarn_code: '',

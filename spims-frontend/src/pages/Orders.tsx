@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { getAllOrders, createOrder, updateOrder, deleteOrder } from '../api/orders';
 import Loader from '../components/Loader';
 import OrderFormModal, { OrderFormData } from '../components/OrderFormModal';
