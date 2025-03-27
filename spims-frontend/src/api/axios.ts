@@ -1,5 +1,6 @@
 // src/api/axios.ts
-import axios, { AxiosRequestConfig } from 'axios';
+import axios from 'axios';
+import type { InternalAxiosRequestConfig } from 'axios';
 import useAuthStore from '../hooks/auth';
 
 const instance = axios.create({
@@ -9,17 +10,12 @@ const instance = axios.create({
   },
 });
 
-// ✅ Add JWT token dynamically using Zustand store
 instance.interceptors.request.use(
-  (config: AxiosRequestConfig) => {
+  (config: InternalAxiosRequestConfig) => {
     const token = useAuthStore.getState().token;
 
-    if (!config.headers) {
-      config.headers = {};
-    }
-
     if (token) {
-      config.headers['Authorization'] = `Bearer ${token}`;
+      config.headers.set('Authorization', `Bearer ${token}`);
       console.log('🔐 Auth token added to request');
     } else {
       console.warn('⚠️ No token found in Zustand auth store');
@@ -27,16 +23,15 @@ instance.interceptors.request.use(
 
     return config;
   },
-  (error) => {
+  (error: unknown) => {
     console.error('❌ Axios request interceptor error:', error);
     return Promise.reject(error);
   }
 );
 
-// ✅ Handle unauthorized errors globally
 instance.interceptors.response.use(
   (response) => response,
-  (error) => {
+  (error: any) => {
     const status = error.response?.status;
 
     if (status === 401) {
