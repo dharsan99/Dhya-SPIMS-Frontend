@@ -101,7 +101,7 @@ const Production = () => {
   };
 
   // ✅ Filter orders not already linked to production, unless it's being edited
-  const usedOrderIds = productionData?.map((prod: ProductionRecord) => prod.linked_order_id) || [];  const allOrders: Order[] = ordersResponse?.data || [];
+  const usedOrderIds = productionData?.map((prod: ProductionRecord) => prod.linked_order_id) || [];  const allOrders: Order[] = ordersResponse|| [];
 
   const availableOrders = editingProduction
     ? allOrders.filter(
