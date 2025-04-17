@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
 
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
@@ -15,8 +16,14 @@ import ProtectedRoute from './routes/ProtectedRoute';
 import PublicRoute from './routes/PublicRoute';
 import DashboardLayout from './layout/DashboardLayout';
 
+import Fibers from './pages/Fibers';
+
 function App() {
   return (
+    <>
+
+    <Toaster position="top-right" />
+  
     <BrowserRouter>
       <Routes>
         {/* ✅ Public Route: Redirect if logged in */}
@@ -51,12 +58,15 @@ function App() {
           <Route path="suppliers" element={<Suppliers />} />
           <Route path="yarns" element={<Yarns />} />
           <Route path="yarn-mapping" element={<YarnMapping />} />
+          <Route path="fibers" element={<Fibers />} />
         </Route>
 
         {/* ✅ Catch-all */}
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
     </BrowserRouter>
+    </>
+
   );
 }
 

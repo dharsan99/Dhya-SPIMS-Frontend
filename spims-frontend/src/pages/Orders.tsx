@@ -1,24 +1,36 @@
 import { useState, useEffect } from 'react';
 import { getAllOrders, createOrder, updateOrder, deleteOrder } from '../api/orders';
+import { getBuyers, createBuyer } from '../api/buyers';
 import Loader from '../components/Loader';
 import OrderFormModal, { OrderFormData } from '../components/OrderFormModal';
-
-interface Order extends OrderFormData {
-  created_at: string | number | Date;
-  yarns: any;
-  id: string;
-}
+import BuyerFormModal from '../components/BuyerFormModal';
+import { Order } from '../types/order';
+import { Buyer, BuyerFormData } from '../types/buyer';
+import useAuthStore from '../hooks/auth';
+import clsx from 'clsx';
 
 const Orders = () => {
+  const auth = useAuthStore();
+  const [tab, setTab] = useState<'order' | 'buyer'>('order');
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
-  const [editingOrder, setEditingOrder] = useState<Order | null>(null);
+  const [buyerModalOpen, setBuyerModalOpen] = useState(false);
+  const [editingOrder, setEditingOrder] = useState<OrderFormData | null>(null);
+  const [buyers, setBuyers] = useState<Buyer[]>([]);
 
+  const fetchBuyers = async () => {
+    try {
+      const buyersList = await getBuyers();
+      setBuyers(buyersList);
+    } catch (error) {
+      console.error('Error fetching buyers:', error);
+    }
+  };
   const fetchOrders = async () => {
     try {
-      const response = await getAllOrders();
-      setOrders(response.data);
+      const data = await getAllOrders(); // ✅ renamed from `response`
+      setOrders(data); // ✅ directly use the data
     } catch (error) {
       console.error('Error fetching orders:', error);
     } finally {
@@ -28,30 +40,27 @@ const Orders = () => {
 
   useEffect(() => {
     fetchOrders();
+    fetchBuyers();
   }, []);
 
-  const handleCreate = () => {
+  const handleCreateOrder = () => {
     setEditingOrder(null);
     setModalOpen(true);
   };
 
   const handleEdit = (order: Order) => {
-    setEditingOrder(order);
+    setEditingOrder({
+      id: order.id,
+      buyer_id: order.buyer_id,
+      shade_id: order.shade_id,
+      tenant_id: order.tenant_id,
+      order_number: order.order_number,
+      quantity_kg: Number(order.quantity_kg),
+      delivery_date: order.delivery_date.split('T')[0],
+      status: (order.status || 'pending') as OrderFormData['status'],
+      created_by: order.created_by || '',
+    });
     setModalOpen(true);
-  };
-
-  const handleSubmit = async (data: OrderFormData) => {
-    try {
-      if (editingOrder) {
-        await updateOrder(editingOrder.id, { ...data }); // This can include status
-      } else {
-        const { status, ...cleanData } = data; // ❌ Remove status for POST
-        await createOrder(cleanData);
-      }
-      fetchOrders();
-    } catch (error) {
-      console.error('Error submitting order:', error);
-    }
   };
 
   const handleDelete = async (id: string) => {
@@ -63,87 +72,188 @@ const Orders = () => {
     }
   };
 
+  const handleSubmitOrder = async (data: Omit<OrderFormData, 'order_number'>) => {
+    try {
+      if (editingOrder?.id) {
+        await updateOrder(editingOrder.id, data);
+      } else {
+        await createOrder(data);
+      }
+      setModalOpen(false);
+      fetchOrders();
+    } catch (error) {
+      console.error('Error submitting order:', error);
+    }
+  };
+
+  const handleSubmitBuyer = async (data: Omit<BuyerFormData, 'tenant_id' | 'created_by'>) => {
+    try {
+      const user = auth.user;
+      if (!user) return;
+      await createBuyer(data);
+      setBuyerModalOpen(false);
+      fetchBuyers();
+    } catch (error) {
+      console.error('Error submitting buyer:', error);
+    }
+  };
+
   if (loading) return <Loader />;
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-semibold text-blue-600 mb-4">Orders</h1>
-      <button onClick={handleCreate} className="bg-blue-600 text-white py-2 px-4 rounded mb-6">+ Create Order</button>
-
-      <OrderFormModal
-        isOpen={modalOpen}
-        onClose={() => setModalOpen(false)}
-        onSubmit={handleSubmit}
-        initialData={editingOrder || undefined}
-      />
-
-      <div className="overflow-x-auto">
-      <table className="table-auto w-full">
-  <thead>
-    <tr>
-      <th className="border px-4 py-2">Date</th>
-      <th className="border px-4 py-2">Delivery Date</th>
-      <th className="border px-4 py-2">S/O No</th>
-      <th className="border px-4 py-2">Buyer Name</th>
-      <th className="border px-4 py-2">Count</th>
-      <th className="border px-4 py-2">Shade No</th>
-      <th className="border px-4 py-2">Blend</th>
-      <th className="border px-4 py-2">Qty (Kgs)</th>
-      
-      <th className="border px-4 py-2">Status</th>
-      <th className="border px-4 py-2">Actions</th>
-    </tr>
-  </thead>
-  <tbody>
-    {orders.map((order) => (
-      <tr key={order.id}>
-        <td className="border px-4 py-2">
-  {new Date(order.created_at).toLocaleDateString('en-GB')}
-</td>
-<td className="border px-4 py-2">
-          {new Date(order.delivery_date).toLocaleDateString('en-GB')}
-        </td>
-        <td className="border px-4 py-2">{order.order_number}</td>
-        <td className="border px-4 py-2">{order.buyer_name}</td>
-        <td className="border px-4 py-2">{order.yarns?.count_range || '-'}</td>
-        <td className="border px-4 py-2">{order.yarns?.base_shade || '-'}</td>
-        <td className="border px-4 py-2">
-          {order.yarns?.blend_id?.substring(0, 8) || '-'}
-        </td>
-        <td className="border px-4 py-2">{order.quantity_kg}</td>
-        
-        <td className="border px-4 py-2 text-sm font-medium">
-          <span
-            className={`px-2 py-1 rounded ${
-              order.status === 'pending'
-                ? 'bg-yellow-100 text-yellow-800'
-                : order.status === 'in_progress'
-                ? 'bg-blue-100 text-blue-800'
-                : 'bg-green-100 text-green-800'
+      <div className="flex border-b mb-6">
+        {['order', 'buyer'].map((type) => (
+          <button
+            key={type}
+            onClick={() => setTab(type as 'order' | 'buyer')}
+            className={`px-4 py-2 border-b-2 font-medium ${
+              tab === type
+                ? 'border-blue-600 text-blue-600'
+                : 'border-transparent text-gray-600 hover:text-blue-600'
             }`}
           >
-            {order.status}
-          </span>
-        </td>
-        <td className="border px-4 py-2 space-x-2">
-          <button
-            onClick={() => handleEdit(order)}
-            className="bg-yellow-500 text-white px-2 py-1 rounded"
-          >
-            Edit
+            {type === 'order' ? '🧾 Orders' : '👤 Buyers'}
           </button>
-          <button
-            onClick={() => handleDelete(order.id)}
-            className="bg-red-600 text-white px-2 py-1 rounded"
-          >
-            Delete
-          </button>
-        </td>
-      </tr>
-    ))}
-  </tbody>
-</table>
+        ))}
       </div>
+
+      <div className="bg-white p-4 rounded shadow mb-6">
+        {tab === 'order' ? (
+          <>
+            <h2 className="text-xl font-semibold text-blue-600 mb-4">Create/Edit Order</h2>
+            <button
+              onClick={handleCreateOrder}
+              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+            >
+              ➕ Add Order
+            </button>
+            <OrderFormModal
+              isOpen={modalOpen}
+              onClose={() => setModalOpen(false)}
+              onSubmit={handleSubmitOrder}
+              initialData={editingOrder || undefined}
+            />
+          </>
+        ) : (
+          <>
+            <h2 className="text-xl font-semibold text-blue-600 mb-4">Create Buyer</h2>
+            <button
+              onClick={() => setBuyerModalOpen(true)}
+              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+            >
+              ➕ Add Buyer
+            </button>
+            <BuyerFormModal
+              isOpen={buyerModalOpen}
+              onClose={() => setBuyerModalOpen(false)}
+              onSubmit={handleSubmitBuyer}
+            />
+          </>
+        )}
+      </div>
+
+      {tab === 'order' ? (
+        <div className="overflow-x-auto bg-white p-4 rounded shadow">
+          <h2 className="text-xl font-semibold text-blue-600 mb-4">Order List</h2>
+          <table className="table-auto w-full text-sm">
+            <thead>
+              <tr>
+                <th className="border px-4 py-2">Date</th>
+                <th className="border px-4 py-2">Delivery</th>
+                <th className="border px-4 py-2">S/O No</th>
+                <th className="border px-4 py-2">Buyer</th>
+                <th className="border px-4 py-2">Shade</th>
+                <th className="border px-4 py-2">Qty (kg)</th>
+                <th className="border px-4 py-2">Status</th>
+                <th className="border px-4 py-2">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {orders.map((order) => (
+                <tr key={order.id}>
+                  <td className="border px-4 py-2">
+                    {new Date(order.created_at).toLocaleDateString('en-GB')}
+                  </td>
+                  <td className="border px-4 py-2">
+                    {new Date(order.delivery_date).toLocaleDateString('en-GB')}
+                  </td>
+                  <td className="border px-4 py-2">{order.order_number}</td>
+                  <td className="border px-4 py-2">{order.buyer?.name || '-'}</td>
+                  <td className="border px-4 py-2">{order.shade?.shade_code || '-'}</td>
+                  <td className="border px-4 py-2">{order.quantity_kg}</td>
+                  <td className="border px-4 py-2">
+                    <span
+                      className={clsx(
+                        'px-2 py-1 rounded text-sm font-medium',
+                        order.status === 'pending'
+                          ? 'bg-yellow-100 text-yellow-800'
+                          : order.status === 'in_progress'
+                          ? 'bg-blue-100 text-blue-800'
+                          : 'bg-green-100 text-green-800'
+                      )}
+                    >
+                      {order.status}
+                    </span>
+                  </td>
+                  <td className="border px-4 py-2 space-x-2">
+                    <button
+                      onClick={() => handleEdit(order)}
+                      className="bg-yellow-500 text-white px-2 py-1 rounded"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDelete(order.id)}
+                      className="bg-red-600 text-white px-2 py-1 rounded"
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+              {orders.length === 0 && (
+                <tr>
+                  <td colSpan={8} className="text-center py-4 text-gray-500 italic">
+                    No orders found.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <div className="overflow-x-auto bg-white p-4 rounded shadow">
+          <h2 className="text-xl font-semibold text-blue-600 mb-4">Buyer List</h2>
+          <table className="table-auto w-full text-sm">
+            <thead>
+              <tr>
+                <th className="border px-4 py-2">Name</th>
+                <th className="border px-4 py-2">Contact</th>
+                <th className="border px-4 py-2">Email</th>
+                <th className="border px-4 py-2">Address</th>
+              </tr>
+            </thead>
+            <tbody>
+              {buyers.map((buyer) => (
+                <tr key={buyer.id}>
+                  <td className="border px-4 py-2">{buyer.name}</td>
+                  <td className="border px-4 py-2">{buyer.contact || '-'}</td>
+                  <td className="border px-4 py-2">{buyer.email || '-'}</td>
+                  <td className="border px-4 py-2">{buyer.address || '-'}</td>
+                </tr>
+              ))}
+              {buyers.length === 0 && (
+                <tr>
+                  <td colSpan={4} className="text-center py-4 text-gray-500 italic">
+                    No buyers found.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 };

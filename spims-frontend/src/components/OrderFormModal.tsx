@@ -1,94 +1,95 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useEffect, useState } from 'react';
 import useAuthStore from '../hooks/auth';
+import { getBuyers } from '../api/buyers';
+import { getAllShades } from '../api/shades';
+import { Buyer } from '../types/buyer';
+import { Shade } from '../types/shade';
 
 export interface OrderFormData {
+  id?: string;
+  created_at?: string | number | Date;
   tenant_id: string;
-  order_number: string;
-  buyer_name: string;
-  yarn_id: string;
+  buyer_id: string;
+  shade_id: string;
   quantity_kg: number;
   delivery_date: string;
   status: 'pending' | 'in_progress' | 'dispatched';
   created_by: string;
+  order_number?: string;
 }
 
-interface OrderFormModalProps {
+interface Props {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (formData: OrderFormData) => void;
+  onSubmit: (formData: Omit<OrderFormData, 'order_number'>) => void;
   initialData?: OrderFormData;
 }
 
-const OrderFormModal = ({ isOpen, onClose, onSubmit, initialData }: OrderFormModalProps) => {
-  const auth = useAuthStore(); // ✅ Access Zustand auth store
-  const [formData, setFormData] = useState<OrderFormData>({
+const OrderFormModal = ({ isOpen, onClose, onSubmit, initialData }: Props) => {
+  const auth = useAuthStore();
+  const [buyers, setBuyers] = useState<Buyer[]>([]);
+  const [shades, setShades] = useState<Shade[]>([]);
+  const [orderDate, setOrderDate] = useState<string>('');
+
+  const [formData, setFormData] = useState<Omit<OrderFormData, 'order_number'>>({
     tenant_id: '',
-    order_number: '',
-    buyer_name: '',
-    yarn_id: '',
+    buyer_id: '',
+    shade_id: '',
     quantity_kg: 0,
     delivery_date: '',
     status: 'pending',
     created_by: '',
-    ...(initialData || {})
+    ...initialData,
   });
 
-  const [yarnOptions, setYarnOptions] = useState<{ id: string; name: string }[]>([]);
-  const [buyers] = useState(['TexWorld Exports', 'Classic Spinners', 'Global Threads']);
-
   useEffect(() => {
-    const fetchInitialData = async () => {
+    const fetchData = async () => {
       try {
-        const token = auth.token;
-        const user = auth.user;
-
-        if (!token || !user) throw new Error('No auth token or user found');
-
-        const config = {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        };
-
-        const [yarnRes] = await Promise.all([
-          axios.get('http://localhost:5001/tenants', config),
-          axios.get('http://localhost:5001/yarns', config),
-        ]);
-
-        const tenant_id = user.tenant_id; // Prefer getting from logged-in user
-        const yarnOptions = yarnRes.data.map((y: any) => ({
-          id: y.id,
-          name: `${y.count_range} - ${y.base_shade}`,
-        }));
-
-        const nextOrderNum = 'SO-' + (1000 + Math.floor(Math.random() * 9000)).toString();
-
-        setFormData((prev) => ({
-          ...prev,
-          tenant_id,
-          yarn_id: yarnOptions[0]?.id || '',
-          order_number: nextOrderNum,
-          created_by: user.id,
-        }));
-
-        setYarnOptions(yarnOptions);
-      } catch (error) {
-        console.error('Error loading initial form data:', error);
+        const buyerList = await getBuyers();
+        const shadeList = await getAllShades();
+        setBuyers(buyerList);
+        setShades(shadeList);
+      } catch (err) {
+        console.error('Error loading dropdowns:', err);
       }
     };
+    fetchData();
+  }, []);
 
+  useEffect(() => {
     if (!initialData) {
-      fetchInitialData();
+      const user = auth.user;
+      if (!user) return;
+      setFormData((prev) => ({
+        ...prev,
+        tenant_id: user.tenant_id,
+        created_by: user.id,
+      }));
     }
   }, [initialData, auth]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: name === 'quantity_kg' ? Number(value) : value
-    }));
+
+    if (name === 'order_date') {
+      setOrderDate(value);
+
+      // calculate +25 days and update delivery_date
+      const delivery = new Date(value);
+      delivery.setDate(delivery.getDate() + 25);
+
+      const deliveryDateStr = delivery.toISOString().split('T')[0];
+
+      setFormData((prev) => ({
+        ...prev,
+        delivery_date: deliveryDateStr,
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: name === 'quantity_kg' ? Number(value) : value,
+      }));
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -100,23 +101,39 @@ const OrderFormModal = ({ isOpen, onClose, onSubmit, initialData }: OrderFormMod
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-      <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg">
-        <h2 className="text-lg font-semibold mb-4">{initialData ? 'Edit Order' : 'Create Order'}</h2>
+<div className="fixed inset-0 z-50 backdrop-blur-sm bg-white/10 flex items-center justify-center">      <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg">
+        <h2 className="text-lg font-semibold mb-4">
+          {initialData ? `Edit Order : ${initialData.order_number}` : 'New Order Entry'}
+        </h2>
+
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Buyer Dropdown */}
-          <select name="buyer_name" value={formData.buyer_name} onChange={handleChange} required className="w-full border p-2 rounded">
+          <select
+            name="buyer_id"
+            value={formData.buyer_id}
+            onChange={handleChange}
+            required
+            className="w-full border p-2 rounded"
+          >
             <option value="">Select Buyer</option>
             {buyers.map((buyer) => (
-              <option key={buyer} value={buyer}>{buyer}</option>
+              <option key={buyer.id} value={buyer.id}>
+                {buyer.name}
+              </option>
             ))}
           </select>
 
-          {/* Yarn Dropdown */}
-          <select name="yarn_id" value={formData.yarn_id} onChange={handleChange} required className="w-full border p-2 rounded">
-            <option value="">Select Yarn</option>
-            {yarnOptions.map((yarn) => (
-              <option key={yarn.id} value={yarn.id}>{yarn.name}</option>
+          <select
+            name="shade_id"
+            value={formData.shade_id}
+            onChange={handleChange}
+            required
+            className="w-full border p-2 rounded"
+          >
+            <option value="">Select Shade</option>
+            {shades.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.shade_code}
+              </option>
             ))}
           </select>
 
@@ -131,27 +148,35 @@ const OrderFormModal = ({ isOpen, onClose, onSubmit, initialData }: OrderFormMod
           />
 
           <input
-            name="delivery_date"
+            name="order_date"
             type="date"
-            value={formData.delivery_date}
+            value={orderDate}
             onChange={handleChange}
             required
             className="w-full border p-2 rounded"
           />
+          <p className="text-gray-500 text-sm">
+            Delivery Date: <strong>{formData.delivery_date || '-'}</strong>
+          </p>
 
-          <select name="status" value={formData.status} onChange={handleChange} className="w-full border p-2 rounded">
+          <select
+            name="status"
+            value={formData.status}
+            onChange={handleChange}
+            className="w-full border p-2 rounded"
+          >
             <option value="pending">Pending</option>
             <option value="in_progress">In Progress</option>
             <option value="dispatched">Dispatched</option>
           </select>
 
-          {/* Hidden Fields */}
           <input type="hidden" name="tenant_id" value={formData.tenant_id} />
-          <input type="hidden" name="order_number" value={formData.order_number} />
           <input type="hidden" name="created_by" value={formData.created_by} />
 
           <div className="flex justify-end space-x-4">
-            <button type="button" onClick={onClose} className="px-4 py-2 bg-gray-300 rounded">Cancel</button>
+            <button type="button" onClick={onClose} className="px-4 py-2 bg-gray-300 rounded">
+              Cancel
+            </button>
             <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded">
               {initialData ? 'Update' : 'Create'}
             </button>

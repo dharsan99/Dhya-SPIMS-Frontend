@@ -1,20 +1,9 @@
 import { NavLink } from 'react-router-dom';
-import {
-  FiGrid,
-  FiClipboard,
-  FiSettings,
-  FiDatabase,
-  FiTruck,
-  FiLayers,
-  FiPackage,
-  FiTag,
-  FiMapPin,
-} from 'react-icons/fi';
+import { FiGrid, FiLayers, FiMapPin } from 'react-icons/fi';
 
 const Sidebar = () => {
   const navLinkStyles =
     'flex items-center gap-3 px-4 py-2 rounded hover:bg-blue-100 text-gray-700 transition';
-
   const activeLink = 'bg-blue-100 text-blue-700 font-medium';
 
   const createNavLink = (to: string, label: string, Icon: React.ElementType) => (
@@ -30,15 +19,14 @@ const Sidebar = () => {
   );
 
   return (
-    <aside className="w-64 bg-white border-r min-h-screen px-4 py-6">
+    <aside className="w-64 sticky top-0 h-screen bg-white border-r px-4 py-6 shadow-sm">
       <h1 className="text-2xl font-bold text-blue-600 mb-10 text-center">SPIMS</h1>
 
       <nav className="flex flex-col gap-4">
         {/* --- Core Navigation --- */}
         <div className="flex flex-col gap-2">
           {createNavLink('/dashboard', 'Dashboard', FiGrid)}
-          {createNavLink('/orders', 'Orders', FiClipboard)}
-          {createNavLink('/production', 'Production', FiSettings)}
+          {createNavLink('/orders', 'Orders', FiGrid)}
         </div>
 
         {/* --- Section Divider --- */}
@@ -48,12 +36,8 @@ const Sidebar = () => {
         <div>
           <h3 className="text-sm font-semibold text-gray-500 uppercase px-2 mb-2">Master Data</h3>
           <div className="flex flex-col gap-2">
-            {createNavLink('/brands', 'Brands', FiTag)}
-            {createNavLink('/blends', 'Blends', FiLayers)}
+            {createNavLink('/fibers', 'Fibres', FiLayers)}
             {createNavLink('/shades', 'Shades', FiMapPin)}
-            {createNavLink('/suppliers', 'Suppliers', FiTruck)}
-            {createNavLink('/yarns', 'Yarns', FiPackage)}
-            {createNavLink('/yarn-mapping', 'Yarn Mapping', FiDatabase)}
           </div>
         </div>
       </nav>

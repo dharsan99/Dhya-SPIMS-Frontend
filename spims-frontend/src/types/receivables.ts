@@ -4,3 +4,5 @@ export interface ReceivablePayable {
     due_date: string;
     type: 'receivable' | 'payable';
   }
+
+  
