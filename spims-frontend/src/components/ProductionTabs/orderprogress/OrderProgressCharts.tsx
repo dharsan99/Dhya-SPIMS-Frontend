@@ -8,7 +8,6 @@ import {
     LineChart,
     Line,
     CartesianGrid,
-    Legend,
   } from 'recharts';
   
   interface OrderProgressChartsProps {

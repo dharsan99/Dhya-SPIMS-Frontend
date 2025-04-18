@@ -15,7 +15,6 @@ const FiberStockModal = ({
   fibreCode,
   requiredQty,
   availableQty,
-  balanceAfter,
   onClose,
 }: Props) => {
   const { data: usageTrend = [], isLoading } = useQuery({
