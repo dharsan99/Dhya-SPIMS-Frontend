@@ -4,7 +4,7 @@ import { Toaster } from 'react-hot-toast';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Orders from './pages/Orders';
-import Production from './pages/Production';
+import ProductionDashboard from './pages/ProductionDashboard';
 import Blends from './pages/Blends';
 import Brands from './pages/Brands';
 import Shades from './pages/Shades';
@@ -15,6 +15,7 @@ import YarnMapping from './pages/YarnMapping';
 import ProtectedRoute from './routes/ProtectedRoute';
 import PublicRoute from './routes/PublicRoute';
 import DashboardLayout from './layout/DashboardLayout';
+
 
 import Fibers from './pages/Fibers';
 
@@ -49,8 +50,7 @@ function App() {
           <Route index element={<Navigate to="dashboard" />} />
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="orders" element={<Orders />} />
-          <Route path="production" element={<Production />} />
-
+          <Route path="production" element={<ProductionDashboard />} />
           {/* Master Data Pages */}
           <Route path="brands" element={<Brands />} />
           <Route path="blends" element={<Blends />} />

@@ -1,10 +1,18 @@
+// ✅ Updated Fiber page with FiberStockModal and inline editing support
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
-import { getAllFibers, createFiber, updateFiber, deleteFiber } from '../api/fibers';
+import {
+  getAllFibers,
+  createFiber,
+  updateFiber,
+  deleteFiber,
+} from '../api/fibers';
 import { getFibreCategories } from '../api/fibreCategories';
 import { Fiber, FiberCategory } from '../types/fiber';
 import FibreModal from '../components/FiberModal';
 import FibreCategoriesTable from '../components/FibreCategoriesTable';
+import FiberStockModal from '../components/FiberStockModal';
 import toast from 'react-hot-toast';
 
 const ITEMS_PER_PAGE = 5;
@@ -15,6 +23,7 @@ const Fibers = () => {
   const [tab, setTab] = useState<'fibres' | 'categories'>('fibres');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [fiberToEdit, setFiberToEdit] = useState<Fiber | null>(null);
+  const [stockModalFibre, setStockModalFibre] = useState<Fiber | null>(null);
   const [search, setSearch] = useState('');
   const [sortKey, setSortKey] = useState<keyof Fiber>('fibre_name');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
@@ -42,12 +51,11 @@ const Fibers = () => {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<Fiber> }) => updateFiber(id, data),
+    mutationFn: ({ id, data }: { id: string; data: Partial<Fiber> }) =>
+      updateFiber(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['fibres'] });
       toast.success('✏️ Fibre updated successfully');
-      setIsModalOpen(false);
-      setFiberToEdit(null);
     },
     onError: () => toast.error('❌ Failed to update fibre'),
   });
@@ -114,7 +122,6 @@ const Fibers = () => {
 
   return (
     <div className="p-6">
-      {/* Tabs */}
       <div className="flex border-b mb-4">
         <button
           onClick={() => setTab('fibres')}
@@ -124,7 +131,7 @@ const Fibers = () => {
               : 'border-transparent text-gray-600 hover:text-blue-600'
           }`}
         >
-          🧵 Fibres
+          Fibres
         </button>
         <button
           onClick={() => setTab('categories')}
@@ -134,11 +141,10 @@ const Fibers = () => {
               : 'border-transparent text-gray-600 hover:text-blue-600'
           }`}
         >
-          📂 Categories
+          Categories
         </button>
       </div>
 
-      {/* Content */}
       {tab === 'categories' ? (
         <FibreCategoriesTable />
       ) : (
@@ -146,7 +152,7 @@ const Fibers = () => {
           <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
             <input
               type="text"
-              placeholder="🔍 Search name, code or category..."
+              placeholder="Search name, code or category..."
               value={search}
               onChange={(e) => {
                 setSearch(e.target.value);
@@ -185,12 +191,18 @@ const Fibers = () => {
                     <td className="p-3">
                       {fibre.category?.name || <span className="text-gray-400 italic">Uncategorized</span>}
                     </td>
-                    <td className="p-3 flex gap-2">
+                    <td className="p-3 flex gap-2 flex-wrap">
                       <button
                         onClick={() => handleEditClick(fibre)}
                         className="text-xs bg-yellow-500 hover:bg-yellow-600 text-white px-2 py-1 rounded"
                       >
                         Edit
+                      </button>
+                      <button
+                        onClick={() => setStockModalFibre(fibre)}
+                        className="text-xs bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded"
+                      >
+                        Update Stock
                       </button>
                       <button
                         onClick={() => handleDelete(fibre.id)}
@@ -243,6 +255,17 @@ const Fibers = () => {
         fibreToEdit={fiberToEdit}
         categories={categories}
       />
+
+      {stockModalFibre && (
+        <FiberStockModal
+          fibreId={stockModalFibre.id}
+          fibreCode={stockModalFibre.fibre_code}
+          requiredQty={"0.00"}
+          availableQty={String(stockModalFibre.stock_kg)}
+          balanceAfter={String(stockModalFibre.stock_kg)}
+          onClose={() => setStockModalFibre(null)}
+        />
+      )}
     </div>
   );
 };

@@ -39,3 +39,8 @@ export const getLowStockFibres = async (): Promise<Fiber[]> => {
     throw error;
   }
 };
+
+export const getFiberUsageTrend = async (fibreId: string): Promise<{ date: string; usedKg: number }[]> => {
+  const response = await api.get(`fibres${fibreId}/usage`);
+  return response.data;
+};

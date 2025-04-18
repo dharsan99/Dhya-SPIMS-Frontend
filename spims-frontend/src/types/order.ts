@@ -4,7 +4,7 @@ export interface OrderFormData {
   buyer_name: string;
   quantity_kg: number;
   delivery_date: string;
-  status?: 'pending' | 'in_progress' | 'dispatched';
+  status: 'pending' | 'in_progress' | 'completed'; 
   created_by: string;
 }
 

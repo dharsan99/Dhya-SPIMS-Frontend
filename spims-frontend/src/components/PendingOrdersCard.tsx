@@ -4,6 +4,7 @@ import Pagination from './Pagination';
 import { Order } from '../types/order';
 import FiberStockModal from './FiberStockModal';
 import RealisationModal from './RealisationModal';
+import OrderStatusModal from './OrderStatusModal';
 
 interface PendingOrdersCardProps {
   data: Order[];
@@ -18,19 +19,27 @@ const PendingOrdersCard = ({ data }: PendingOrdersCardProps) => {
   } | null>(null);
 
   const [realModalOrderId, setRealModalOrderId] = useState<string | null>(null);
+  const [statusModalOpen, setStatusModalOpen] = useState(false);
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(3);
 
-  const filtered = data.filter((order) => order.status === 'pending');
-  const totalItems = filtered.length;
+  // ✅ Show both pending and in_progress orders
+  const visibleOrders = data.filter((order) =>
+    ['pending', 'in_progress'].includes(order.status)
+  );
+
+  // ✅ Only show pending orders in status modal
+  const pendingOnly = data.filter((order) => order.status === 'pending');
+
+  const totalItems = visibleOrders.length;
   const startIndex = (page - 1) * rowsPerPage;
   const endIndex = startIndex + rowsPerPage;
-  const paginatedOrders = filtered
+  const paginatedOrders = visibleOrders
     .sort((a, b) => new Date(a.delivery_date).getTime() - new Date(b.delivery_date).getTime())
     .slice(startIndex, endIndex);
 
   const runningStockMap: Record<string, number> = {};
-  filtered.forEach(order => {
+  visibleOrders.forEach(order => {
     order.shade?.shade_fibres?.forEach((sf: { fibre: { id: any; stock_kg: any; }; }) => {
       const fibreId = sf.fibre?.id;
       const stock = parseFloat(sf.fibre?.stock_kg ?? 0);
@@ -110,11 +119,19 @@ const PendingOrdersCard = ({ data }: PendingOrdersCardProps) => {
   return (
     <div className="bg-white p-6 rounded-lg shadow mb-8">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-semibold">Pending Orders</h3>
-        <div className="text-sm text-gray-500">
-          {totalItems > 0 && (
-            <>{startIndex + 1}–{Math.min(endIndex, totalItems)} of {totalItems} items</>
-          )}
+        <h3 className="text-lg font-semibold">Production Orders</h3>
+        <div className="flex gap-4 items-center">
+          <button
+            onClick={() => setStatusModalOpen(true)}
+            className="bg-indigo-600 hover:bg-indigo-700 text-white text-sm px-4 py-2 rounded"
+          >
+            Update Order Status
+          </button>
+          <div className="text-sm text-gray-500">
+            {totalItems > 0 && (
+              <>{startIndex + 1}–{Math.min(endIndex, totalItems)} of {totalItems} items</>
+            )}
+          </div>
         </div>
       </div>
 
@@ -149,6 +166,7 @@ const PendingOrdersCard = ({ data }: PendingOrdersCardProps) => {
           availableQty={modalData.availableQty}
           balanceAfter={modalData.balanceAfter}
           onClose={() => setModalData(null)}
+          fibreId=""
         />
       )}
 
@@ -156,6 +174,13 @@ const PendingOrdersCard = ({ data }: PendingOrdersCardProps) => {
         <RealisationModal
           order={data.find((d) => d.id === realModalOrderId)!}
           onClose={() => setRealModalOrderId(null)}
+        />
+      )}
+
+      {statusModalOpen && (
+        <OrderStatusModal
+          orders={pendingOnly}
+          onClose={() => setStatusModalOpen(false)}
         />
       )}
     </div>

@@ -27,6 +27,8 @@ const Sidebar = () => {
         <div className="flex flex-col gap-2">
           {createNavLink('/dashboard', 'Dashboard', FiGrid)}
           {createNavLink('/orders', 'Orders', FiGrid)}
+          {createNavLink('/production', 'Productions', FiGrid)}
+
         </div>
 
         {/* --- Section Divider --- */}

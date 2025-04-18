@@ -74,11 +74,20 @@ const Orders = () => {
 
   const handleSubmitOrder = async (data: Omit<OrderFormData, 'order_number'>) => {
     try {
+      const sanitizedData = {
+        ...data,
+        status: (data.status === 'dispatched' ? 'completed' : data.status) as
+          | 'pending'
+          | 'in_progress'
+          | 'completed',
+      };
+  
       if (editingOrder?.id) {
-        await updateOrder(editingOrder.id, data);
+        await updateOrder(editingOrder.id, sanitizedData);
       } else {
-        await createOrder(data);
+        await createOrder(sanitizedData);
       }
+  
       setModalOpen(false);
       fetchOrders();
     } catch (error) {

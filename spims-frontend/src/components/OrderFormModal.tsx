@@ -39,45 +39,53 @@ const OrderFormModal = ({ isOpen, onClose, onSubmit, initialData }: Props) => {
     delivery_date: '',
     status: 'pending',
     created_by: '',
-    ...initialData,
   });
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchDropdownData = async () => {
       try {
-        const buyerList = await getBuyers();
-        const shadeList = await getAllShades();
+        const [buyerList, shadeList] = await Promise.all([getBuyers(), getAllShades()]);
         setBuyers(buyerList);
         setShades(shadeList);
       } catch (err) {
         console.error('Error loading dropdowns:', err);
       }
     };
-    fetchData();
+    fetchDropdownData();
   }, []);
 
   useEffect(() => {
-    if (!initialData) {
-      const user = auth.user;
-      if (!user) return;
+    const user = auth.user;
+    if (!user) return;
+
+    if (initialData) {
+      setFormData({
+        ...initialData,
+        tenant_id: initialData.tenant_id || user.tenant_id,
+        created_by: initialData.created_by || user.id,
+      });
+
+      if (initialData.delivery_date) {
+        const orderDateEstimate = new Date(initialData.delivery_date);
+        orderDateEstimate.setDate(orderDateEstimate.getDate() - 25);
+        setOrderDate(orderDateEstimate.toISOString().split('T')[0]);
+      }
+    } else {
       setFormData((prev) => ({
         ...prev,
         tenant_id: user.tenant_id,
         created_by: user.id,
       }));
     }
-  }, [initialData, auth]);
+  }, [auth, initialData]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
 
     if (name === 'order_date') {
       setOrderDate(value);
-
-      // calculate +25 days and update delivery_date
       const delivery = new Date(value);
       delivery.setDate(delivery.getDate() + 25);
-
       const deliveryDateStr = delivery.toISOString().split('T')[0];
 
       setFormData((prev) => ({
@@ -101,84 +109,100 @@ const OrderFormModal = ({ isOpen, onClose, onSubmit, initialData }: Props) => {
   if (!isOpen) return null;
 
   return (
-<div className="fixed inset-0 z-50 backdrop-blur-sm bg-white/10 flex items-center justify-center">      <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg">
+    <div className="fixed inset-0 z-50 backdrop-blur-sm bg-white/10 flex items-center justify-center">
+      <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg">
         <h2 className="text-lg font-semibold mb-4">
-          {initialData ? `Edit Order : ${initialData.order_number}` : 'New Order Entry'}
+          {initialData ? `✏️ Edit Order: ${initialData.order_number}` : '➕ New Order Entry'}
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <select
-            name="buyer_id"
-            value={formData.buyer_id}
-            onChange={handleChange}
-            required
-            className="w-full border p-2 rounded"
-          >
-            <option value="">Select Buyer</option>
-            {buyers.map((buyer) => (
-              <option key={buyer.id} value={buyer.id}>
-                {buyer.name}
-              </option>
-            ))}
-          </select>
+          <div>
+            <label className="text-sm block text-gray-600 mb-1">Buyer</label>
+            <select
+              name="buyer_id"
+              value={formData.buyer_id}
+              onChange={handleChange}
+              required
+              className="w-full border p-2 rounded"
+            >
+              <option value="">Select Buyer</option>
+              {buyers.map((buyer) => (
+                <option key={buyer.id} value={buyer.id}>
+                  {buyer.name}
+                </option>
+              ))}
+            </select>
+          </div>
 
-          <select
-            name="shade_id"
-            value={formData.shade_id}
-            onChange={handleChange}
-            required
-            className="w-full border p-2 rounded"
-          >
-            <option value="">Select Shade</option>
-            {shades.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.shade_code}
-              </option>
-            ))}
-          </select>
+          <div>
+            <label className="text-sm block text-gray-600 mb-1">Shade</label>
+            <select
+              name="shade_id"
+              value={formData.shade_id}
+              onChange={handleChange}
+              required
+              className="w-full border p-2 rounded"
+            >
+              <option value="">Select Shade</option>
+              {shades.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.shade_code}
+                </option>
+              ))}
+            </select>
+          </div>
 
-          <input
-            name="quantity_kg"
-            type="number"
-            value={formData.quantity_kg}
-            onChange={handleChange}
-            placeholder="Quantity (kg)"
-            required
-            className="w-full border p-2 rounded"
-          />
+          <div>
+            <label className="text-sm block text-gray-600 mb-1">Quantity (kg)</label>
+            <input
+              name="quantity_kg"
+              type="number"
+              value={formData.quantity_kg}
+              onChange={handleChange}
+              placeholder="e.g. 500"
+              required
+              className="w-full border p-2 rounded"
+            />
+          </div>
 
-          <input
-            name="order_date"
-            type="date"
-            value={orderDate}
-            onChange={handleChange}
-            required
-            className="w-full border p-2 rounded"
-          />
-          <p className="text-gray-500 text-sm">
-            Delivery Date: <strong>{formData.delivery_date || '-'}</strong>
-          </p>
+          <div>
+            <label className="text-sm block text-gray-600 mb-1">Order Date</label>
+            <input
+              name="order_date"
+              type="date"
+              value={orderDate}
+              onChange={handleChange}
+              required
+              className="w-full border p-2 rounded"
+            />
+            <p className="text-gray-500 text-sm mt-1">
+              Delivery Date: <strong>{formData.delivery_date || '-'}</strong>
+            </p>
+          </div>
 
-          <select
-            name="status"
-            value={formData.status}
-            onChange={handleChange}
-            className="w-full border p-2 rounded"
-          >
-            <option value="pending">Pending</option>
-            <option value="in_progress">In Progress</option>
-            <option value="dispatched">Dispatched</option>
-          </select>
+          <div>
+            <label className="text-sm block text-gray-600 mb-1">Status</label>
+            <select
+              name="status"
+              value={formData.status}
+              onChange={handleChange}
+              className="w-full border p-2 rounded"
+            >
+              <option value="pending">Pending</option>
+              <option value="in_progress">In Progress</option>
+              <option value="dispatched">Dispatched</option>
+            </select>
+          </div>
 
           <input type="hidden" name="tenant_id" value={formData.tenant_id} />
           <input type="hidden" name="created_by" value={formData.created_by} />
 
-          <div className="flex justify-end space-x-4">
-            <button type="button" onClick={onClose} className="px-4 py-2 bg-gray-300 rounded">
+          <div className="flex justify-end gap-3 mt-6">
+            <button type="button" onClick={onClose} className="bg-gray-300 hover:bg-gray-400 text-gray-700 px-4 py-2 rounded">
               Cancel
             </button>
-            <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded">
-              {initialData ? 'Update' : 'Create'}
+            <button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
+              {initialData ? 'Update Order' : 'Create Order'}
             </button>
           </div>
         </form>

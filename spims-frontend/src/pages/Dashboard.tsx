@@ -77,17 +77,7 @@ const Dashboard = () => {
       <PendingFibersCard data={pendingFibres} />
 
       {/* Production Summary */}
-      <ProductionSummaryCard
-        data={[
-          {
-            section: 'Carding',
-            shift_1: 671,
-            shift_2: 359,
-            shift_3: 494,
-            total: 1524,
-          },
-        ]}
-      />
+      <ProductionSummaryCard />
 
       {/* Receivables / Payables */}
       <ReceivablesPayablesCard

@@ -6,8 +6,9 @@ interface FibreModalProps {
   onClose: () => void;
   onCreate: (data: Omit<Fiber, 'id'>) => void;
   onUpdate?: (data: Fiber) => void;
+  onStockUpdate?: (id: string, newStock: number) => void;
   fibreToEdit?: Fiber | null;
-  categories: FiberCategory[]; // ✅ Pre-fetched and passed from parent
+  categories: FiberCategory[];
 }
 
 const FibreModal = ({
@@ -15,6 +16,7 @@ const FibreModal = ({
   onClose,
   onCreate,
   onUpdate,
+  onStockUpdate,
   fibreToEdit,
   categories,
 }: FibreModalProps) => {
@@ -24,7 +26,6 @@ const FibreModal = ({
   const [categoryId, setCategoryId] = useState<string>('');
   const nameRef = useRef<HTMLInputElement>(null);
 
-  // ✅ Reset form state on modal open/edit mode
   useEffect(() => {
     if (isOpen) {
       if (fibreToEdit) {
@@ -62,10 +63,21 @@ const FibreModal = ({
     onClose();
   };
 
+  const handleStockUpdate = () => {
+    if (fibreToEdit && onStockUpdate) {
+      const newStock = parseFloat(stockKg);
+      if (!isNaN(newStock)) {
+        onStockUpdate(fibreToEdit.id, newStock);
+        onClose();
+      }
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
-<div className="fixed inset-0 z-50 backdrop-blur-sm bg-white/10 flex items-center justify-center">      <form
+    <div className="fixed inset-0 z-50 backdrop-blur-sm bg-white/10 flex items-center justify-center">
+      <form
         onSubmit={handleSubmit}
         className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md"
       >
@@ -83,6 +95,7 @@ const FibreModal = ({
               value={fibreName}
               onChange={(e) => setFibreName(e.target.value)}
               required
+              disabled={!!fibreToEdit && !!onStockUpdate}
             />
           </div>
 
@@ -94,6 +107,7 @@ const FibreModal = ({
               value={fibreCode}
               onChange={(e) => setFibreCode(e.target.value)}
               required
+              disabled={!!fibreToEdit && !!onStockUpdate}
             />
           </div>
 
@@ -115,6 +129,7 @@ const FibreModal = ({
               className="w-full border p-2 rounded"
               value={categoryId}
               onChange={(e) => setCategoryId(e.target.value)}
+              disabled={!!fibreToEdit && !!onStockUpdate}
             >
               <option value="">Uncategorized</option>
               {categories.map((cat) => (
@@ -134,12 +149,23 @@ const FibreModal = ({
           >
             Cancel
           </button>
-          <button
-            type="submit"
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-          >
-            {fibreToEdit ? 'Update' : 'Save'}
-          </button>
+
+          {fibreToEdit && onStockUpdate ? (
+            <button
+              type="button"
+              onClick={handleStockUpdate}
+              className="px-4 py-2 bg-amber-600 text-white rounded hover:bg-amber-700"
+            >
+              Update Stock
+            </button>
+          ) : (
+            <button
+              type="submit"
+              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            >
+              {fibreToEdit ? 'Update' : 'Save'}
+            </button>
+          )}
         </div>
       </form>
     </div>
