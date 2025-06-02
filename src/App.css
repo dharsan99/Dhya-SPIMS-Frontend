@@ -1,0 +1,17 @@
+/* App-level layout wrapper (optional) */
+
+
+#root {
+  max-width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #f8fafc; /* Tailwind's gray-50 */
+  color: #1e293b; /* Tailwind's slate-800 */
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+/* Smooth transitions for route/page changes */
+.page-transition {
+  transition: all 0.3s ease-in-out;
+}
