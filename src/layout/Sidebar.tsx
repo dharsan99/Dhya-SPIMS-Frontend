@@ -3,7 +3,7 @@ import { FiGrid, FiLayers, FiMapPin, FiSettings, FiPackage, FiUsers, FiMail } fr
 
 import useAuthStore from '../hooks/auth';
 
-const Sidebar = () => {
+const Sidebar = ({ onLinkClick }: { onLinkClick?: () => void }) => {
   const auth = useAuthStore();
   const email = auth.user?.email || '';
 
@@ -15,21 +15,23 @@ const Sidebar = () => {
     'text-gray-700 hover:bg-blue-50 dark:text-gray-300 dark:hover:bg-gray-800';
 
   const createNavLink = (
-    to: string,
-    label: string,
-    Icon: React.ComponentType<React.SVGProps<SVGSVGElement>>
-  ) => (
-    <NavLink
-      to={to}
-      aria-label={label}
-      className={({ isActive }) =>
-        `${navLinkStyles} ${isActive ? activeLink : inactiveLink}`
-      }
-    >
-      <Icon className="w-5 h-5 shrink-0" />
-      <span className="truncate">{label}</span>
-    </NavLink>
-  );
+  to: string,
+  label: string,
+  Icon: React.ComponentType<React.SVGProps<SVGSVGElement>>
+) => (
+  <NavLink
+    to={to}
+    aria-label={label}
+    className={({ isActive }) =>
+      `${navLinkStyles} ${isActive ? activeLink : inactiveLink}`
+    }
+    onClick={onLinkClick}
+  >
+    <Icon className="w-5 h-5 shrink-0" />
+    <span className="truncate">{label}</span>
+  </NavLink>
+);
+
 
   const isOrderUser = email === 'orders@nscspinning.com';
 

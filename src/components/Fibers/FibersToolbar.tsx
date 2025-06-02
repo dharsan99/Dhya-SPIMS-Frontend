@@ -3,9 +3,11 @@ import React from 'react';
 interface FibersToolbarProps {
   searchTerm: string;
   setSearchTerm: React.Dispatch<React.SetStateAction<string>>;
-
   onSearchChange: (value: string) => void;
-  onAddClick: () => void; // ✅ Add this line
+  onAddClick: () => void;
+
+  placeholder?: string; // Optional custom placeholder
+  buttonText?: string;  // Optional custom button label
 }
 
 const FibersToolbar: React.FC<FibersToolbarProps> = ({
@@ -13,12 +15,14 @@ const FibersToolbar: React.FC<FibersToolbarProps> = ({
   setSearchTerm,
   onSearchChange,
   onAddClick,
+  placeholder = 'Search fibres...',
+  buttonText = '+ Add Fiber',
 }) => {
   return (
     <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
       <input
         type="text"
-        placeholder="Search fibres..."
+        placeholder={placeholder}
         onChange={(e) => {
           setSearchTerm(e.target.value);
           onSearchChange(e.target.value);
@@ -30,10 +34,11 @@ const FibersToolbar: React.FC<FibersToolbarProps> = ({
         onClick={onAddClick}
         className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
       >
-        + Add Fiber
+        {buttonText}
       </button>
     </div>
   );
 };
+
 
 export default FibersToolbar;
