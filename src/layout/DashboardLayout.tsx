@@ -30,30 +30,30 @@ const DashboardLayout = () => {
   return (
     <div className="flex min-h-screen bg-gray-100 dark:bg-gray-950 transition-colors duration-300 overflow-hidden relative">
 
-      {/* Sidebar */}
+      {/* Desktop Sidebar (fixed width) */}
       <div className="hidden md:block">
         <Sidebar />
       </div>
 
       {/* Mobile Sidebar Overlay */}
-    <div
-  className={`fixed inset-0 z-50 md:hidden transition-opacity duration-300 ${
-    sidebarOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
-  } bg-transperant bg-opacity-40`}
-  onClick={() => setSidebarOpen(false)}
->
-  <div
-    className={`absolute top-0 left-0 h-full w-64 transform bg-white dark:bg-gray-900 shadow-md transition-transform duration-300 ${
-      sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-    }`}
-    onClick={(e) => e.stopPropagation()}
-  >
-    <Sidebar onLinkClick={() => setSidebarOpen(false)} />
-  </div>
-</div>
+      <div
+        className={`fixed inset-0 z-50 md:hidden transition-opacity duration-300 ${
+          sidebarOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+        } bg-black/30 `}
+        onClick={() => setSidebarOpen(false)}
+      >
+        <div
+          className={`absolute top-0 left-0 h-full w-64 transform bg-white dark:bg-gray-900 shadow-md transition-transform duration-300 ${
+            sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+          }`}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <Sidebar onLinkClick={() => setSidebarOpen(false)} />
+        </div>
+      </div>
 
-      {/* Right Side */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      {/* Right Side (main content) */}
+      <div className="flex-1 flex flex-col overflow-hidden md:ml-64">
 
         {/* Header */}
         <header className="sticky top-0 z-40 bg-white dark:bg-gray-900 border-b dark:border-gray-800 px-4 py-3 flex items-center justify-between shadow-sm">

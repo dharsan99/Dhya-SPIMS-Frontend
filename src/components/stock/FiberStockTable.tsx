@@ -4,13 +4,11 @@ import React from 'react';
 
 interface StockTableProps {
   stock: StockItem[];
+   onEditClick: (item: StockItem) => void;
 }
 
-const StockTable: React.FC<StockTableProps> = ({ stock }) => {
-  const handleEditClick = (item: StockItem) => {
-    console.log('Edit clicked for:', item);
-    // Future: Open modal or navigate to edit screen
-  };
+const StockTable: React.FC<StockTableProps> = ({ stock , onEditClick}) => {
+
 
   return (
     <div className="w-full overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm bg-white dark:bg-gray-900 mt-4">
@@ -42,11 +40,11 @@ const StockTable: React.FC<StockTableProps> = ({ stock }) => {
                 <td className="px-4 py-3 text-center">{item.last_updated}</td>
                 <td className="px-4 py-3 text-center">
                   <button
-                    onClick={() => handleEditClick(item)}
-                    className="px-2 py-1 text-xs font-medium bg-blue-500 hover:bg-blue-600 text-white rounded"
-                  >
-                    Edit
-                  </button>
+                  onClick={() => onEditClick(item)}
+                  className="px-2 py-1 text-xs font-medium bg-blue-500 hover:bg-blue-600 text-white rounded"
+                >
+                  Edit
+                </button>
                 </td>
               </tr>
             ))
