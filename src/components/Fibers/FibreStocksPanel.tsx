@@ -9,6 +9,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { mockStockData as initialMockData } from '@/mock/stockData';
 import EditFiberStockModal from '../stock/EditFiberStockModal';
 import toast from 'react-hot-toast';
+import StockSummaryCard from '../stock/StockSummaryCard';
 
 const FiberStocksPanel = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -104,6 +105,8 @@ const FiberStocksPanel = () => {
 
   return (
     <div className="p-4 text-gray-700 dark:text-gray-200">
+
+      <StockSummaryCard stock={stockData} />
       <FibersToolbar
       searchTerm={searchTerm}
       setSearchTerm={setSearchTerm}
@@ -128,6 +131,7 @@ const FiberStocksPanel = () => {
       />
 
       <AddFiberStockModal
+        key={showModal ? 'open' : 'closed'} // 👈 this resets the modal when closed
         isOpen={showModal}
         onClose={() => setShowModal(false)}
         onSubmit={handleModalSubmit}
@@ -142,6 +146,7 @@ const FiberStocksPanel = () => {
           categories={categories}
         />
       )}
+      
     </div>
   );
 };

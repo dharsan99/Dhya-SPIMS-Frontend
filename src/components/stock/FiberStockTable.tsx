@@ -1,5 +1,6 @@
 
 import { StockItem } from '@/types/stock';
+import { formatValue } from '@/utils/stock';
 import React from 'react';
 
 interface StockTableProps {
@@ -27,17 +28,17 @@ const StockTable: React.FC<StockTableProps> = ({ stock , onEditClick}) => {
           {stock.length > 0 ? (
             stock.map((item) => (
               <tr key={item.id} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition">
-                <td className="px-4 py-3">{item.fibre_name}</td>
-                <td className="px-4 py-3">{item.category}</td>
-                <td className="px-4 py-3 text-center">{item.stock_kg.toFixed(2)}</td>
-                <td
-                  className={`px-4 py-3 text-center ${
-                    item.stock_kg < item.threshold_kg ? 'text-red-600 font-semibold' : ''
-                  }`}
-                >
-                  {item.threshold_kg.toFixed(2)}
-                </td>
-                <td className="px-4 py-3 text-center">{item.last_updated}</td>
+               <td className="px-4 py-3">{formatValue(item.fibre_name)}</td>
+            <td className="px-4 py-3">{formatValue(item.category)}</td>
+            <td className="px-4 py-3 text-center">{formatValue(item.stock_kg, 2)}</td>
+            <td
+              className={`px-4 py-3 text-center ${
+                item.stock_kg < item.threshold_kg ? 'text-red-600 font-semibold' : ''
+              }`}
+            >
+              {formatValue(item.threshold_kg, 2)}
+            </td>
+            <td className="px-4 py-3 text-center">{formatValue(item.last_updated)}</td>
                 <td className="px-4 py-3 text-center">
                   <button
                   onClick={() => onEditClick(item)}
