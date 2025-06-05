@@ -10,6 +10,11 @@ import { mockStockData as initialMockData } from '@/mock/stockData';
 import EditFiberStockModal from '../stock/EditFiberStockModal';
 import toast from 'react-hot-toast';
 import StockSummaryCard from '../stock/StockSummaryCard';
+import * as XLSX from 'xlsx';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import ExportDropdown from '../stock/ExportDropdown';
+import ViewLogsModal, { StockLogEntry } from '../stock/ViewStockLogsModal';
 
 const FiberStocksPanel = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -20,6 +25,9 @@ const FiberStocksPanel = () => {
   const [editingStock, setEditingStock] = useState<StockItem | null>(null);
   const [stockData, setStockData] = useState<StockItem[]>(initialMockData);
   const [categoryFilter, setCategoryFilter] = useState('');
+  const [exportCurrentPageOnly, setExportCurrentPageOnly] = useState(false);
+  const [stockLogs, setStockLogs] = useState<Record<string, StockLogEntry[]>>({});
+  const [viewingLogsId, setViewingLogsId] = useState<string | null>(null);
 
 
   const categories = useMemo(() => {
@@ -43,6 +51,16 @@ const FiberStocksPanel = () => {
       last_updated: new Date().toISOString().split('T')[0], // format: YYYY-MM-DD
     };
     setStockData(prev => [newStock, ...prev]);
+    setStockLogs(prev => ({
+  ...prev,
+  [newStock.id]: [
+    {
+      date: new Date().toISOString(),
+      action: 'Added',
+      details: `Initial stock: ${newStock.stock_kg}kg, threshold: ${newStock.threshold_kg}kg`,
+    },
+  ],
+}));
     setShowModal(false);
     toast.success('Stock added successfully!', {
       style: {
@@ -70,6 +88,17 @@ const FiberStocksPanel = () => {
   setStockData(prev =>
     prev.map(item => (item.id === updatedItem.id ? updatedItem : item))
   );
+  setStockLogs(prev => ({
+  ...prev,
+  [updatedItem.id]: [
+    ...(prev[updatedItem.id] || []),
+    {
+      date: new Date().toISOString(),
+      action: 'Stock updated',
+      details: `Stock: ${updatedItem.stock_kg}kg, Threshold: ${updatedItem.threshold_kg}kg`,
+    },
+  ],
+}));
   setEditingStock(null); // close modal
   toast.success('Stock updated successfully!', {
   style: {
@@ -82,6 +111,34 @@ const FiberStocksPanel = () => {
   },
 });
 };
+
+
+ const handleExport = (format: 'xlsx' | 'pdf') => {
+  const exportData = (exportCurrentPageOnly ? paginatedStock : filteredStock).map(item => ({
+    Fibre: item.fibre_name,
+    Category: item.category,
+    'Stock (kg)': item.stock_kg,
+    'Threshold (kg)': item.threshold_kg,
+    'Last Updated': item.last_updated,
+  }));
+
+  if (format === 'xlsx') {
+    const worksheet = XLSX.utils.json_to_sheet(exportData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Fiber Stock');
+    XLSX.writeFile(workbook, 'fiber-stock.xlsx');
+  }
+
+  if (format === 'pdf') {
+    const doc = new jsPDF();
+    autoTable(doc, {
+      head: [['Fibre', 'Category', 'Stock (kg)', 'Threshold (kg)', 'Last Updated']],
+      body: exportData.map(item => Object.values(item)),
+    });
+    doc.save('fiber-stock.pdf');
+  }
+};
+
 
    const filteredStock = useMemo(() => {
   return stockData.filter((item) => {
@@ -119,8 +176,21 @@ const FiberStocksPanel = () => {
       filterOptions={categories}
     />
 
-      <StockTable stock={paginatedStock} onEditClick={setEditingStock} />
+    <div className="flex justify-end lg:justify-end mb-4">
+      <ExportDropdown
+        onExport={handleExport}
+        exportCurrentPageOnly={exportCurrentPageOnly}
+        setExportCurrentPageOnly={setExportCurrentPageOnly}
+      />
+    </div>
 
+
+
+      <StockTable
+        stock={paginatedStock}
+        onEditClick={setEditingStock}
+        onViewLogsClick={(id) => setViewingLogsId(id)}
+      />
       <Pagination
         page={page}
         setPage={setPage}
@@ -146,6 +216,15 @@ const FiberStocksPanel = () => {
           categories={categories}
         />
       )}
+
+      {viewingLogsId && (
+        <ViewLogsModal
+          isOpen={!!viewingLogsId}
+          onClose={() => setViewingLogsId(null)}
+          logs={stockLogs[viewingLogsId] || []}
+        />
+      )}
+
       
     </div>
   );

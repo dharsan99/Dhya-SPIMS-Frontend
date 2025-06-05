@@ -32,7 +32,7 @@ const FibersToolbar: React.FC<FibersToolbarProps> = ({
     value: cat,
   }));
   return (
-    <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
+    <div className="flex flex-col lg:flex-row justify-between items-center mb-6 gap-4">
       <input
         type="text"
         placeholder={placeholder}
@@ -41,9 +41,9 @@ const FibersToolbar: React.FC<FibersToolbarProps> = ({
           onSearchChange(e.target.value);
         }}
         value={searchTerm}
-        className="border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-3 py-2 rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-full sm:w-72"
+        className="border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-3 py-2 rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-full sm:w-full lg:w-72"
       />
-      <div className="flex flex-row items-center gap-2 w-full sm:w-auto">
+      <div className="flex flex-row items-center justify-between gap-2 w-full sm:w-full lg:w-auto">
         {setFilter && (
           <div className="min-w-[150px]">
             <Select
@@ -63,7 +63,7 @@ const FibersToolbar: React.FC<FibersToolbarProps> = ({
         )}
         <button
           onClick={onAddClick}
-          className="px-1 sm:px-4 py-1 sm:py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition text-xs lg:text-sm"
+          className="px-1 sm:px-4 py-2.5 sm:py-2.5 sm:py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition text-xs lg:text-sm"
         >
           {buttonText}
         </button>

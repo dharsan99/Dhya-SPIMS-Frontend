@@ -5,10 +5,12 @@ import React from 'react';
 
 interface StockTableProps {
   stock: StockItem[];
-   onEditClick: (item: StockItem) => void;
+  onEditClick: (item: StockItem) => void;
+  onViewLogsClick: (id: string) => void;
 }
 
-const StockTable: React.FC<StockTableProps> = ({ stock , onEditClick}) => {
+
+const StockTable: React.FC<StockTableProps> = ({ stock , onEditClick, onViewLogsClick}) => {
 
 
   return (
@@ -39,14 +41,22 @@ const StockTable: React.FC<StockTableProps> = ({ stock , onEditClick}) => {
               {formatValue(item.threshold_kg, 2)}
             </td>
             <td className="px-4 py-3 text-center">{formatValue(item.last_updated)}</td>
-                <td className="px-4 py-3 text-center">
-                  <button
+                <td className="px-4 py-3 text-center space-x-2">
+                <div className='flex flex-col lg:flex-row gap-3'>
+                <button
                   onClick={() => onEditClick(item)}
                   className="px-2 py-1 text-xs font-medium bg-blue-500 hover:bg-blue-600 text-white rounded"
                 >
                   Edit
                 </button>
-                </td>
+                <button
+                  onClick={() => onViewLogsClick(item.id)}
+                  className="px-2 py-1 text-xs font-medium bg-gray-500 hover:bg-gray-600 text-white rounded"
+                >
+                  View Logs
+                </button>
+                </div>
+              </td>
               </tr>
             ))
           ) : (
