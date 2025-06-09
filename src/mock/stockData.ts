@@ -1,5 +1,6 @@
 import { StockItem } from '@/types/stock';
 import { v4 as uuidv4 } from 'uuid';
+const now = new Date().toISOString().split('T')[0];
 
 
 
@@ -10,15 +11,19 @@ export const mockStockData: StockItem[] = [
     category: 'Cotton',
     stock_kg: 1200,
     threshold_kg: 500,
-    last_updated: '2025-05-31',
+    created_at: now,
+    last_updated: now,
+
   },
   {
     id: uuidv4(),
     fibre_name: 'Polyester B',
     category: 'Synthetic',
     stock_kg: 800,
-    threshold_kg: 300,
-    last_updated: '2025-05-30',
+    threshold_kg: 200,
+    created_at: now,
+    last_updated: now,
+
   },
   {
     id: uuidv4(),
@@ -26,7 +31,9 @@ export const mockStockData: StockItem[] = [
     category: 'Semi-Synthetic',
     stock_kg: 100,
     threshold_kg: 200,
-    last_updated: '2025-05-29',
+    created_at: now,
+    last_updated: now,
+
   },
   {
     id: uuidv4(),
@@ -34,7 +41,8 @@ export const mockStockData: StockItem[] = [
     category: 'Natural',
     stock_kg: 450,
     threshold_kg: 400,
-    last_updated: '2025-05-28',
+    created_at: now,
+    last_updated: now,
   },
   {
     id: uuidv4(),
@@ -42,7 +50,8 @@ export const mockStockData: StockItem[] = [
     category: 'Animal',
     stock_kg: 950,
     threshold_kg: 600,
-    last_updated: '2025-05-27',
+    created_at: now,
+    last_updated: now,
   },
   {
     id: uuidv4(),
@@ -50,7 +59,8 @@ export const mockStockData: StockItem[] = [
     category: 'Synthetic',
     stock_kg: 320,
     threshold_kg: 350,
-    last_updated: '2025-05-26',
+    created_at: now,
+    last_updated: now,
   },
   {
     id: uuidv4(),
@@ -58,7 +68,8 @@ export const mockStockData: StockItem[] = [
     category: 'Animal',
     stock_kg: 210,
     threshold_kg: 150,
-    last_updated: '2025-05-25',
+    created_at: now,
+    last_updated: now,
   },
   {
     id: uuidv4(),
@@ -66,7 +77,8 @@ export const mockStockData: StockItem[] = [
     category: 'Synthetic',
     stock_kg: 600,
     threshold_kg: 400,
-    last_updated: '2025-05-24',
+    created_at: now,
+    last_updated: now,
   },
   {
     id: uuidv4(),
@@ -74,7 +86,8 @@ export const mockStockData: StockItem[] = [
     category: 'Natural',
     stock_kg: 180,
     threshold_kg: 200,
-    last_updated: '2025-05-23',
+    created_at: now,
+    last_updated: now,
   },
   {
     id: uuidv4(),
@@ -82,6 +95,7 @@ export const mockStockData: StockItem[] = [
     category: 'Semi-Synthetic',
     stock_kg: 750,
     threshold_kg: 500,
-    last_updated: '2025-05-22',
+    created_at: now,
+    last_updated: now,
   },
 ];

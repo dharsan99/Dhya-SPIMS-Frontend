@@ -5,4 +5,5 @@ export interface StockItem {
   stock_kg: number;
   threshold_kg: number;
   last_updated: string;
+  created_at: string;
 }

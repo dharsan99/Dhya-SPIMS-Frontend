@@ -7,10 +7,11 @@ interface StockTableProps {
   stock: StockItem[];
   onEditClick: (item: StockItem) => void;
   onViewLogsClick: (id: string) => void;
+  currentUser: { role: string } | null; // <-- fix here
 }
 
 
-const StockTable: React.FC<StockTableProps> = ({ stock , onEditClick, onViewLogsClick}) => {
+const StockTable: React.FC<StockTableProps> = ({ stock , onEditClick, onViewLogsClick, currentUser}) => {
 
 
   return (
@@ -43,12 +44,14 @@ const StockTable: React.FC<StockTableProps> = ({ stock , onEditClick, onViewLogs
             <td className="px-4 py-3 text-center">{formatValue(item.last_updated)}</td>
                 <td className="px-4 py-3 text-center space-x-2">
                 <div className='flex flex-col lg:flex-row gap-3'>
-                <button
-                  onClick={() => onEditClick(item)}
-                  className="px-2 py-1 text-xs font-medium bg-blue-500 hover:bg-blue-600 text-white rounded"
-                >
-                  Edit
-                </button>
+               {currentUser?.role === 'admin' && (
+                    <button
+                      onClick={() => onEditClick(item)}
+                      className="px-2 py-1 text-xs font-medium bg-blue-500 hover:bg-blue-600 text-white rounded"
+                    >
+                      Edit
+                    </button>
+                  )}
                 <button
                   onClick={() => onViewLogsClick(item.id)}
                   className="px-2 py-1 text-xs font-medium bg-gray-500 hover:bg-gray-600 text-white rounded"

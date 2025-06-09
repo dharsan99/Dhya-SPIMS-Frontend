@@ -15,6 +15,7 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import ExportDropdown from '../stock/ExportDropdown';
 import ViewLogsModal, { StockLogEntry } from '../stock/ViewStockLogsModal';
+import useAuthStore from '@/hooks/auth';
 
 const FiberStocksPanel = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -26,9 +27,22 @@ const FiberStocksPanel = () => {
   const [stockData, setStockData] = useState<StockItem[]>(initialMockData);
   const [categoryFilter, setCategoryFilter] = useState('');
   const [exportCurrentPageOnly, setExportCurrentPageOnly] = useState(false);
-  const [stockLogs, setStockLogs] = useState<Record<string, StockLogEntry[]>>({});
+  const [stockLogs, setStockLogs] = useState<Record<string, StockLogEntry[]>>(() => {
+  const logs: Record<string, StockLogEntry[]> = {};
+  initialMockData.forEach(item => {
+    logs[item.id] = [
+      {
+        date: new Date(item.created_at).toISOString(),
+        action: 'Created',
+        details: `Initial stock: ${item.stock_kg}kg, threshold: ${item.threshold_kg}kg`,
+      }
+    ];
+  });
+  return logs;
+});
   const [viewingLogsId, setViewingLogsId] = useState<string | null>(null);
 
+  const currentUser = useAuthStore.getState().user
 
   const categories = useMemo(() => {
     const set = new Set<string>();
@@ -48,6 +62,7 @@ const FiberStocksPanel = () => {
       category: data.category,
       stock_kg: data.stock_kg,
       threshold_kg: data.threshold_kg,
+      created_at: new Date().toISOString().split('T')[0],
       last_updated: new Date().toISOString().split('T')[0], // format: YYYY-MM-DD
     };
     setStockData(prev => [newStock, ...prev]);
@@ -190,6 +205,7 @@ const FiberStocksPanel = () => {
         stock={paginatedStock}
         onEditClick={setEditingStock}
         onViewLogsClick={(id) => setViewingLogsId(id)}
+        currentUser={currentUser}
       />
       <Pagination
         page={page}
