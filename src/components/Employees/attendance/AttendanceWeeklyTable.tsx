@@ -1,8 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Employee } from '../../../types/employee';
 import { AttendanceRow } from './AttendanceTypes';
 import AttendancePagination from './AttendancePagination';
 import { fetchAttendanceByDate } from '../../../api/attendance';
+import { getStatusBadge } from './StatusBadge';
+import { calculateWeeklyTotals } from './utils/attendence';
 
 interface Props {
   employees: Employee[];
@@ -12,6 +14,7 @@ interface Props {
   onPageChange: (newPage: number) => void;
   onPageSizeChange: (newSize: number) => void;
 }
+
 
 const AttendanceWeeklyTable: React.FC<Props> = ({
   employees,
@@ -24,27 +27,41 @@ const AttendanceWeeklyTable: React.FC<Props> = ({
   const [attendanceMap, setAttendanceMap] = useState<Record<string, Record<string, AttendanceRow>>>({});
   const [loading, setLoading] = useState(true);
 
-  const startIndex = (page - 1) * pageSize;
-  const paginatedEmployees = employees.slice(startIndex, startIndex + pageSize);
+  const paginatedEmployees = useMemo(() => {
+    const startIndex = (page - 1) * pageSize;
+    return employees.slice(startIndex, startIndex + pageSize);
+  }, [employees, page, pageSize]);
+
+  const weeklyTotals = useMemo(() => {
+    const totals: Record<string, ReturnType<typeof calculateWeeklyTotals>> = {};
+    employees.forEach((emp) => {
+      totals[emp.id] = calculateWeeklyTotals(emp, attendanceMap, weekDates);
+    });
+    return totals;
+  }, [employees, attendanceMap, weekDates]);
 
   useEffect(() => {
     const fetchAllAttendance = async () => {
       setLoading(true);
+
+      const results = await Promise.all(
+        weekDates.map((date) =>
+          fetchAttendanceByDate(date)
+            .then((rows) => ({ date, rows }))
+            .catch((err) => {
+              console.error(`❌ Error fetching attendance for ${date}:`, err);
+              return { date, rows: [] };
+            })
+        )
+      );
+
       const newMap: Record<string, Record<string, AttendanceRow>> = {};
-
-      for (const date of weekDates) {
-        try {
-          const rows = await fetchAttendanceByDate(date);
-          newMap[date] = {};
-
-          rows.forEach((row: AttendanceRow) => {
-            newMap[date][row.employee_id] = row;
-          });
-        } catch (err) {
-          console.error(`❌ Error fetching attendance for ${date}:`, err);
-          newMap[date] = {};
-        }
-      }
+      results.forEach(({ date, rows }) => {
+        newMap[date] = {};
+        rows.forEach((row: any) => {
+          newMap[date][row.employee_id] = row;
+        });
+      });
 
       setAttendanceMap(newMap);
       setLoading(false);
@@ -53,53 +70,13 @@ const AttendanceWeeklyTable: React.FC<Props> = ({
     fetchAllAttendance();
   }, [weekDates]);
 
-  const getStatusBadge = (status?: string) => {
-    const normalized = status?.toUpperCase?.();
-
-    switch (normalized) {
-      case 'PRESENT':
-        return <span className="text-green-600">✅</span>;
-      case 'HALF_DAY':
-        return <span className="text-yellow-500">½</span>;
-      case 'LEAVE':
-        return <span className="text-blue-500">📘</span>;
-      case 'ABSENT':
-        return <span className="text-red-500">❌</span>;
-      default:
-        return <span className="text-gray-400">–</span>;
-    }
-  };
-
-const calculateWeeklyTotals = (emp: Employee) => {
-  let totalHours = 0;
-  let totalDays = 0;
-  let totalOvertime = 0;
-
-  weekDates.forEach((date) => {
-    const att = attendanceMap[date]?.[emp.id];
-
-    if (att && att.status !== 'ABSENT') {
-      totalHours += att.total_hours;
-      totalOvertime += att.overtime_hours;
-
-      if (att.status === 'PRESENT') {
-        totalDays += 1;
-      } else if (att.status === 'HALF_DAY') {
-        totalDays += 0.5;
-      }
-    }
-  });
-
-  const dailyRate = parseFloat(emp.shift_rate.toString());
-  const hourlyRate = dailyRate / 8;
-  const wages = parseFloat((totalHours * hourlyRate).toFixed(2));
-
-  return { totalHours, totalDays, totalOvertime, wages };
-};
+  
 
   if (loading) {
     return <div className="text-center py-6 text-sm text-gray-500">Loading weekly attendance...</div>;
   }
+
+  const cellClass = "px-2 py-2 text-center";
 
   return (
     <div className="space-y-4">
@@ -112,21 +89,21 @@ const calculateWeeklyTotals = (emp: Employee) => {
               {weekDates.map((date) => (
                 <th
                   key={date}
-                  className="px-3 py-2 border dark:border-gray-700 text-center whitespace-nowrap"
+                  className={`${cellClass} border dark:border-gray-700 whitespace-nowrap`}
                   title={date}
                 >
                   {date.slice(5)} {/* shows MM-DD */}
                 </th>
               ))}
-              <th className="px-3 py-2 border dark:border-gray-700 text-center">Total Hrs</th>
-              <th className="px-3 py-2 border dark:border-gray-700 text-center">Days</th>
-              <th className="px-3 py-2 border dark:border-gray-700 text-center">Overtime</th>
-              <th className="px-3 py-2 border dark:border-gray-700 text-center">Wages</th>
+              <th className={`${cellClass} border dark:border-gray-700`}>Total Hrs</th>
+              <th className={`${cellClass} border dark:border-gray-700`}>Days</th>
+              <th className={`${cellClass} border dark:border-gray-700`}>Overtime</th>
+              <th className={`${cellClass} border dark:border-gray-700`}>Wages</th>
             </tr>
           </thead>
           <tbody>
             {paginatedEmployees.map((emp, i) => {
-              const { totalHours, totalDays, totalOvertime, wages } = calculateWeeklyTotals(emp);
+              const { totalHours, totalDays, totalOvertime, wages } = weeklyTotals[emp.id];
 
               return (
                 <tr
@@ -140,15 +117,15 @@ const calculateWeeklyTotals = (emp: Employee) => {
                   {weekDates.map((date) => {
                     const att = attendanceMap[date]?.[emp.id];
                     return (
-                      <td key={date} className="px-2 py-2 text-center">
+                      <td key={date} className={cellClass}>
                         {getStatusBadge(att?.status)}
                       </td>
                     );
                   })}
-                  <td className="px-2 py-2 text-center">{totalHours}</td>
-                  <td className="px-2 py-2 text-center">{totalDays}</td>
-                  <td className="px-2 py-2 text-center">{totalOvertime}</td>
-                  <td className="px-2 py-2 text-center font-semibold text-green-600 dark:text-green-400">
+                  <td className={cellClass}>{totalHours}</td>
+                  <td className={cellClass}>{totalDays}</td>
+                  <td className={cellClass}>{totalOvertime}</td>
+                  <td className={`${cellClass} font-semibold text-green-600 dark:text-green-400`}>
                     ₹{wages.toFixed(2)}
                   </td>
                 </tr>
