@@ -1,4 +1,3 @@
-import React from 'react';
 
 export const getStatusBadge = (status?: string) => {
   const normalized = status?.toUpperCase?.();
@@ -16,3 +15,15 @@ export const getStatusBadge = (status?: string) => {
       return <span className="text-gray-400">–</span>;
   }
 };
+
+
+export const getAttendenceStatusBadge = (status?: string) => {
+    switch (status) {
+      case 'PRESENT':
+        return <span className="text-green-600 font-semibold">✅ Present</span>;
+      case 'HALF_DAY':
+        return <span className="text-yellow-500 font-semibold">⚠️ Half Day</span>;
+      default:
+        return <span className="text-red-500 font-semibold">❌ Absent</span>;
+    }
+  };

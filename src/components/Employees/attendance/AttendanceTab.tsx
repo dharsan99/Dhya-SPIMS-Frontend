@@ -14,6 +14,7 @@ import { ShiftType, shiftTimeMap, AttendanceRow } from './AttendanceTypes';
 import { useQuery } from '@tanstack/react-query';
 import { buildAttendanceMap, buildEmptyRow } from '@/components/Employees/attendance/utils/attendence';
 import { useAttendanceDates } from './hooks/useAttendanceDates';
+import { useEmployeeStore } from './useAttendenceStore';
 
 
 const AttendanceTab = () => {
@@ -26,11 +27,14 @@ const AttendanceTab = () => {
   const [rangeMode, setRangeMode] = useState<'day' | 'week' | 'month'>('day');
   const [searchQuery, setSearchQuery] = useState('');
   const [itemsPerPage, setItemsPerPage] = useState(10);
+  const setEmployees = useEmployeeStore((state) => state.setEmployees);
 
   const { data: employees = [] } = useQuery({
     queryKey: ['employees'],
     queryFn: getAllEmployees,
   });
+
+  console.log('employees', employees)
 
   const initialAttendance = useMemo(() => {
     return employees.reduce((acc, emp) => {
@@ -39,9 +43,12 @@ const AttendanceTab = () => {
     }, {} as Record<string, AttendanceRow>);
   }, [employees]);
 
+  console.log('ini', initialAttendance)
+
   useEffect(() => {
     if (employees.length) {
       setAttendance(initialAttendance);
+      setEmployees(employees)
     }
   }, [employees, initialAttendance]);
 

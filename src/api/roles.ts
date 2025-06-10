@@ -14,7 +14,7 @@ export const getRoles = async (): Promise<Role[]> => {
 export const createRole = (data: {
   name: string;
   tenant_id: string;
-  permissions?: any; // You can type this better if needed
+  permissions?: Record<string, string[]>;
 }) => api.post(endpoint, data);
 
 // 🔹 Assign a role to a user (via /user-roles/assign)
@@ -26,8 +26,12 @@ export const getUserRole = (user_id: string) =>
   api.get(`/user-roles/${user_id}`);
 
 export const updateRole = (
-    id: string,
-    data: Partial<{ name: string; permissions: string[] }>
-  ) => api.put(`${endpoint}/${id}`, data);
+  id: string,
+  data: Partial<{
+    name: string;
+    permissions: Record<string, string[]>;
+  }>
+) => api.put(`${endpoint}/${id}`, data);
+
   
   export const deleteRole = (id: string) => api.delete(`${endpoint}/${id}`);

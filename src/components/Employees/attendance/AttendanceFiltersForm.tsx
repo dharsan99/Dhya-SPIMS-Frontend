@@ -1,4 +1,5 @@
 import React from 'react';
+import Select from 'react-select';
 
 interface WeekOrMonthRange {
   label: string;
@@ -70,21 +71,28 @@ const AttendanceFiltersForm: React.FC<AttendanceFiltersFormProps> = ({
     }
   };
 
+   const departmentOptions = [
+    { label: 'All Departments', value: '' },
+    ...departments.map((dept) => ({ label: dept, value: dept })),
+  ];
+
+  const selectedDepartment = departmentOptions.find(opt => opt.value === department);
+
   return (
     <div className="flex flex-col lg:flex-row gap-4">
         <div className='flex flex-row gap-4'>
       {renderDateSelector()}
      
-      <select
-        value={department}
-        onChange={(e) => onDepartmentChange(e.target.value)}
-        className="border px-2 py-1 rounded dark:bg-gray-800 dark:text-white"
-      >
-        <option value="">All Departments</option>
-        {departments.map((dept) => (
-          <option key={dept} value={dept}>{dept}</option>
-        ))}
-      </select>
+      <div className="min-w-[200px]">
+          <Select
+            options={departmentOptions}
+            value={selectedDepartment}
+            onChange={(selectedOption) => onDepartmentChange(selectedOption?.value || '')}
+            className="react-select-container"
+            classNamePrefix="react-select"
+            isClearable
+          />
+        </div>
       </div>
 
       <input

@@ -5,9 +5,11 @@ import AppPreferences from '../components/settings/AppPreferences';
 import Notifications from '../components/settings/Notifications';
 import Billing from '../components/settings/Billing';
 import Integrations from '../components/settings/Integrations';
+import useAuthStore from '@/hooks/auth';
 
 const Settings = () => {
   const [tab, setTab] = useState('organization');
+  const { user } = useAuthStore();
 
   const tabList = [
     { key: 'organization', label: 'Organization' },
@@ -17,6 +19,8 @@ const Settings = () => {
     { key: 'billing', label: 'Billing' },
     { key: 'integrations', label: 'Integrations' },
   ];
+
+  console.log('user', user)
 
   const renderTabContent = () => {
     switch (tab) {

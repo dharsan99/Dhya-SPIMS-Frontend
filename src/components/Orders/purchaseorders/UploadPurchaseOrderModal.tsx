@@ -21,6 +21,7 @@ const UploadPurchaseOrderModal: React.FC<Props> = ({ isOpen, onClose, onParsed }
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [, setPdfDoc] = useState<PDFDocumentProxy | null>(null);
 
+
   useEffect(() => {
     if (file) renderPDF(file);
   }, [file]);

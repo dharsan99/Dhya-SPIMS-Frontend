@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { AttendanceViewModeProps } from './AttendanceTypes';
 import { fetchAttendanceByDate } from '../../../api/attendance';
+import { formatINR } from './utils/attendence';
+import { getAttendenceStatusBadge } from './StatusBadge';
 
+// 🔹 Shift label and time map
 const shiftMap = {
   SHIFT_1: { label: 'Shift 1', time: '6 AM - 2 PM' },
   SHIFT_2: { label: 'Shift 2', time: '2 PM - 10 PM' },
@@ -9,13 +12,20 @@ const shiftMap = {
   ABSENT: { label: 'Absent', time: '--:--' },
 };
 
-// 💰 Format INR currency
-const formatINR = (value: number) =>
-  new Intl.NumberFormat('en-IN', {
-    style: 'currency',
-    currency: 'INR',
-    maximumFractionDigits: 2,
-  }).format(value);
+// 🔹 Format INR currency
+
+
+// 🔹 Attendance status badge renderer
+const getStatusBadge = (status?: string) => {
+  switch (status) {
+    case 'PRESENT':
+      return <span className="text-green-600 font-semibold">✅ Present</span>;
+    case 'HALF_DAY':
+      return <span className="text-yellow-500 font-semibold">⚠️ Half Day</span>;
+    default:
+      return <span className="text-red-500 font-semibold">❌ Absent</span>;
+  }
+};
 
 const AttendanceViewMode: React.FC<AttendanceViewModeProps & { date: string }> = ({
   employees,
@@ -25,38 +35,24 @@ const AttendanceViewMode: React.FC<AttendanceViewModeProps & { date: string }> =
   const [attendance, setAttendance] = useState<Record<string, any>>({});
   const [loading, setLoading] = useState(true);
 
-useEffect(() => {
-  const fetchData = async () => {
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const records = await fetchAttendanceByDate(date);
+        const map: Record<string, any> = {};
+        records.forEach((rec: any) => {
+          map[rec.employee_id] = rec;
+        });
+        setAttendance(map);
+      } catch (err) {
+        console.error('❌ Failed to fetch attendance:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    try {
-      const records = await fetchAttendanceByDate(date);
-
-      const map: Record<string, any> = {};
-      records.forEach((rec: any) => {
-        map[rec.employee_id] = rec;
-      });
-
-      setAttendance(map);
-    } catch (err) {
-      console.error('❌ Failed to fetch attendance:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  fetchData();
-}, [date]);
-
-  const getStatusBadge = (status?: string) => {
-    switch (status) {
-      case 'PRESENT':
-        return <span className="text-green-600 font-semibold">✅ Present</span>;
-      case 'HALF_DAY':
-        return <span className="text-yellow-500 font-semibold">⚠️ Half Day</span>;
-      default:
-        return <span className="text-red-500 font-semibold">❌ Absent</span>;
-    }
-  };
+    fetchData();
+  }, [date]);
 
   if (loading) {
     return <div className="text-center py-10 text-sm text-gray-600">Loading attendance...</div>;
@@ -80,16 +76,15 @@ useEffect(() => {
         </thead>
         <tbody>
           {employees.map((emp, idx) => {
-  const att = attendance[emp.id];
-  const isPresent = att?.status === 'PRESENT';
-  const overtime = att?.overtime_hours || 0;
-  const shiftKey = isPresent ? att.shift || 'SHIFT_1' : 'ABSENT';
-  const shift = shiftMap[shiftKey as keyof typeof shiftMap];
-  const totalHours = isPresent ? 8 + overtime : 0;
-  const workDays = isPresent ? 1 : 0;
-  const wageRate = emp.shift_rate ?? 0;
-  const wages = (totalHours / 8) * wageRate;
-
+            const att = attendance[emp.id];
+            const isPresent = att?.status === 'PRESENT';
+            const overtime = att?.overtime_hours || 0;
+            const shiftKey = isPresent ? att.shift || 'SHIFT_1' : 'ABSENT';
+            const shift = shiftMap[shiftKey as keyof typeof shiftMap];
+            const totalHours = isPresent ? 8 + overtime : 0;
+            const workDays = isPresent ? 1 : 0;
+            const wageRate = emp.shift_rate ?? 0;
+            const wages = (totalHours / 8) * wageRate;
 
             return (
               <tr
@@ -113,7 +108,7 @@ useEffect(() => {
                 <td className="px-3 py-2 text-center">{totalHours}</td>
                 <td className="px-3 py-2 text-center">{workDays}</td>
                 <td className="px-3 py-2 text-center">{formatINR(wages)}</td>
-                <td className="px-3 py-2 text-center">{getStatusBadge(att?.status)}</td>
+                <td className="px-3 py-2 text-center">{getAttendenceStatusBadge(att?.status)}</td>
               </tr>
             );
           })}
