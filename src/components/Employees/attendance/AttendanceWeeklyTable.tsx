@@ -1,149 +1,135 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { Employee } from '../../../types/employee';
-import { AttendanceRow } from './AttendanceTypes';
-import AttendancePagination from './AttendancePagination';
+import React, { useEffect, useState } from 'react';
+import { AttendanceViewModeProps } from './AttendanceTypes';
 import { fetchAttendanceByDate } from '../../../api/attendance';
-import { getStatusBadge } from './StatusBadge';
-import { calculateWeeklyTotals } from './utils/attendence';
+import { formatINR } from './utils/attendence';
+import { getAttendenceStatusBadge } from './StatusBadge';
 
-interface Props {
-  employees: Employee[];
-  weekDates: string[]; // Dates in 'YYYY-MM-DD' format
-  page: number;
-  pageSize: number;
-  onPageChange: (newPage: number) => void;
-  onPageSizeChange: (newSize: number) => void;
-}
+// 🔹 Shift label and time map
+const shiftMap = {
+  SHIFT_1: { label: 'Shift 1', time: '6 AM - 2 PM' },
+  SHIFT_2: { label: 'Shift 2', time: '2 PM - 10 PM' },
+  SHIFT_3: { label: 'Shift 3', time: '10 PM - 6 AM' },
+  ABSENT: { label: 'Absent', time: '--:--' },
+};
 
-
-const AttendanceWeeklyTable: React.FC<Props> = ({
+const AttendanceViewMode: React.FC<AttendanceViewModeProps & { date: string }> = ({
   employees,
-  weekDates,
-  page,
-  pageSize,
-  onPageChange,
-  onPageSizeChange,
+  pageStart,
+  date,
 }) => {
-  const [attendanceMap, setAttendanceMap] = useState<Record<string, Record<string, AttendanceRow>>>({});
+  const [attendance, setAttendance] = useState<Record<string, any>>({});
   const [loading, setLoading] = useState(true);
 
-  const paginatedEmployees = useMemo(() => {
-    const startIndex = (page - 1) * pageSize;
-    return employees.slice(startIndex, startIndex + pageSize);
-  }, [employees, page, pageSize]);
-
-  const weeklyTotals = useMemo(() => {
-    const totals: Record<string, ReturnType<typeof calculateWeeklyTotals>> = {};
-    employees.forEach((emp) => {
-      totals[emp.id] = calculateWeeklyTotals(emp, attendanceMap, weekDates);
-    });
-    return totals;
-  }, [employees, attendanceMap, weekDates]);
-
   useEffect(() => {
-    const fetchAllAttendance = async () => {
-      setLoading(true);
-
-      const results = await Promise.all(
-        weekDates.map((date) =>
-          fetchAttendanceByDate(date)
-            .then((rows) => ({ date, rows }))
-            .catch((err) => {
-              console.error(`❌ Error fetching attendance for ${date}:`, err);
-              return { date, rows: [] };
-            })
-        )
-      );
-
-      const newMap: Record<string, Record<string, AttendanceRow>> = {};
-      results.forEach(({ date, rows }) => {
-        newMap[date] = {};
-        rows.forEach((row: any) => {
-          newMap[date][row.employee_id] = row;
+    const fetchData = async () => {
+      try {
+        const records = await fetchAttendanceByDate(date);
+        const map: Record<string, any> = {};
+        records.forEach((rec: any) => {
+          map[rec.employee_id] = rec;
         });
-      });
-
-      setAttendanceMap(newMap);
-      setLoading(false);
+        setAttendance(map);
+      } catch (err) {
+        console.error('❌ Failed to fetch attendance:', err);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    fetchAllAttendance();
-  }, [weekDates]);
-
-  
+    fetchData();
+  }, [date]);
 
   if (loading) {
-    return <div className="text-center py-6 text-sm text-gray-500">Loading weekly attendance...</div>;
+    return (
+      <div className="w-full overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm bg-white dark:bg-gray-900">
+        <div className="text-center py-6 text-gray-500 italic dark:text-gray-400">
+          Loading attendance...
+        </div>
+      </div>
+    );
   }
 
-  const cellClass = "px-2 py-2 text-center";
-
   return (
-    <div className="space-y-4">
-      <div className="overflow-x-auto rounded border dark:border-gray-700 shadow-sm">
-        <table className="min-w-full text-sm text-left border-collapse">
-          <thead className="sticky top-0 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 z-10">
-            <tr>
-              <th className="px-4 py-2 border dark:border-gray-700">T.No</th>
-              <th className="px-4 py-2 border dark:border-gray-700">Employee</th>
-              {weekDates.map((date) => (
-                <th
-                  key={date}
-                  className={`${cellClass} border dark:border-gray-700 whitespace-nowrap`}
-                  title={date}
-                >
-                  {date.slice(5)} {/* shows MM-DD */}
-                </th>
-              ))}
-              <th className={`${cellClass} border dark:border-gray-700`}>Total Hrs</th>
-              <th className={`${cellClass} border dark:border-gray-700`}>Days</th>
-              <th className={`${cellClass} border dark:border-gray-700`}>Overtime</th>
-              <th className={`${cellClass} border dark:border-gray-700`}>Wages</th>
-            </tr>
-          </thead>
-          <tbody>
-            {paginatedEmployees.map((emp, i) => {
-              const { totalHours, totalDays, totalOvertime, wages } = weeklyTotals[emp.id];
+    <div className="w-full overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm bg-white dark:bg-gray-900">
+      <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 text-sm">
+        <thead className="bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-semibold sticky top-0 z-10">
+          <tr>
+            <th className="px-4 py-3 text-center">T.No</th>
+            <th className="px-4 py-3 text-left">Employee</th>
+            <th className="px-4 py-3 text-center">Shift</th>
+            <th className="px-4 py-3 text-center">Time</th>
+            <th className="px-4 py-3 text-center">Overtime</th>
+            <th className="px-4 py-3 text-center">Total Hrs</th>
+            <th className="px-4 py-3 text-center">Work Days</th>
+            <th className="px-4 py-3 text-center">Wages</th>
+            <th className="px-4 py-3 text-center">Status</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+          {employees.length > 0 ? (
+            employees.map((emp, idx) => {
+              const att = attendance[emp.id];
+              const isPresent = att?.status === 'PRESENT';
+              const overtime = att?.overtime_hours || 0;
+              const shiftKey = isPresent ? att.shift || 'SHIFT_1' : 'ABSENT';
+              const shift = shiftMap[shiftKey as keyof typeof shiftMap];
+              const totalHours = isPresent ? 8 + overtime : 0;
+              const workDays = isPresent ? 1 : 0;
+              const wageRate = emp.shift_rate ?? 0;
+              const wages = (totalHours / 8) * wageRate;
 
               return (
                 <tr
                   key={emp.id}
-                  className={`border-t dark:border-gray-700 ${
-                    i % 2 === 0 ? 'bg-white dark:bg-gray-900' : 'bg-gray-50 dark:bg-gray-800'
-                  }`}
+                  className="hover:bg-gray-50 dark:hover:bg-gray-800 transition"
                 >
-                  <td className="px-4 py-2 text-center">{emp.token_no || '-'}</td>
-                  <td className="px-4 py-2 max-w-[120px] truncate">{emp.name}</td>
-                  {weekDates.map((date) => {
-                    const att = attendanceMap[date]?.[emp.id];
-                    return (
-                      <td key={date} className={cellClass}>
-                        {getStatusBadge(att?.status)}
-                      </td>
-                    );
-                  })}
-                  <td className={cellClass}>{totalHours}</td>
-                  <td className={cellClass}>{totalDays}</td>
-                  <td className={cellClass}>{totalOvertime}</td>
-                  <td className={`${cellClass} font-semibold text-green-600 dark:text-green-400`}>
-                    ₹{wages.toFixed(2)}
+                  <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-300">
+                    {emp.token_no || pageStart + idx + 1}
+                  </td>
+                  <td
+                    className="px-4 py-3 text-gray-900 dark:text-white max-w-[200px] truncate"
+                    title={emp.name}
+                  >
+                    {emp.name}
+                  </td>
+                  <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-300">
+                    {shift.label}
+                  </td>
+                  <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-300">
+                    {shift.time}
+                  </td>
+                  <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-300">
+                    {overtime}
+                  </td>
+                  <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-300">
+                    {totalHours}
+                  </td>
+                  <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-300">
+                    {workDays}
+                  </td>
+                  <td className="px-4 py-3 text-center text-blue-700 dark:text-blue-400">
+                    {formatINR(wages)}
+                  </td>
+                  <td className="px-4 py-3 text-center">
+                    {getAttendenceStatusBadge(att?.status)}
                   </td>
                 </tr>
               );
-            })}
-          </tbody>
-        </table>
-      </div>
-
-      <AttendancePagination
-        page={page}
-        total={employees.length}
-        pageSize={pageSize}
-        onPageChange={onPageChange}
-        onPageSizeChange={onPageSizeChange}
-      />
+            })
+          ) : (
+            <tr>
+              <td
+                colSpan={9}
+                className="text-center py-6 text-gray-500 italic dark:text-gray-400"
+              >
+                No employees found.
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
     </div>
   );
 };
 
-export default AttendanceWeeklyTable;
+export default AttendanceViewMode;

@@ -5,17 +5,17 @@ interface RoleModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (data: { id?: string; name: string; permissions: Record<string, string[]> }) => void;
-  roleToEdit?: { id: string; name: string; permissions: string[] } | null;
+  roleToEdit?: { id: string; name: string; permissions: Record<string, string[]> } | null;
 }
 
 const FEATURES = [
   {
     name: 'Orders',
-    subPermissions: ['Add Order', 'Update Order', 'Delete Order'],
+    subPermissions: ['Add Order', 'Update Order', 'Delete Order', 'View Order'],
   },
   {
     name: 'Shades',
-    subPermissions: ['Add Shade', 'Update Shade', 'Delete Shade'],
+    subPermissions: ['Add Shade', 'Update Shade', 'Delete Shade', 'View Shade'],
   },
   {
     name: 'Fibres',
@@ -45,23 +45,29 @@ const RoleModal = ({ isOpen, onClose, onSave, roleToEdit }: RoleModalProps) => {
   const [expandedFeatures, setExpandedFeatures] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
-    if (roleToEdit) {
-      setName(roleToEdit.name);
-      // Convert flat permission list to grouped object
-      const grouped: Record<string, string[]> = {};
-      FEATURES.forEach(({ name, subPermissions }) => {
-        const selected = subPermissions.filter(p => roleToEdit.permissions.includes(p));
-        if (selected.length > 0) {
-          grouped[name] = selected;
-        }
-      });
-      setPermissions(grouped);
-    } else {
-      setName('');
-      setPermissions({});
-      setExpandedFeatures({});
-    }
-  }, [roleToEdit, isOpen]);
+  if (roleToEdit) {
+    setName(roleToEdit.name);
+    const grouped: Record<string, string[]> = {};
+    const expanded: Record<string, boolean> = {};
+
+    FEATURES.forEach(({ name, subPermissions }) => {
+      const selected = roleToEdit.permissions[name] || [];
+      const matched = subPermissions.filter(p => selected.includes(p));
+      if (matched.length > 0) {
+        grouped[name] = matched;
+        expanded[name] = true; // Auto-expand if there are selected permissions
+      }
+    });
+
+    setPermissions(grouped);
+    setExpandedFeatures(expanded);
+  } else {
+    setName('');
+    setPermissions({});
+    setExpandedFeatures({});
+  }
+}, [roleToEdit, isOpen]);
+
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

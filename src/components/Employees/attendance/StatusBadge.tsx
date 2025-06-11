@@ -1,3 +1,4 @@
+import { CheckCircle, AlertTriangle, XCircle } from 'lucide-react';
 
 export const getStatusBadge = (status?: string) => {
   const normalized = status?.toUpperCase?.();
@@ -18,12 +19,24 @@ export const getStatusBadge = (status?: string) => {
 
 
 export const getAttendenceStatusBadge = (status?: string) => {
-    switch (status) {
-      case 'PRESENT':
-        return <span className="text-green-600 font-semibold">✅ Present</span>;
-      case 'HALF_DAY':
-        return <span className="text-yellow-500 font-semibold">⚠️ Half Day</span>;
-      default:
-        return <span className="text-red-500 font-semibold">❌ Absent</span>;
-    }
-  };
+  switch (status) {
+    case 'PRESENT':
+      return (
+        <span className="flex items-center gap-1 text-green-600 font-semibold justify-center">
+          <CheckCircle className="w-4 h-4" /> Present
+        </span>
+      );
+    case 'HALF_DAY':
+      return (
+        <span className="flex items-center gap-1 text-yellow-500 font-semibold justify-center">
+          <AlertTriangle className="w-4 h-4" /> Half Day
+        </span>
+      );
+    default:
+      return (
+        <span className="flex items-center gap-1 text-red-500 font-semibold justify-center">
+          <XCircle className="w-4 h-4" /> Absent
+        </span>
+      );
+  }
+};

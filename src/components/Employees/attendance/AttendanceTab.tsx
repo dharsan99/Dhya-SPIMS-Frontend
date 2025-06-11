@@ -43,8 +43,6 @@ const AttendanceTab = () => {
     }, {} as Record<string, AttendanceRow>);
   }, [employees]);
 
-  console.log('ini', initialAttendance)
-
   useEffect(() => {
     if (employees.length) {
       setAttendance(initialAttendance);

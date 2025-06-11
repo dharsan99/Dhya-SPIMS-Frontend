@@ -40,22 +40,22 @@ const UserTable = ({ users, roles, onSave, onDelete }: UserTableProps) => {
         </button>
       </div>
 
-      <div className="overflow-x-auto rounded border bg-white dark:bg-gray-900 dark:border-gray-700 shadow">
-        <table className="min-w-full text-sm text-left">
-          <thead className="bg-gray-100 dark:bg-gray-800">
-            <tr className="text-gray-700 dark:text-gray-200">
-              <th className="p-3 border-b">Name</th>
-              <th className="p-3 border-b">Email</th>
-              <th className="p-3 border-b">Role</th>
-              <th className="p-3 border-b text-center">Actions</th>
+      <div className="w-full overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm bg-white dark:bg-gray-900">
+        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 text-sm">
+          <thead className="bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-semibold">
+            <tr>
+              <th className="px-4 py-3 text-left">Name</th>
+              <th className="px-4 py-3 text-left">Email</th>
+              <th className="px-4 py-3 text-left">Role</th>
+              <th className="px-4 py-3 text-center">Actions</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
             {users.length === 0 ? (
               <tr>
                 <td
                   colSpan={4}
-                  className="text-center text-gray-500 dark:text-gray-400 py-6"
+                  className="text-center py-6 text-gray-500 italic dark:text-gray-400"
                 >
                   No users found.
                 </td>
@@ -64,22 +64,23 @@ const UserTable = ({ users, roles, onSave, onDelete }: UserTableProps) => {
               users.map((user) => (
                 <tr
                   key={user.id}
-                  className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                  className="hover:bg-gray-50 dark:hover:bg-gray-800 transition"
                 >
-                  <td className="p-3 border-b text-gray-900 dark:text-gray-100">
+                  <td className="px-4 py-3 text-gray-900 dark:text-white">
                     {user.name}
                   </td>
-                  <td className="p-3 border-b text-gray-700 dark:text-gray-300">
+                  <td className="px-4 py-3 text-gray-700 dark:text-gray-300">
                     {user.email}
                   </td>
-                  <td className="p-3 border-b text-gray-700 dark:text-gray-300">
-                    {user.role?.name || '—'}
+                  <td className="px-4 py-3 text-gray-700 dark:text-gray-300">
+                    {user.role?.name || <span className="italic text-gray-400">–</span>}
                   </td>
-                  <td className="p-3 border-b text-center">
+                  <td className="px-4 py-3 text-center">
                     <div className="flex justify-center gap-2">
                       <button
                         onClick={() => handleEdit(user)}
-                        className="text-xs bg-yellow-500 hover:bg-yellow-600 text-white px-2 py-1 rounded"
+                        title="Edit"
+                        className="px-2 py-1 text-xs font-medium bg-yellow-500 hover:bg-yellow-600 text-white rounded"
                       >
                         Edit
                       </button>
@@ -89,7 +90,8 @@ const UserTable = ({ users, roles, onSave, onDelete }: UserTableProps) => {
                             onDelete(user.id);
                           }
                         }}
-                        className="text-xs bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded"
+                        title="Delete"
+                        className="px-2 py-1 text-xs font-medium bg-red-600 hover:bg-red-700 text-white rounded"
                       >
                         Delete
                       </button>

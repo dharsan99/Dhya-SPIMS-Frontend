@@ -17,6 +17,7 @@ const AttendanceHeaderStats: React.FC<Props> = ({
     queryKey: ['attendance', date],
     queryFn: () => fetchAttendanceByDate(date),
     enabled: !!date,
+    refetchOnWindowFocus: false
   });
 
   const attendanceMap: Record<string, AttendanceRow> = React.useMemo(() => {
@@ -57,8 +58,12 @@ const AttendanceHeaderStats: React.FC<Props> = ({
   const avgHours = presentCount > 0 ? totalHours / presentCount : 0;
 
   if (isLoading) {
-    return <div className="text-gray-500 text-sm">Loading stats...</div>;
-  }
+  return (
+    <div className="flex justify-center items-center h-24">
+      <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+    </div>
+  );
+}
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-4 gap-6 mb-8">

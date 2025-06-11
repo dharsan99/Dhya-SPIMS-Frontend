@@ -35,12 +35,16 @@ const UserAccess = () => {
   // ✅ Use useQuery to fetch roles
   const {
     data: roles = [],
+    isLoading: rolesLoading, // 👈 add this
     refetch: refetchRoles,
   } = useQuery({
     queryKey: ['roles'],
     queryFn: getRolesByTenant,
     select: (res) => res.data,
   });
+
+  console.log('roles', roles)
+
 
   // ✅ Use useQuery to fetch users
   const {
@@ -61,11 +65,12 @@ const UserAccess = () => {
   // ✅ Role Operations
   const handleSaveRole = async (data: { id?: string; name: string; permissions: Record<string, string[]> }) => {
     try {
+       const description = `This is description of ${data.name}`;
       if (data.id) {
         await updateRole(data.id, { name: data.name, permissions: data.permissions });
         toast.success('Role updated successfully');
       } else {
-        await createRole({ name: data.name, permissions: data.permissions, tenant_id: tenantId });
+        await createRole({ name: data.name, permissions: data.permissions, tenant_id: tenantId, description});
         toast.success('Role created successfully');
       }
       setIsRoleModalOpen(false);
@@ -149,6 +154,7 @@ const UserAccess = () => {
             setSelectedRole(null);
             setIsRoleModalOpen(true);
           }}
+          loading={rolesLoading}
         />
       </section>
 
@@ -175,6 +181,7 @@ const UserAccess = () => {
         }}
         onSave={handleSaveRole}
         roleToEdit={selectedRole}
+
       />
 
       {/* 🧑‍💻 User Modal */}

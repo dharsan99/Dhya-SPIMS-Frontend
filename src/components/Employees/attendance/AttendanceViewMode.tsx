@@ -12,21 +12,6 @@ const shiftMap = {
   ABSENT: { label: 'Absent', time: '--:--' },
 };
 
-// 🔹 Format INR currency
-
-
-// 🔹 Attendance status badge renderer
-const getStatusBadge = (status?: string) => {
-  switch (status) {
-    case 'PRESENT':
-      return <span className="text-green-600 font-semibold">✅ Present</span>;
-    case 'HALF_DAY':
-      return <span className="text-yellow-500 font-semibold">⚠️ Half Day</span>;
-    default:
-      return <span className="text-red-500 font-semibold">❌ Absent</span>;
-  }
-};
-
 const AttendanceViewMode: React.FC<AttendanceViewModeProps & { date: string }> = ({
   employees,
   pageStart,
@@ -55,63 +40,92 @@ const AttendanceViewMode: React.FC<AttendanceViewModeProps & { date: string }> =
   }, [date]);
 
   if (loading) {
-    return <div className="text-center py-10 text-sm text-gray-600">Loading attendance...</div>;
+    return (
+      <div className="w-full overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm bg-white dark:bg-gray-900">
+        <div className="text-center py-6 text-gray-500 italic dark:text-gray-400">
+          Loading attendance...
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="overflow-x-auto rounded-lg shadow border dark:border-gray-700">
-      <table className="min-w-full text-sm table-auto">
-        <thead className="bg-gray-100 dark:bg-gray-800 sticky top-0 z-10 text-gray-800 dark:text-gray-100 text-center">
-          <tr className="text-xs">
-            <th className="px-3 py-2 border">T.No</th>
-            <th className="px-3 py-2 border text-left">Employee</th>
-            <th className="px-3 py-2 border">Shift</th>
-            <th className="px-3 py-2 border">Time</th>
-            <th className="px-3 py-2 border">Overtime</th>
-            <th className="px-3 py-2 border">Total Hrs</th>
-            <th className="px-3 py-2 border">Work Days</th>
-            <th className="px-3 py-2 border">Wages</th>
-            <th className="px-3 py-2 border">Status</th>
+    <div className="w-full overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm bg-white dark:bg-gray-900">
+      <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 text-sm">
+        <thead className="bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-semibold sticky top-0 z-10">
+          <tr>
+            <th className="px-4 py-3 text-center">T.No</th>
+            <th className="px-4 py-3 text-left">Employee</th>
+            <th className="px-4 py-3 text-center">Shift</th>
+            <th className="px-4 py-3 text-center">Time</th>
+            <th className="px-4 py-3 text-center">Overtime</th>
+            <th className="px-4 py-3 text-center">Total Hrs</th>
+            <th className="px-4 py-3 text-center">Work Days</th>
+            <th className="px-4 py-3 text-center">Wages</th>
+            <th className="px-4 py-3 text-center">Status</th>
           </tr>
         </thead>
-        <tbody>
-          {employees.map((emp, idx) => {
-            const att = attendance[emp.id];
-            const isPresent = att?.status === 'PRESENT';
-            const overtime = att?.overtime_hours || 0;
-            const shiftKey = isPresent ? att.shift || 'SHIFT_1' : 'ABSENT';
-            const shift = shiftMap[shiftKey as keyof typeof shiftMap];
-            const totalHours = isPresent ? 8 + overtime : 0;
-            const workDays = isPresent ? 1 : 0;
-            const wageRate = emp.shift_rate ?? 0;
-            const wages = (totalHours / 8) * wageRate;
+        <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+          {employees.length > 0 ? (
+            employees.map((emp, idx) => {
+              const att = attendance[emp.id];
+              const isPresent = att?.status === 'PRESENT';
+              const overtime = att?.overtime_hours || 0;
+              const shiftKey = isPresent ? att.shift || 'SHIFT_1' : 'ABSENT';
+              const shift = shiftMap[shiftKey as keyof typeof shiftMap];
+              const totalHours = isPresent ? 8 + overtime : 0;
+              const workDays = isPresent ? 1 : 0;
+              const wageRate = emp.shift_rate ?? 0;
+              const wages = (totalHours / 8) * wageRate;
 
-            return (
-              <tr
-                key={emp.id}
-                className={`border-t dark:border-gray-700 ${
-                  idx % 2 === 0 ? 'bg-white dark:bg-gray-900' : 'bg-gray-50 dark:bg-gray-800'
-                }`}
-              >
-                <td className="px-3 py-2 text-center text-xs text-gray-700 dark:text-gray-200">
-                  {emp.token_no || pageStart + idx + 1}
-                </td>
-                <td
-                  className="px-3 py-2 font-medium text-gray-900 dark:text-white max-w-[200px] truncate"
-                  title={emp.name}
+              return (
+                <tr
+                  key={emp.id}
+                  className="hover:bg-gray-50 dark:hover:bg-gray-800 transition"
                 >
-                  {emp.name}
-                </td>
-                <td className="px-3 py-2 text-center">{shift.label}</td>
-                <td className="px-3 py-2 text-center">{shift.time}</td>
-                <td className="px-3 py-2 text-center">{overtime}</td>
-                <td className="px-3 py-2 text-center">{totalHours}</td>
-                <td className="px-3 py-2 text-center">{workDays}</td>
-                <td className="px-3 py-2 text-center">{formatINR(wages)}</td>
-                <td className="px-3 py-2 text-center">{getAttendenceStatusBadge(att?.status)}</td>
-              </tr>
-            );
-          })}
+                  <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-300">
+                    {emp.token_no || pageStart + idx + 1}
+                  </td>
+                  <td
+                    className="px-4 py-3 text-gray-900 dark:text-white max-w-[200px] truncate"
+                    title={emp.name}
+                  >
+                    {emp.name}
+                  </td>
+                  <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-300">
+                    {shift.label}
+                  </td>
+                  <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-300">
+                    {shift.time}
+                  </td>
+                  <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-300">
+                    {overtime}
+                  </td>
+                  <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-300">
+                    {totalHours}
+                  </td>
+                  <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-300">
+                    {workDays}
+                  </td>
+                  <td className="px-4 py-3 text-center text-blue-700 dark:text-blue-400">
+                    {formatINR(wages)}
+                  </td>
+                  <td className="px-4 py-3 text-center">
+                    {getAttendenceStatusBadge(att?.status)}
+                  </td>
+                </tr>
+              );
+            })
+          ) : (
+            <tr>
+              <td
+                colSpan={9}
+                className="text-center py-6 text-gray-500 italic dark:text-gray-400"
+              >
+                No employees found.
+              </td>
+            </tr>
+          )}
         </tbody>
       </table>
     </div>

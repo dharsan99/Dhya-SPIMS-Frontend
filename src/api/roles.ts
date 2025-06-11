@@ -13,6 +13,7 @@ export const getRoles = async (): Promise<Role[]> => {
 // 🔹 Create a new role
 export const createRole = (data: {
   name: string;
+  description?: string;
   tenant_id: string;
   permissions?: Record<string, string[]>;
 }) => api.post(endpoint, data);
