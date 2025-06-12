@@ -1,4 +1,4 @@
-import { Attendance } from '../../types/attendance';
+import { Attendance } from '../../../types/attendance';
 
 /**
  * 🔢 Total overtime hours from attendance records

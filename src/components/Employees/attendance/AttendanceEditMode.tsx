@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { AttendanceEditModeProps, ShiftType, shiftTimeMap } from './AttendanceTypes';
 import { markAttendance, fetchAttendanceByDate, MarkAttendancePayload } from '../../../api/attendance';
 import { TailwindDialog } from '../../ui/Dialog';
+import { useQueryClient } from '@tanstack/react-query';
 
 const AttendanceEditMode: React.FC<
   AttendanceEditModeProps & {
@@ -11,17 +12,23 @@ const AttendanceEditMode: React.FC<
 > = ({ employees, attendance, onTimeChange, onOvertimeChange, pageStart, date, onSubmitSuccess }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     const prefillAttendance = async () => {
       try {
         const records = await fetchAttendanceByDate(date);
-        records.forEach((rec: any) => {
-          onTimeChange(rec.employee_id, 'shift', rec.shift);
-          onTimeChange(rec.employee_id, 'in_time', shiftTimeMap[rec.shift as ShiftType]?.in_time || '');
-          onTimeChange(rec.employee_id, 'out_time', shiftTimeMap[rec.shift as ShiftType]?.out_time || '');
-          onOvertimeChange(rec.employee_id, rec.overtime_hours || 0);
-        });
+          records.forEach((rec: any) => {
+            const existing = attendance[rec.employee_id];
+            if (!existing?.shift || existing.shift === 'ABSENT') {
+              onTimeChange(rec.employee_id, 'shift', rec.shift);
+              onTimeChange(rec.employee_id, 'in_time', shiftTimeMap[rec.shift as ShiftType]?.in_time || '');
+              onTimeChange(rec.employee_id, 'out_time', shiftTimeMap[rec.shift as ShiftType]?.out_time || '');
+              onOvertimeChange(rec.employee_id, rec.overtime_hours || 0);
+            }
+          });
+
+        
       } catch (err) {
         console.error('❌ Failed to prefill attendance:', err);
       }
@@ -66,6 +73,7 @@ const AttendanceEditMode: React.FC<
       };
 
       await markAttendance(payload);
+      queryClient.invalidateQueries({ queryKey: ['attendance'] });
       setIsModalOpen(false);
       onSubmitSuccess?.();
     } catch (err) {
@@ -86,12 +94,12 @@ const AttendanceEditMode: React.FC<
         </button>
       </div>
 
-      <div className="overflow-x-auto rounded-lg shadow border dark:border-gray-700">
-        <table className="min-w-full text-sm table-auto">
+     <div className="overflow-x-auto rounded-lg shadow border dark:border-gray-700">
+  <table className="min-w-full text-sm border dark:border-gray-700">
           <thead className="bg-gray-100 dark:bg-gray-800 sticky top-0 z-10 text-center">
             <tr className="text-xs text-gray-700 dark:text-gray-200">
               <th className="px-3 py-2 border">T.No</th>
-              <th className="px-3 py-2 border text-left">Employee</th>
+              <th className="px-3 py-2 border text-left">Employees</th>
               <th className="px-3 py-2 border">Shift</th>
               <th className="px-3 py-2 border">Overtime</th>
               <th className="px-3 py-2 border">Total Hours</th>

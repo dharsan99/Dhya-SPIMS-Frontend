@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { getAllPurchaseOrders } from '../../api/purchaseOrders';
 import {
   PurchaseOrder,
@@ -7,30 +7,24 @@ import {
 import Loader from '../Loader';
 import PurchaseOrderTable from './PurchaseOrderTable';
 import UploadPurchaseOrderModal from './purchaseorders/UploadPurchaseOrderModal'; // ✅ Import
+import { useQuery } from '@tanstack/react-query';
 
 const PurchaseOrdersTab = () => {
-  const [orders, setOrders] = useState<PurchaseOrder[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [isModalOpen, setIsModalOpen] = useState(false); // ✅ modal state
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const fetchPurchaseOrders = async () => {
-    try {
-      setLoading(true);
-      const data = await getAllPurchaseOrders();
-      setOrders(Array.isArray(data) ? data : []);
-    } catch (err) {
-      console.error('Error fetching purchase orders:', err);
-      setOrders([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+ const {
+    data: orders = [],
+    isLoading,
+    isError,
+    refetch,
+  } = useQuery<PurchaseOrder[]>({
+    queryKey: ['purchaseOrders'],
+    queryFn: getAllPurchaseOrders,
+  });
 
-  useEffect(() => {
-    fetchPurchaseOrders();
-  }, []);
+  if (isLoading) return <Loader />;
+  if (isError) return <div className="text-red-500">Error loading purchase orders.</div>;
 
-  if (loading) return <Loader />;
 
   return (
     <div>
@@ -44,12 +38,12 @@ const PurchaseOrdersTab = () => {
         </button>
       </div>
 
-      <PurchaseOrderTable orders={orders} onRefresh={fetchPurchaseOrders} />
+      <PurchaseOrderTable orders={orders} onRefresh={refetch} />
 
       <UploadPurchaseOrderModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-          onParsed={fetchPurchaseOrders} // ✅ correct prop name
+          onParsed={refetch} // ✅ correct prop name
       />
     </div>
   );

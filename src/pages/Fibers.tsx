@@ -19,10 +19,11 @@ import FibreTransfersPanel from '../components/Fibers/FibreTransfersPanel';
 import FibersToolbar from '../components/Fibers/FibersToolbar';
 import FibersTable from '../components/Fibers/FibersTable';
 import { CreateFibreTransfer, FibreTransfer } from '../types/fibreTransfer';
+import FiberStocksPanel from '@/components/Fibers/FibreStocksPanel';
 
 const Fibers = () => {
   const queryClient = useQueryClient();
-  const [tab, setTab] = useState<'fibres' | 'categories' | 'suppliers' | 'transfers'>('fibres');
+  const [tab, setTab] = useState<'fibres' | 'categories' | 'suppliers' | 'transfers' | 'stock'>('fibres');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [fiberToEdit, setFiberToEdit] = useState<Fiber | null>(null);
   const [stockModalFibre, setStockModalFibre] = useState<Fiber | null>(null);
@@ -117,10 +118,10 @@ const Fibers = () => {
   }
 
   return (
-    <div className="p-6 transition-colors duration-300">
+    <div className="p-4 transition-colors duration-300">
       {/* Tab Buttons */}
-      <div className="flex border-b border-gray-200 dark:border-gray-700 mb-4">
-        {(['fibres', 'categories', 'suppliers', 'transfers'] as const).map((key) => (
+     <div className="flex border-b border-gray-200 dark:border-gray-700 mb-4">
+        {(['fibres', 'stock', 'categories', 'suppliers', 'transfers'] as const).map((key) => (
           <button
             key={key}
             onClick={() => setTab(key)}
@@ -138,6 +139,7 @@ const Fibers = () => {
       {/* Tab Content */}
       <div className="relative">
         {tab === 'categories' && <FibreCategoriesPanel />}
+        {tab === 'stock' && <FiberStocksPanel />}
         {tab === 'suppliers' && <FibreSuppliersPanel />}
         {tab === 'transfers' && (
           <FibreTransfersPanel

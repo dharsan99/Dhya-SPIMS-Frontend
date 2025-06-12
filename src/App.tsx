@@ -34,6 +34,7 @@ import DisclaimerPage from './pages/website/DisclaimerPage';
 import Employees from './pages/Employees';
 import Marketing from './pages/Marketing';
 
+
 function App() {
   const { setTheme } = useThemeStore();
 
@@ -46,7 +47,7 @@ function App() {
 
   return (
     <>
-      <Toaster position="top-right" />
+      <Toaster position="top-center" />
 
       <BrowserRouter>
         <Routes>

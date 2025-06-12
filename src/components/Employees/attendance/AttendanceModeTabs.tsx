@@ -19,7 +19,7 @@ const AttendanceModeTabs: React.FC<AttendanceModeTabsProps> = ({
   const isEditDisabled = range !== 'day';
 
   return (
-    <div className="flex justify-between items-center flex-wrap gap-4">
+    <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-8">
       {/* 👇 Range Tabs */}
       <div className="flex border rounded overflow-hidden bg-white dark:bg-gray-800 shadow-sm">
         {(['day', 'week', 'month'] as AttendanceRangeMode[]).map((r) => (

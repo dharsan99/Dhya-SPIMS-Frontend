@@ -1,5 +1,5 @@
 import React from 'react';
-import Button from '../ui/button'; // ✅ correct import for lowercase filename
+import Button from '../../ui/button'; // ✅ correct import for lowercase filename
 
 interface Props {
   onAutofillInTime: () => void;

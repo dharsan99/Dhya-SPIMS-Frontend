@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Role, User } from '../../../types/user';
+import Modal from '@/components/Modal';
 
 interface UserModalProps {
   isOpen: boolean;
@@ -33,117 +34,111 @@ const UserModal = ({ isOpen, onClose, onSave, userToEdit, roles }: UserModalProp
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-  
+
     if (!name.trim() || !email.trim() || !roleId) {
       alert('Name, Email, and Role are required.');
       return;
     }
-  
+
     if (userToEdit) {
-      // 🛠 Editing an existing user
       onSave({
-        id: userToEdit.id, // ✅ include ID
+        id: userToEdit.id,
         name: name.trim(),
         email: email.trim(),
         role_id: roleId,
         is_active: isActive,
       });
     } else {
-      // 🛠 Creating a new user
       onSave({
         name: name.trim(),
         email: email.trim(),
-        password: password.trim(), // ✅ password required for new users
+        password: password.trim(),
         role_id: roleId,
         is_active: isActive,
       });
     }
-  
+
     onClose();
   };
+
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-40 backdrop-blur-sm flex items-center justify-center z-50 transition">
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white dark:bg-gray-900 rounded-lg shadow-lg p-6 w-full max-w-md transition-colors"
-      >
-        <h2 className="text-lg font-semibold text-blue-700 dark:text-blue-400 mb-4">
+    <Modal onClose={onClose}>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <h2 className="text-lg font-semibold text-blue-700 dark:text-blue-400">
           {userToEdit ? 'Edit User' : 'Add User'}
         </h2>
 
-        <div className="space-y-4">
-          {/* Name */}
+        {/* Name */}
+        <div>
+          <label className="block text-sm mb-1 text-gray-700 dark:text-gray-300">Name</label>
+          <input
+            type="text"
+            className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+          />
+        </div>
+
+        {/* Email */}
+        <div>
+          <label className="block text-sm mb-1 text-gray-700 dark:text-gray-300">Email</label>
+          <input
+            type="email"
+            className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+        </div>
+
+        {/* Password – only when creating */}
+        {!userToEdit && (
           <div>
-            <label className="block text-sm mb-1 text-gray-700 dark:text-gray-300">Name</label>
+            <label className="block text-sm mb-1 text-gray-700 dark:text-gray-300">Password</label>
             <input
-              type="text"
+              type="password"
               className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               required
             />
           </div>
+        )}
 
-          {/* Email */}
-          <div>
-            <label className="block text-sm mb-1 text-gray-700 dark:text-gray-300">Email</label>
-            <input
-              type="email"
-              className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
+        {/* Role */}
+        <div>
+          <label className="block text-sm mb-1 text-gray-700 dark:text-gray-300">Role</label>
+          <select
+            className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            value={roleId}
+            onChange={(e) => setRoleId(e.target.value)}
+            required
+          >
+            <option value="">Select Role</option>
+            {roles.map((role) => (
+              <option key={role.id} value={role.id}>
+                {role.name}
+              </option>
+            ))}
+          </select>
+        </div>
 
-          {/* Password – only when creating */}
-          {!userToEdit && (
-            <div>
-              <label className="block text-sm mb-1 text-gray-700 dark:text-gray-300">Password</label>
-              <input
-                type="password"
-                className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
-          )}
-
-          {/* Role */}
-          <div>
-            <label className="block text-sm mb-1 text-gray-700 dark:text-gray-300">Role</label>
-            <select
-              className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={roleId}
-              onChange={(e) => setRoleId(e.target.value)}
-              required
-            >
-              <option value="">Select Role</option>
-              {roles.map((role) => (
-                <option key={role.id} value={role.id}>
-                  {role.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Active checkbox */}
-          <div className="flex items-center gap-2 mt-2">
-            <input
-              type="checkbox"
-              checked={isActive}
-              onChange={(e) => setIsActive(e.target.checked)}
-              className="accent-blue-600"
-            />
-            <label className="text-sm text-gray-700 dark:text-gray-300">Active</label>
-          </div>
+        {/* Active checkbox */}
+        <div className="flex items-center gap-2 mt-2">
+          <input
+            type="checkbox"
+            checked={isActive}
+            onChange={(e) => setIsActive(e.target.checked)}
+            className="accent-blue-600"
+          />
+          <label className="text-sm text-gray-700 dark:text-gray-300">Active</label>
         </div>
 
         {/* Actions */}
-        <div className="flex justify-end gap-3 mt-6">
+        <div className="flex justify-end gap-3 pt-4">
           <button
             type="button"
             onClick={onClose}
@@ -159,7 +154,7 @@ const UserModal = ({ isOpen, onClose, onSave, userToEdit, roles }: UserModalProp
           </button>
         </div>
       </form>
-    </div>
+    </Modal>
   );
 };
 
