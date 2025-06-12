@@ -1,5 +1,6 @@
 import React from 'react';
 import Select from 'react-select';
+import useAuthStore from '../../hooks/auth';
 
 interface FibersToolbarProps {
   searchTerm: string;
@@ -7,13 +8,13 @@ interface FibersToolbarProps {
   onSearchChange: (value: string) => void;
   onAddClick: () => void;
 
-  placeholder?: string; // Optional custom placeholder
-  buttonText?: string;  // Optional custom button label
+  placeholder?: string;
+  buttonText?: string;
 
-   filter?: string;
-   setFilter?: React.Dispatch<React.SetStateAction<string>>;
-   filterOptions?: string[];
-  }
+  filter?: string;
+  setFilter?: React.Dispatch<React.SetStateAction<string>>;
+  filterOptions?: string[];
+}
 
 const FibersToolbar: React.FC<FibersToolbarProps> = ({
   searchTerm,
@@ -26,11 +27,22 @@ const FibersToolbar: React.FC<FibersToolbarProps> = ({
   setFilter,
   filterOptions = [],
 }) => {
+  const hasPermission = useAuthStore((state) => state.hasPermission);
 
   const categoryOptions = filterOptions.map((cat) => ({
     label: cat,
     value: cat,
   }));
+
+  // Extract permission logic based on buttonText
+  let canShowButton = false;
+
+  if (buttonText.includes('Fiber')) {
+    canShowButton = hasPermission('Fibres', 'Add Fibre');
+  } else if (buttonText.includes('Stock')) {
+    canShowButton = true;
+  }
+
   return (
     <div className="flex flex-col lg:flex-row justify-between items-center mb-6 gap-4">
       <input
@@ -61,17 +73,17 @@ const FibersToolbar: React.FC<FibersToolbarProps> = ({
             />
           </div>
         )}
-        <button
-          onClick={onAddClick}
-          className="px-1 sm:px-4 py-2.5 sm:py-2.5 sm:py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition text-xs lg:text-sm"
-        >
-          {buttonText}
-        </button>
+        {canShowButton && (
+          <button
+            onClick={onAddClick}
+            className="px-1 sm:px-4 py-2.5 sm:py-2.5 sm:py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition text-xs lg:text-sm"
+          >
+            {buttonText}
+          </button>
+        )}
       </div>
-
     </div>
   );
 };
-
 
 export default FibersToolbar;

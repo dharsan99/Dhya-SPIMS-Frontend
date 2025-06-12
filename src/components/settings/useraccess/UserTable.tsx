@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { User, Role } from '../../../types/user';
 import UserModal from './UserModal';
+import Pagination from '@/components/Pagination';
+import { usePaginationStore } from '@/store/usePaginationStore';
 
 interface UserTableProps {
   users: User[];
@@ -12,6 +14,13 @@ interface UserTableProps {
 const UserTable = ({ users, roles, onSave, onDelete }: UserTableProps) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const { page, setPage, rowsPerPage, setRowsPerPage } = usePaginationStore();
+  
+
+  const paginatedUsers = useMemo(()=>{
+    const startIndex = (page - 1) * rowsPerPage;
+    return users.slice(startIndex, startIndex + rowsPerPage);
+  }, [users, page, rowsPerPage]);
 
   const handleAdd = () => {
     setSelectedUser(null);
@@ -61,7 +70,7 @@ const UserTable = ({ users, roles, onSave, onDelete }: UserTableProps) => {
                 </td>
               </tr>
             ) : (
-              users.map((user) => (
+            paginatedUsers.map((user) => (
                 <tr
                   key={user.id}
                   className="hover:bg-gray-50 dark:hover:bg-gray-800 transition"
@@ -111,6 +120,13 @@ const UserTable = ({ users, roles, onSave, onDelete }: UserTableProps) => {
         userToEdit={selectedUser}
         roles={roles}
       />
+      <Pagination
+          page={page}
+          setPage={setPage}
+          rowsPerPage={rowsPerPage}
+          setRowsPerPage={setRowsPerPage}
+          total={users.length}
+        />
     </section>
   );
 };

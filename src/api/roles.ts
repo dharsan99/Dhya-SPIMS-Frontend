@@ -5,7 +5,9 @@ const endpoint = '/roles';
 
 // 🔹 Get all roles for current tenant
 export const getAllRoles = () => api.get(endpoint);
-export const getRolesByTenant = () => api.get(endpoint);
+export const getRolesByTenant = (tenantId: string) => {
+  return api.get(`/roles?tenantId=${tenantId}`);
+};
 export const getRoles = async (): Promise<Role[]> => {
     const res = await api.get('/roles');
     return res.data;
@@ -31,8 +33,11 @@ export const updateRole = (
   data: Partial<{
     name: string;
     permissions: Record<string, string[]>;
+    description: string;
   }>
-) => api.put(`${endpoint}/${id}`, data);
+) => {
+  return api.put(endpoint, { id, ...data });
+};
 
   
-  export const deleteRole = (id: string) => api.delete(`${endpoint}/${id}`);
+export const deleteRole = (id: string) => api.delete(`${endpoint}?id=${id}`);

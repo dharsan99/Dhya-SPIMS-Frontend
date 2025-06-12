@@ -1,5 +1,6 @@
 import React from 'react';
 import { Fiber } from '../../types/fiber';
+import useAuthStore from '@/hooks/auth';
 
 interface FibersTableProps {
   fibers: Fiber[];
@@ -9,6 +10,11 @@ interface FibersTableProps {
 }
 
 const FibersTable: React.FC<FibersTableProps> = ({ fibers, onEdit, onStockUpdate, onDelete }) => {
+  const hasPermission = useAuthStore((state) => state.hasPermission);
+
+  const canUpdateFibre = hasPermission('Fibres', 'Update Fibre');
+  const canDeleteFibre = hasPermission('Fibres', 'Delete Fibre');
+
   return (
     <div className="w-full overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm bg-white dark:bg-gray-900">
       <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 text-sm">
@@ -52,27 +58,33 @@ const FibersTable: React.FC<FibersTableProps> = ({ fibers, onEdit, onStockUpdate
                 </td>
                 <td className="px-4 py-3 text-center">
                   <div className="flex justify-center gap-2">
-                    <button
-                      onClick={() => onEdit(fiber)}
-                      title="Edit"
-                      className="px-2 py-1 text-xs font-medium bg-yellow-500 hover:bg-yellow-600 text-white rounded"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => onStockUpdate(fiber)}
-                      title="Update Stock"
-                      className="px-2 py-1 text-xs font-medium bg-green-600 hover:bg-green-700 text-white rounded"
-                    >
-                      Stock
-                    </button>
-                    <button
-                      onClick={() => onDelete(fiber.id)}
-                      title="Delete"
-                      className="px-2 py-1 text-xs font-medium bg-red-600 hover:bg-red-700 text-white rounded"
-                    >
-                      Delete
-                    </button>
+                    {canUpdateFibre && (
+                      <button
+                        onClick={() => onEdit(fiber)}
+                        title="Edit"
+                        className="px-2 py-1 text-xs font-medium bg-yellow-500 hover:bg-yellow-600 text-white rounded"
+                      >
+                        Edit
+                      </button>
+                    )}
+                    {canUpdateFibre && (
+                      <button
+                        onClick={() => onStockUpdate(fiber)}
+                        title="Update Stock"
+                        className="px-2 py-1 text-xs font-medium bg-green-600 hover:bg-green-700 text-white rounded"
+                      >
+                        Stock
+                      </button>
+                    )}
+                    {canDeleteFibre && (
+                      <button
+                        onClick={() => onDelete(fiber.id)}
+                        title="Delete"
+                        className="px-2 py-1 text-xs font-medium bg-red-600 hover:bg-red-700 text-white rounded"
+                      >
+                        Delete
+                      </button>
+                    )}
                   </div>
                 </td>
               </tr>

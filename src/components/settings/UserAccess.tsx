@@ -35,15 +35,15 @@ const UserAccess = () => {
   // ✅ Use useQuery to fetch roles
   const {
     data: roles = [],
-    isLoading: rolesLoading, // 👈 add this
+    isLoading: rolesLoading,
     refetch: refetchRoles,
   } = useQuery({
-    queryKey: ['roles'],
-    queryFn: getRolesByTenant,
+    queryKey: ['roles', tenantId], // include tenantId for cache key
+    queryFn: () => getRolesByTenant(tenantId),
     select: (res) => res.data,
+    enabled: !!tenantId, // only run query if tenantId exists
   });
 
-  console.log('roles', roles)
 
 
   // ✅ Use useQuery to fetch users
@@ -67,7 +67,7 @@ const UserAccess = () => {
     try {
        const description = `This is description of ${data.name}`;
       if (data.id) {
-        await updateRole(data.id, { name: data.name, permissions: data.permissions });
+        await updateRole(data.id, { name: data.name, permissions: data.permissions, description: data.name, });
         toast.success('Role updated successfully');
       } else {
         await createRole({ name: data.name, permissions: data.permissions, tenant_id: tenantId, description});
@@ -141,7 +141,7 @@ const UserAccess = () => {
   return (
     <div className="space-y-10 transition-colors duration-300">
       {/* 🔐 Role Management */}
-      <section className="bg-white dark:bg-gray-900 p-6 rounded shadow">
+      <section className="bg-white dark:bg-gray-900 p-6 rounded">
         <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">Role Management</h2>
         <RoleTable
           roles={roles}
@@ -159,7 +159,7 @@ const UserAccess = () => {
       </section>
 
       {/* 👤 User Management */}
-      <section className="bg-white dark:bg-gray-900 p-6 rounded shadow">
+      <section className="bg-white dark:bg-gray-900 p-6 rounded">
         <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">User Management</h2>
         <UserTable
           users={users.map((u: any) => ({
