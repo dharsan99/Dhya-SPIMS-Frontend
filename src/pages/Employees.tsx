@@ -11,6 +11,7 @@ import {
   deleteEmployee,
 } from '../api/employees';
 import Loader from '../components/Loader';
+import useAuthStore from '@/hooks/auth';
 
 const Employees = () => {
   const [activeTab, setActiveTab] = useState<'employees' | 'attendance'>('attendance');
@@ -19,6 +20,8 @@ const Employees = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const hasPermission = useAuthStore((state) => state.hasPermission);
+  const canViewAttendance = hasPermission('Attendance', 'View Attendance'); 
 
   const fetchEmployees = async () => {
     try {
@@ -83,27 +86,30 @@ const Employees = () => {
 
       {/* Tab Switcher */}
       <div className="flex border-b mb-6 space-x-4">
-        <button
-          className={`pb-2 px-2 border-b-2 transition ${
-            activeTab === 'attendance'
-              ? 'border-blue-600 text-blue-600'
-              : 'border-transparent text-gray-500 dark:text-gray-400'
-          }`}
-          onClick={() => setActiveTab('attendance')}
-        >
-          Attendance
-        </button>
-        <button
-          className={`pb-2 px-2 border-b-2 transition ${
-            activeTab === 'employees'
-              ? 'border-blue-600 text-blue-600'
-              : 'border-transparent text-gray-500 dark:text-gray-400'
-          }`}
-          onClick={() => setActiveTab('employees')}
-        >
-          Employees
-        </button>
-      </div>
+  {canViewAttendance && (
+    <button
+      className={`pb-2 px-2 border-b-2 transition ${
+        activeTab === 'attendance'
+          ? 'border-blue-600 text-blue-600'
+          : 'border-transparent text-gray-500 dark:text-gray-400'
+      }`}
+      onClick={() => setActiveTab('attendance')}
+    >
+      Attendance
+    </button>
+  )}
+  <button
+    className={`pb-2 px-2 border-b-2 transition ${
+      activeTab === 'employees'
+        ? 'border-blue-600 text-blue-600'
+        : 'border-transparent text-gray-500 dark:text-gray-400'
+    }`}
+    onClick={() => setActiveTab('employees')}
+  >
+    Employees
+  </button>
+</div>
+
 
       {/* Tab Views */}
       {activeTab === 'employees' && (
@@ -114,7 +120,12 @@ const Employees = () => {
         />
       )}
 
-{activeTab === 'attendance' && <AttendanceTab />}
+{activeTab === 'attendance' && canViewAttendance && <AttendanceTab />}
+{activeTab === 'attendance' && !canViewAttendance && (
+  <div className="p-4 text-red-500 dark:text-red-400">
+    You do not have permission to view attendance.
+  </div>
+)}
       {/* Modal for Create/Edit Employee */}
       <EmployeeModal
         isOpen={modalOpen}

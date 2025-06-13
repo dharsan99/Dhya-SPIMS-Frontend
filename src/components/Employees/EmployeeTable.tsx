@@ -11,7 +11,7 @@ interface EmployeeTableProps {
 const EmployeeTable: React.FC<EmployeeTableProps> = ({ employees, onEdit, onDelete }) => {
   const hasPermission = useAuthStore((state) => state.hasPermission);
 
-  const canEdit = hasPermission('Employees', 'Edit Employee');
+  const canEdit = hasPermission('Employees', 'Update Employee');
   const canDelete = hasPermission('Employees', 'Delete Employee');
   const showActions = canEdit || canDelete;
 

@@ -13,4 +13,5 @@ export interface User {
   role?: Role;
   tenant_id?: string;
   is_active?: boolean;
+  user_roles?: any[]
 }
