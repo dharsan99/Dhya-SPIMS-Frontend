@@ -1,4 +1,3 @@
-import { NavLink } from 'react-router-dom';
 import {
   FiGrid,
   FiLayers,
@@ -9,11 +8,18 @@ import {
   FiMail,
 } from 'react-icons/fi';
 
+import { NavLink } from 'react-router-dom';
 import useAuthStore from '../hooks/auth';
 
 const Sidebar = ({ onLinkClick }: { onLinkClick?: () => void }) => {
-  const auth = useAuthStore();
-  const email = auth.user?.email || '';
+  const hasPermission = useAuthStore((state) => state.hasPermission);
+
+  // Permission checks
+  const canViewFibres = hasPermission('Fibres', 'View Fibre');
+  const canViewShades = hasPermission('Shades', 'Add Shade');
+  const canViewEmployees = hasPermission('Employees', 'View Employee');
+  const canViewMarketing = hasPermission('Marketing', 'View Marketing');
+  const canViewSettings = hasPermission('Settings', 'View Settings');
 
   const navLinkStyles =
     'flex items-center gap-3 px-4 py-2 rounded-lg transition-colors duration-200 text-sm font-medium';
@@ -40,8 +46,6 @@ const Sidebar = ({ onLinkClick }: { onLinkClick?: () => void }) => {
     </NavLink>
   );
 
-  const isOrderUser = email === 'orders@nscspinning.com';
-
   return (
     <aside className="w-64 fixed top-0 left-0 h-screen flex flex-col bg-white dark:bg-gray-900 border-r dark:border-gray-700 px-4 py-6 shadow-md transition-colors duration-300 overflow-y-auto z-50">
       {/* Logo */}
@@ -63,21 +67,21 @@ const Sidebar = ({ onLinkClick }: { onLinkClick?: () => void }) => {
           </div>
         </div>
 
-        {!isOrderUser && (
+        {(canViewFibres || canViewShades || canViewEmployees || canViewMarketing) && (
           <div>
             <h3 className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase px-2 mb-3 tracking-wide">
               Master Data
             </h3>
             <div className="flex flex-col gap-1">
-              {createNavLink('/app/fibers', 'Fibres', FiLayers)}
-              {createNavLink('/app/shades', 'Shades', FiMapPin)}
-              {createNavLink('/app/employees', 'Employees', FiUsers)}
-              {createNavLink('/app/marketing', 'Marketing', FiMail)}
+              {canViewFibres && createNavLink('/app/fibers', 'Fibres', FiLayers)}
+              {canViewShades && createNavLink('/app/shades', 'Shades', FiMapPin)}
+              {canViewEmployees && createNavLink('/app/employees', 'Employees', FiUsers)}
+              {canViewMarketing && createNavLink('/app/marketing', 'Marketing', FiMail)}
             </div>
           </div>
         )}
 
-        {!isOrderUser && (
+        {canViewSettings && (
           <div>
             <h3 className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase px-2 mb-3 tracking-wide">
               Configuration

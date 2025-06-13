@@ -7,6 +7,7 @@ import { Fiber } from '../types/fiber';
 import ShadeModal from '../components/ShadeModal';
 import toast from 'react-hot-toast';
 import Pagination from '../components/Pagination';
+import useAuthStore from '@/hooks/auth';
 
 const Shades = () => {
   const queryClient = useQueryClient();
@@ -17,6 +18,11 @@ const Shades = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [shadeToEdit, setShadeToEdit] = useState<ShadeWithBlendDescription | null>(null);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const hasPermission = useAuthStore((state) => state.hasPermission);
+
+  const canAddShade = hasPermission('Shades', 'Add Shade');
+  const canEditShade = hasPermission('Shades', 'Update Shade');
+  const canDeleteShade = hasPermission('Shades', 'Delete Shade');
 
   const { data: shadesRaw } = useQuery({ queryKey: ['shades'], queryFn: getAllShades });
   const { data: fibres = [] } = useQuery<Fiber[]>({ queryKey: ['fibres'], queryFn: getAllFibers });
@@ -130,15 +136,17 @@ const Shades = () => {
               setCurrentPage(1);
             }}
           />
-          <button
-            onClick={() => {
-              setIsModalOpen(true);
-              setShadeToEdit(null);
-            }}
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
-          >
-            ➕ Add Shade
-          </button>
+         {canAddShade && (
+            <button
+              onClick={() => {
+                setIsModalOpen(true);
+                setShadeToEdit(null);
+              }}
+              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+            >
+              ➕ Add Shade
+            </button>
+          )}
         </div>
       </div>
 
@@ -177,26 +185,31 @@ const Shades = () => {
                   ))}
                 </td>
                 <td className="p-3 space-x-2">
-                  <button
-                    className="px-2 py-1 text-xs bg-yellow-500 text-white rounded hover:bg-yellow-600"
-                    onClick={() => {
-                      setShadeToEdit(shade);
-                      setIsModalOpen(true);
-                    }}
-                  >
-                    Edit
-                  </button>
-                  <button
-                    className="px-2 py-1 text-xs bg-red-600 text-white rounded hover:bg-red-700"
-                    onClick={() => {
-                      if (confirm(`Are you sure you want to delete ${shade.shade_code}?`)) {
-                        deleteMutation.mutate(shade.id);
-                      }
-                    }}
-                  >
-                    Delete
-                  </button>
+                  {canEditShade && (
+                    <button
+                      className="px-2 py-1 text-xs bg-yellow-500 text-white rounded hover:bg-yellow-600"
+                      onClick={() => {
+                        setShadeToEdit(shade);
+                        setIsModalOpen(true);
+                      }}
+                    >
+                      Edit
+                    </button>
+                  )}
+                  {canDeleteShade && (
+                    <button
+                      className="px-2 py-1 text-xs bg-red-600 text-white rounded hover:bg-red-700"
+                      onClick={() => {
+                        if (confirm(`Are you sure you want to delete ${shade.shade_code}?`)) {
+                          deleteMutation.mutate(shade.id);
+                        }
+                      }}
+                    >
+                      Delete
+                    </button>
+                  )}
                 </td>
+
               </tr>
             ))}
             {paginated.length === 0 && (

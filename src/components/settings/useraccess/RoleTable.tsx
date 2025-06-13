@@ -1,4 +1,7 @@
+import { useState } from 'react';
 import { Role } from '../../../types/user';
+import Pagination from '@/components/Pagination';
+import { usePaginationStore } from '@/store/usePaginationStore';
 
 interface RoleTableProps {
   roles: Role[];
@@ -9,6 +12,13 @@ interface RoleTableProps {
 }
 
 const RoleTable = ({ roles, onEdit, onDelete, onAdd, loading }: RoleTableProps) => {
+  const [expandedRoleId, setExpandedRoleId] = useState<string | null>(null);
+  const { page, setPage, rowsPerPage, setRowsPerPage } = usePaginationStore();
+
+  const startIndex = (page - 1) * rowsPerPage;
+    const endIndex = startIndex + rowsPerPage;
+    const paginatedRoles = roles.slice(startIndex, endIndex);
+
   return (
     <section className="space-y-6">
       <div className="flex justify-between items-center">
@@ -34,11 +44,13 @@ const RoleTable = ({ roles, onEdit, onDelete, onAdd, loading }: RoleTableProps) 
             {loading ? (
               <tr>
                 <td colSpan={3} className="text-center py-6 text-gray-500 italic dark:text-gray-400">
-                  Loading roles...
+                <div className="flex justify-center items-center h-24">
+                  <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                </div>
                 </td>
               </tr>
             ) : roles.length > 0 ? (
-              roles.map((role) => (
+              paginatedRoles.map((role) => (
                 <tr
                   key={role.id}
                   className="hover:bg-gray-50 dark:hover:bg-gray-800 transition"
@@ -47,23 +59,42 @@ const RoleTable = ({ roles, onEdit, onDelete, onAdd, loading }: RoleTableProps) 
                     {role.name}
                   </td>
                   <td className="px-4 py-3">
-                    <div className="space-y-2">
-                      {Object.entries(role.permissions).map(([feature, perms]) => (
-                        <div key={feature}>
-                          <div className="font-medium text-gray-800 dark:text-gray-200 mb-1">{feature}</div>
-                          <div className="flex flex-wrap gap-1">
-                            {perms.map((perm) => (
-                              <span
-                                key={perm}
-                                className="inline-block bg-blue-100 text-blue-800 text-xs font-medium px-2 py-0.5 rounded dark:bg-blue-900 dark:text-blue-100"
-                              >
-                                {perm}
-                              </span>
-                            ))}
-                          </div>
+                    {(() => {
+                      const entries = Object.entries(role.permissions);
+                      const isExpanded = expandedRoleId === role.id;
+                      const visibleEntries = isExpanded ? entries : entries.slice(0, 2);
+                      
+                      return (
+                        <div className="space-y-2">
+                          {visibleEntries.map(([feature, perms]) => (
+                            <div key={feature}>
+                              <div className="font-medium text-gray-800 dark:text-gray-200 mb-1">{feature}</div>
+                              <div className="flex flex-wrap gap-3">
+                                {perms.map((perm) => (
+                                  <span
+                                    key={perm}
+                                    className="inline-block bg-blue-100 text-blue-800 text-xs font-medium px-2 py-0.5 rounded dark:bg-blue-900 dark:text-blue-100"
+                                  >
+                                    {perm}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          ))}
+
+                          {entries.length > 2 && (
+                            <button
+                              className="text-blue-600 hover:underline text-xs mt-1"
+                              onClick={() =>
+                                setExpandedRoleId(isExpanded ? null : role.id)
+                              }
+                            >
+                              {isExpanded ? 'See less' : `+${entries.length - 2} more`}
+                            </button>
+                          )}
                         </div>
-                      ))}
-                    </div>
+                      );
+                    })()}
                   </td>
                   <td className="px-4 py-3 text-center">
                     <div className="flex justify-center gap-2">
@@ -99,6 +130,13 @@ const RoleTable = ({ roles, onEdit, onDelete, onAdd, loading }: RoleTableProps) 
           </tbody>
         </table>
       </div>
+      <Pagination
+          page={page}
+          setPage={setPage}
+          rowsPerPage={rowsPerPage}
+          setRowsPerPage={setRowsPerPage}
+          total={roles.length}
+        />
     </section>
   );
 };

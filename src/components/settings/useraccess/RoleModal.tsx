@@ -29,13 +29,22 @@ const FEATURES = [
     name: 'Buyers',
     subPermissions: ['Add Buyer', 'Update Buyer', 'Delete Buyer'],
   },
+
+  {
+    name: 'Employees',
+    subPermissions: ['Add Employee', 'Update Employee', 'Delete Employee'],
+  },
+  {
+    name: 'Attendence',
+    subPermissions: ['Add Attendence', 'Update Attendence', 'Delete Attendence'],
+  },
   {
     name: 'Suppliers',
     subPermissions: ['Add Supplier', 'Update Supplier', 'Delete Supplier'],
   },
   {
     name: 'Settings',
-    subPermissions: ['Access Settings'],
+    subPermissions: ['View Settings', 'Add Settings', 'Update Settings', 'Delete Settings'],
   },
 ];
 
