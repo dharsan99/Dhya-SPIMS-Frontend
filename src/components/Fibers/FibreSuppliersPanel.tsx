@@ -5,11 +5,15 @@ import { Supplier } from '../../types/supplier';
 import toast from 'react-hot-toast';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { createSupplier, updateSupplier } from '../../api/suppliers';
+import useAuthStore from '@/hooks/auth';
 
 const FibreSuppliersPanel: React.FC = () => {
   const queryClient = useQueryClient();
   const [isSupplierModalOpen, setIsSupplierModalOpen] = useState(false);
   const [supplierToEdit, setSupplierToEdit] = useState<Supplier | null>(null);
+
+  const hasPermission = useAuthStore((state) => state.hasPermission);
+  const canAdd = hasPermission('Suppliers', 'Add Supplier'); // 👈 Permission check
 
   const createMutation = useMutation({
     mutationFn: createSupplier,
@@ -44,17 +48,19 @@ const FibreSuppliersPanel: React.FC = () => {
 
   return (
     <>
-      <div className="flex justify-end mb-4">
-        <button
-          onClick={() => {
-            setIsSupplierModalOpen(true);
-            setSupplierToEdit(null);
-          }}
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
-        >
-          + Add Supplier
-        </button>
-      </div>
+     {canAdd && (
+        <div className="flex justify-end mb-4">
+          <button
+            onClick={() => {
+              setIsSupplierModalOpen(true);
+              setSupplierToEdit(null);
+            }}
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+          >
+            + Add Supplier
+          </button>
+        </div>
+      )}
       <SupplierTable
         onEdit={(supplier) => {
           setSupplierToEdit(supplier);

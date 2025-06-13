@@ -3,6 +3,7 @@ import { User, Role } from '../../../types/user';
 import UserModal from './UserModal';
 import Pagination from '@/components/Pagination';
 import { usePaginationStore } from '@/store/usePaginationStore';
+import useAuthStore from '@/hooks/auth';
 
 interface UserTableProps {
   users: User[];
@@ -15,7 +16,13 @@ const UserTable = ({ users, roles, onSave, onDelete }: UserTableProps) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const { page, setPage, rowsPerPage, setRowsPerPage } = usePaginationStore();
-  
+  const hasPermission = useAuthStore((state) => state.hasPermission);
+    const canAdd = hasPermission('Users', 'Add User');
+    const canEdit = hasPermission('Users', 'Update User');
+    const canDelete = hasPermission('Users', 'Delete User');
+    const showActions = canEdit || canDelete;
+      
+    console.log('users', users)
 
   const paginatedUsers = useMemo(()=>{
     const startIndex = (page - 1) * rowsPerPage;
@@ -41,12 +48,14 @@ const UserTable = ({ users, roles, onSave, onDelete }: UserTableProps) => {
     <section className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-lg font-semibold text-blue-700 dark:text-blue-400">Users</h2>
-        <button
-          onClick={handleAdd}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
-        >
-          Add User
-        </button>
+        {canAdd && (
+            <button
+              onClick={handleAdd}
+              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+            >
+              Add User
+            </button>
+          )}
       </div>
 
       <div className="w-full overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm bg-white dark:bg-gray-900">
@@ -56,7 +65,10 @@ const UserTable = ({ users, roles, onSave, onDelete }: UserTableProps) => {
               <th className="px-4 py-3 text-left">Name</th>
               <th className="px-4 py-3 text-left">Email</th>
               <th className="px-4 py-3 text-left">Role</th>
-              <th className="px-4 py-3 text-center">Actions</th>
+              {showActions && (
+                <th className="px-4 py-3 text-center">Actions</th>
+              )}
+
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
@@ -82,30 +94,36 @@ const UserTable = ({ users, roles, onSave, onDelete }: UserTableProps) => {
                     {user.email}
                   </td>
                   <td className="px-4 py-3 text-gray-700 dark:text-gray-300">
-                    {user.role?.name || <span className="italic text-gray-400">–</span>}
+                    {user.user_roles?.[0]?.role?.name || <span className="italic text-gray-400">–</span>}
                   </td>
+                  {showActions && (
                   <td className="px-4 py-3 text-center">
                     <div className="flex justify-center gap-2">
-                      <button
-                        onClick={() => handleEdit(user)}
-                        title="Edit"
-                        className="px-2 py-1 text-xs font-medium bg-yellow-500 hover:bg-yellow-600 text-white rounded"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => {
-                          if (confirm('Are you sure you want to delete this user?')) {
-                            onDelete(user.id);
-                          }
-                        }}
-                        title="Delete"
-                        className="px-2 py-1 text-xs font-medium bg-red-600 hover:bg-red-700 text-white rounded"
-                      >
-                        Delete
-                      </button>
+                      {canEdit && (
+                        <button
+                          onClick={() => handleEdit(user)}
+                          title="Edit"
+                          className="px-2 py-1 text-xs font-medium bg-yellow-500 hover:bg-yellow-600 text-white rounded"
+                        >
+                          Edit
+                        </button>
+                      )}
+                      {canDelete && (
+                        <button
+                          onClick={() => {
+                            if (confirm('Are you sure you want to delete this user?')) {
+                              onDelete(user.id);
+                            }
+                          }}
+                          title="Delete"
+                          className="px-2 py-1 text-xs font-medium bg-red-600 hover:bg-red-700 text-white rounded"
+                        >
+                          Delete
+                        </button>
+                      )}
                     </div>
                   </td>
+                )}
                 </tr>
               ))
             )}

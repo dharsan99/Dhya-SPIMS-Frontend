@@ -14,6 +14,7 @@ const FibersTable: React.FC<FibersTableProps> = ({ fibers, onEdit, onStockUpdate
 
   const canUpdateFibre = hasPermission('Fibres', 'Update Fibre');
   const canDeleteFibre = hasPermission('Fibres', 'Delete Fibre');
+  const showActions = canUpdateFibre || canDeleteFibre;
 
   return (
     <div className="w-full overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm bg-white dark:bg-gray-900">
@@ -29,7 +30,9 @@ const FibersTable: React.FC<FibersTableProps> = ({ fibers, onEdit, onStockUpdate
             <th className="px-4 py-3 text-center">Consumed</th>
             <th className="px-4 py-3 text-left">Description</th>
             <th className="px-4 py-3 text-left">Category</th>
+            {showActions &&
             <th className="px-4 py-3 text-center">Actions</th>
+          }
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
@@ -56,7 +59,8 @@ const FibersTable: React.FC<FibersTableProps> = ({ fibers, onEdit, onStockUpdate
                     <span className="italic text-gray-400 dark:text-gray-500">Uncategorized</span>
                   )}
                 </td>
-                <td className="px-4 py-3 text-center">
+                {showActions && ( 
+                  <td className="px-4 py-3 text-center">
                   <div className="flex justify-center gap-2">
                     {canUpdateFibre && (
                       <button
@@ -87,6 +91,7 @@ const FibersTable: React.FC<FibersTableProps> = ({ fibers, onEdit, onStockUpdate
                     )}
                   </div>
                 </td>
+                )}
               </tr>
             ))
           ) : (

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Role } from '../../../types/user';
 import Pagination from '@/components/Pagination';
-import { usePaginationStore } from '@/store/usePaginationStore';
+import useAuthStore from '@/hooks/auth';
 
 interface RoleTableProps {
   roles: Role[];
@@ -13,7 +13,13 @@ interface RoleTableProps {
 
 const RoleTable = ({ roles, onEdit, onDelete, onAdd, loading }: RoleTableProps) => {
   const [expandedRoleId, setExpandedRoleId] = useState<string | null>(null);
-  const { page, setPage, rowsPerPage, setRowsPerPage } = usePaginationStore();
+  const [page, setPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const hasPermission = useAuthStore((state) => state.hasPermission);
+  const canEdit = hasPermission('Roles', 'Update Role');
+  const canDelete = hasPermission('Roles', 'Delete Role');
+  const canAdd = hasPermission('Roles', 'Add Role');
+  const showActions = canEdit || canDelete;
 
   const startIndex = (page - 1) * rowsPerPage;
     const endIndex = startIndex + rowsPerPage;
@@ -23,12 +29,14 @@ const RoleTable = ({ roles, onEdit, onDelete, onAdd, loading }: RoleTableProps) 
     <section className="space-y-6">
       <div className="flex justify-between items-center">
         <h3 className="text-lg font-semibold text-blue-700 dark:text-blue-400">Roles</h3>
-        <button
-          onClick={onAdd}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition"
+        {canAdd && (
+          <button
+            onClick={onAdd}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition"
         >
           Add Role
         </button>
+        )}
       </div>
 
       <div className="w-full overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm bg-white dark:bg-gray-900">
@@ -37,7 +45,9 @@ const RoleTable = ({ roles, onEdit, onDelete, onAdd, loading }: RoleTableProps) 
             <tr>
               <th className="px-4 py-3 text-left">Role Name</th>
               <th className="px-4 py-3 text-left">Permissions</th>
-              <th className="px-4 py-3 text-center">Actions</th>
+              {showActions && (
+                <th className="px-4 py-3 text-center">Actions</th>
+              )}
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
@@ -96,28 +106,34 @@ const RoleTable = ({ roles, onEdit, onDelete, onAdd, loading }: RoleTableProps) 
                       );
                     })()}
                   </td>
-                  <td className="px-4 py-3 text-center">
-                    <div className="flex justify-center gap-2">
-                      <button
-                        onClick={() => onEdit(role)}
-                        title="Edit"
-                        className="px-2 py-1 text-xs font-medium bg-yellow-500 hover:bg-yellow-600 text-white rounded"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => {
-                          if (confirm(`Delete role "${role.name}"?`)) {
-                            onDelete(role.id);
-                          }
-                        }}
-                        title="Delete"
-                        className="px-2 py-1 text-xs font-medium bg-red-600 hover:bg-red-700 text-white rounded"
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </td>
+                  {showActions && (
+                      <td className="px-4 py-3 text-center">
+                        <div className="flex justify-center gap-2">
+                          {canEdit && (
+                            <button
+                              onClick={() => onEdit(role)}
+                              title="Edit"
+                              className="px-2 py-1 text-xs font-medium bg-yellow-500 hover:bg-yellow-600 text-white rounded"
+                            >
+                              Edit
+                            </button>
+                          )}
+                          {canDelete && (
+                            <button
+                              onClick={() => {
+                                if (confirm(`Delete role "${role.name}"?`)) {
+                                  onDelete(role.id);
+                                }
+                              }}
+                              title="Delete"
+                              className="px-2 py-1 text-xs font-medium bg-red-600 hover:bg-red-700 text-white rounded"
+                            >
+                              Delete
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    )}
                 </tr>
               ))
             ) : (

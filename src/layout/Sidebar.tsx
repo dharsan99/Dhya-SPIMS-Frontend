@@ -16,7 +16,7 @@ const Sidebar = ({ onLinkClick }: { onLinkClick?: () => void }) => {
 
   // Permission checks
   const canViewFibres = hasPermission('Fibres', 'View Fibre');
-  const canViewShades = hasPermission('Shades', 'Add Shade');
+  const canViewShades = hasPermission('Shades', 'View Shade');
   const canViewEmployees = hasPermission('Employees', 'View Employee');
   const canViewMarketing = hasPermission('Marketing', 'View Marketing');
   const canViewSettings = hasPermission('Settings', 'View Settings');

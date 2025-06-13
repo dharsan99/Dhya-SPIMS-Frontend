@@ -92,14 +92,15 @@ const { dates, weekDates, monthDates } = useAttendanceDates(rangeMode, date);
             total_hours: 0,
             status: 'ABSENT',
           });
-        } else {
+        } } else if (value && shiftTimeMap[value as ShiftType]) {
           const { in_time, out_time } = shiftTimeMap[value as ShiftType];
           updated.in_time = in_time;
           updated.out_time = out_time;
           updated.total_hours = 8 + (updated.overtime_hours || 0);
           updated.status = 'PRESENT';
+        } else {
+          console.warn(`Invalid shift value: ${value}`);
         }
-      }
 
       if (field === 'in_time' || field === 'out_time') {
         const inTime = field === 'in_time' ? value : updated.in_time;

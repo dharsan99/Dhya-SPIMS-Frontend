@@ -20,6 +20,7 @@ import FibersToolbar from '../components/Fibers/FibersToolbar';
 import FibersTable from '../components/Fibers/FibersTable';
 import { CreateFibreTransfer, FibreTransfer } from '../types/fibreTransfer';
 import FiberStocksPanel from '@/components/Fibers/FibreStocksPanel';
+import useAuthStore from '@/hooks/auth';
 
 const Fibers = () => {
   const queryClient = useQueryClient();
@@ -31,6 +32,11 @@ const Fibers = () => {
   const [search, setSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const hasPermission = useAuthStore((state) => state.hasPermission); // 👈 get permission checker
+
+  const canViewSuppliers = hasPermission('Suppliers', 'View Supplier');
+  const canViewStocks = hasPermission('Stocks', 'View Stock');
+    // 👈 permission check
 
   const { data: fibres = [], isLoading: loadingFibres } = useQuery<Fiber[]>({
     queryKey: ['fibres'],
@@ -139,8 +145,18 @@ const Fibers = () => {
       {/* Tab Content */}
       <div className="relative">
         {tab === 'categories' && <FibreCategoriesPanel />}
-        {tab === 'stock' && <FiberStocksPanel />}
-        {tab === 'suppliers' && <FibreSuppliersPanel />}
+        {tab === 'stock' && canViewStocks && <FiberStocksPanel />}
+        {tab === 'stock' && !canViewStocks && (
+          <div className="p-4 text-red-500 dark:text-red-400">
+            You do not have permission to view stocks.
+          </div>
+        )}
+        {tab === 'suppliers' && canViewSuppliers && <FibreSuppliersPanel />}
+          {tab === 'suppliers' && !canViewSuppliers && (
+            <div className="p-4 text-red-500 dark:text-red-400">
+              You do not have permission to view suppliers.
+            </div>
+          )}
         {tab === 'transfers' && (
           <FibreTransfersPanel
             fibres={fibres}

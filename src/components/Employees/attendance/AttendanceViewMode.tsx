@@ -71,8 +71,8 @@ const AttendanceViewMode: React.FC<AttendanceViewModeProps & { date: string }> =
               const att = attendance[emp.id];
               const isPresent = att?.status === 'PRESENT';
               const overtime = att?.overtime_hours || 0;
-              const shiftKey = isPresent ? att.shift || 'SHIFT_1' : 'ABSENT';
-              const shift = shiftMap[shiftKey as keyof typeof shiftMap];
+              const rawShiftKey = isPresent ? att?.shift ?? 'SHIFT_1' : 'ABSENT';
+              const shift = shiftMap[rawShiftKey as keyof typeof shiftMap] ?? shiftMap['ABSENT'];
               const totalHours = isPresent ? 8 + overtime : 0;
               const workDays = isPresent ? 1 : 0;
               const wageRate = emp.shift_rate ?? 0;
@@ -93,7 +93,7 @@ const AttendanceViewMode: React.FC<AttendanceViewModeProps & { date: string }> =
                     {emp.name}
                   </td>
                   <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-300">
-                    {shift.label}
+                    {shift?.label}
                   </td>
                   <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-300">
                     {shift.time}
