@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { AttendanceEditModeProps, ShiftType, shiftTimeMap } from './AttendanceTypes';
-import { markAttendance, fetchAttendanceByDate, MarkAttendancePayload } from '../../../api/attendance';
+import { markAttendance, fetchAttendanceByDate, MarkAttendancePayload, markSingleAttendance } from '../../../api/attendance';
 import { TailwindDialog } from '../../ui/Dialog';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -27,8 +27,6 @@ const AttendanceEditMode: React.FC<
               onOvertimeChange(rec.employee_id, rec.overtime_hours || 0);
             }
           });
-
-        
       } catch (err) {
         console.error('❌ Failed to prefill attendance:', err);
       }
@@ -85,17 +83,9 @@ const AttendanceEditMode: React.FC<
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-end">
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="px-4 py-2 mt-2 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded shadow"
-        >
-          Update Attendance
-        </button>
-      </div>
 
      <div className="overflow-x-auto rounded-lg shadow border dark:border-gray-700">
-  <table className="min-w-full text-sm border dark:border-gray-700">
+     <table className="min-w-full text-sm border dark:border-gray-700">
           <thead className="bg-gray-100 dark:bg-gray-800 sticky top-0 z-10 text-center">
             <tr className="text-xs text-gray-700 dark:text-gray-200">
               <th className="px-3 py-2 border">T.No</th>
@@ -105,6 +95,7 @@ const AttendanceEditMode: React.FC<
               <th className="px-3 py-2 border">Total Hours</th>
               <th className="px-3 py-2 border">Work Days</th>
               <th className="px-3 py-2 border">Status</th>
+              <th className="px-3 py-2 border">Action</th> 
             </tr>
           </thead>
           <tbody>
@@ -143,6 +134,43 @@ const AttendanceEditMode: React.FC<
                   <td className="px-3 py-2 text-center">{totalHours}</td>
                   <td className="px-3 py-2 text-center">{isPresent ? 1 : 0}</td>
                   <td className="px-3 py-2 text-center">{isPresent ? '✅' : '❌'}</td>
+                  <td className="px-3 py-2 text-center">
+                      <button
+                        className="px-2 py-1 text-sm bg-green-600 hover:bg-green-700 text-white rounded"
+                        onClick={async () => {
+                          const att = attendance[emp.id];
+                          if (!att || att.shift === 'ABSENT') {
+                            alert('Cannot update attendance for absent employees.');
+                            return;
+                          }
+                        
+                          try {
+                            // Combine date and time strings and convert to ISO
+                            const inDateTime = new Date(`${date}T${att.in_time}:00Z`);
+                            const outDateTime = new Date(`${date}T${att.out_time}:00Z`);
+                        
+                            const payload = {
+                              date,
+                              employee_id: emp.id,
+                              in_time: inDateTime.toISOString(),
+                              out_time: outDateTime.toISOString(),
+                              overtime_hours: att.overtime_hours || 0,
+                              status: 'PRESENT' as const, // explicitly cast to match the type
+                              shift: att.shift,
+                            };
+                        
+                            await markSingleAttendance(payload);
+                            alert(`✅ Attendance updated for ${emp.name}`);
+                            queryClient.invalidateQueries({ queryKey: ['attendance'] });
+                          } catch (error) {
+                            console.error('❌ Failed to update single attendance:', error);
+                            alert('Failed to update attendance');
+                          }
+                        }}
+                      >
+                        Update
+                      </button>
+                    </td>
                 </tr>
               );
             })}
