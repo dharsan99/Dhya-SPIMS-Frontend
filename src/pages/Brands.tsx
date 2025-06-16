@@ -20,8 +20,6 @@ const Brands = () => {
     try {
       const response = await getBrands();
       setBrands(response.data);
-    } catch (err) {
-      console.error("Error fetching brands:", err);
     } finally {
       setLoading(false);
     }

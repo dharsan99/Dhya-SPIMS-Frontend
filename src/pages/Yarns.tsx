@@ -53,8 +53,6 @@ const YarnsPage = () => {
   const fetchData = async () => {
     try {
       await Promise.all([fetchYarns(), fetchYarnTypes(), fetchBlends()]);
-    } catch (err) {
-      console.error('Error loading data:', err);
     } finally {
       setLoading(false);
     }

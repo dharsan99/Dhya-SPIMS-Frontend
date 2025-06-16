@@ -23,7 +23,6 @@ export const getEmployeeById = async (id: string): Promise<Employee> => {
  * ✅ Create new employee
  */
 export const createEmployee = (data: Omit<Employee, 'id'>) => {
-  console.log('📤 Creating employee:', data);
   return api.post(endpoint, data);
 };
 
@@ -31,7 +30,6 @@ export const createEmployee = (data: Omit<Employee, 'id'>) => {
  * ✅ Update existing employee
  */
 export const updateEmployee = (id: string, data: Partial<Omit<Employee, 'id'>>) => {
-  console.log(`🛠️ Updating employee ${id}:`, data);
   return api.put(`${endpoint}/${id}`, data);
 };
 
@@ -39,6 +37,5 @@ export const updateEmployee = (id: string, data: Partial<Omit<Employee, 'id'>>) 
  * ✅ Delete employee
  */
 export const deleteEmployee = (id: string) => {
-  console.log(`🗑️ Deleting employee ${id}`);
   return api.delete(`${endpoint}/${id}`);
 };

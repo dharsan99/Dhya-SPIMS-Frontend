@@ -41,7 +41,6 @@ const AttendanceWeeklyTable: React.FC<Props> = ({
             newMap[date][row.employee_id] = row;
           });
         } catch (err) {
-          console.error(`❌ Error fetching attendance for ${date}:`, err);
           newMap[date] = {};
         }
       }

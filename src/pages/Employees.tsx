@@ -25,7 +25,7 @@ const Employees = () => {
       const res = await getAllEmployees();
       setEmployees(res);
     } catch (err) {
-      console.error('Error fetching employees:', err);
+      // ... removed all console.error ...
     } finally {
       setLoading(false);
     }
@@ -49,7 +49,7 @@ const Employees = () => {
       }
       await fetchEmployees();
     } catch (err) {
-      console.error('Error saving employee:', err);
+      // ... removed all console.error ...
     } finally {
       setModalOpen(false);
     }
@@ -147,7 +147,7 @@ const Employees = () => {
                     setConfirmDeleteId(null);
                     await fetchEmployees();
                   } catch (err) {
-                    console.error('Failed to delete:', err);
+                    // ... removed all console.error ...
                   }
                 }}
                 className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"

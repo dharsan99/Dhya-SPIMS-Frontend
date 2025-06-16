@@ -10,6 +10,7 @@ import EfficiencyInsights from './orderprogress/EfficiencyInsights';
 import ExportButtons from './orderprogress/ExportButtons';
 
 import { getAllOrders, getOrderProgressDetails } from '../../api/orders';
+import { Order } from '../../types/order';
 
 const OrderProgressPanel = () => {
   const [selectedOrderId, setSelectedOrderId] = useState<string>('');
@@ -18,9 +19,9 @@ const OrderProgressPanel = () => {
     data: orders = [],
     isLoading: loadingOrders,
     isError: ordersError,
-  } = useQuery({
+  } = useQuery<Order[]>({
     queryKey: ['orders'],
-    queryFn: getAllOrders,
+    queryFn: () => getAllOrders({}),
   });
 
   const {

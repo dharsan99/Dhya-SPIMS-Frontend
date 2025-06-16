@@ -33,6 +33,7 @@ import RefundPolicyPage from './pages/website/RefundPolicyPage';
 import DisclaimerPage from './pages/website/DisclaimerPage';
 import Employees from './pages/Employees';
 import Marketing from './pages/Marketing';
+import ProductionEntryPage from './pages/ProductionEntryPage';
 
 function App() {
   const { setTheme } = useThemeStore();
@@ -70,7 +71,11 @@ function App() {
             <Route index element={<Navigate to="dashboard" replace />} />
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="orders" element={<Orders />} />
-            <Route path="production" element={<ProductionDashboard />} />
+            <Route path="production">
+              <Route index element={<ProductionDashboard />} />
+              <Route path="new" element={<ProductionEntryPage />} />
+              <Route path=":date" element={<ProductionEntryPage />} />
+            </Route>
             <Route path="brands" element={<Brands />} />
             <Route path="blends" element={<Blends />} />
             <Route path="shades" element={<Shades />} />
