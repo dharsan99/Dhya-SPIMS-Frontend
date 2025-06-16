@@ -57,8 +57,10 @@ export interface AttendanceRecord {
 token_no?: string;
 employee_id: string;
 name: string;
+in_time: string;
+out_time: string;
 department: string;
-employee: { name: string; department: string };
+employee: { name: string; department: string , token_no: string, shift_rate: number};
 date: string; // ISO date string like "2025-06-15T00:00:00.000Z"
 shift: string;
 status: AttendanceStatus | string;
@@ -81,7 +83,7 @@ records: {
 }
 
 export interface SingleAttendancePayload {
-date: string;
+date?: string;
 employee_id: string;
 in_time: string;
 out_time: string;

@@ -1,4 +1,4 @@
-import { AttendanceRecord, MarkAttendancePayload, SingleAttendancePayload } from '@/types/attendance';
+import { AttendanceRecord, SingleAttendancePayload } from '@/types/attendance';
 import api from './axios';
 
 export type ShiftType = 'SHIFT_1' | 'SHIFT_2' | 'SHIFT_3';
@@ -13,17 +13,24 @@ export const getAllAttendances = async (date?: string): Promise<AttendanceRecord
   return res.data;
 };
 
+export const getAttendanceInRange = async (start: string, end: string) => {
+  const response = await api.get(`/attendance/range?start=${start}&end=${end}`);
+  return response.data;
+};
+
 
 /**
  * ✅ Submit attendance data
  */
-export const markAttendance = async (payload: MarkAttendancePayload) => {
-  const res = await api.post('/attendance/mark', payload);
+export const markAttendance = async (payload: any) => {
+  const res = await api.post('/attendance', payload);
   return res.data;
 };
 
-export const markSingleAttendance = async (payload: SingleAttendancePayload) => {
-  const res = await api.post('/attendance', payload);
+export const markSingleAttendance = async (payload: Omit<SingleAttendancePayload, 'employee_id'> & { employee_id: string }) => {
+  const { employee_id, ...rest } = payload;
+
+  const res = await api.put(`/attendance/${employee_id}`, rest);
   return res.data;
 };
 

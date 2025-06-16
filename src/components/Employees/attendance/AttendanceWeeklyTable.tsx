@@ -25,6 +25,7 @@ const AttendanceWeeklyTable: React.FC<Props> = ({
   onPageChange,
   onPageSizeChange,
 }) => {
+  console.log('employees', employees)
   const [attendanceMap, setAttendanceMap] = useState<Record<string, Record<string, AttendanceRow>>>({});
   const [loading, setLoading] = useState(true);
 
@@ -115,13 +116,13 @@ const AttendanceWeeklyTable: React.FC<Props> = ({
                     className="hover:bg-gray-50 dark:hover:bg-gray-800 transition"
                   >
                     <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-300">
-                       (page - 1) * pageSize + idx + 1
+                       {emp.employee.token_no || <span className="italic text-gray-400">–</span>}
                     </td>
                     <td
                       className="px-4 py-3 text-gray-900 dark:text-white max-w-[200px] truncate"
                       title={emp.name}
                     >
-                      {emp.name}
+                      {emp.employee.name}
                     </td>
                     {weekDates.map((date) => {
                       const att = attendanceMap[date]?.[emp.employee_id];
@@ -132,13 +133,13 @@ const AttendanceWeeklyTable: React.FC<Props> = ({
                       );
                     })}
                     <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-300">
-                      {totalHours}
+                      {totalHours.toFixed(3)}
                     </td>
                     <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-300">
                       {totalDays}
                     </td>
                     <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-300">
-                      {totalOvertime}
+                      {totalOvertime.toFixed(3)}
                     </td>
                     <td className="px-4 py-3 text-center text-blue-700 dark:text-blue-400">
                       {formatINR(wages)}

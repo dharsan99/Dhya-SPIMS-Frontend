@@ -14,11 +14,8 @@ const shiftMap = {
 
 const AttendanceViewMode: React.FC<AttendanceViewModeProps & { date: string }> = ({
   employees,
-  pageStart,
   loading
 }) => {
-  
-
 
 
   if (loading) {
@@ -56,8 +53,10 @@ const AttendanceViewMode: React.FC<AttendanceViewModeProps & { date: string }> =
               const shift = shiftMap[rawShiftKey as keyof typeof shiftMap] ?? shiftMap['ABSENT'];
               const totalHours = isPresent ? 8 + overtime : 0;
               const workDays = isPresent ? 1 : 0;
-              const wageRate = emp.shift_rate ?? 0;
+              const wageRate = Number(emp.employee.shift_rate) ?? 0;
               const wages = (totalHours / 8) * wageRate;
+
+              console.log('emp', emp)
 
               return (
                 <tr
@@ -65,7 +64,7 @@ const AttendanceViewMode: React.FC<AttendanceViewModeProps & { date: string }> =
                   className="hover:bg-gray-50 dark:hover:bg-gray-800 transition"
                 >
                   <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-300">
-                    {emp.employee_id || pageStart + idx + 1}
+                    {emp.employee.token_no || <span className="italic text-gray-400">–</span>}
                   </td>
                   <td
                     className="px-4 py-3 text-gray-900 dark:text-white max-w-[200px] truncate"
@@ -80,7 +79,7 @@ const AttendanceViewMode: React.FC<AttendanceViewModeProps & { date: string }> =
                     {shift.time}
                   </td>
                   <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-300">
-                    {overtime}
+                    {overtime.toFixed(3)}
                   </td>
                   <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-300">
                     {totalHours}

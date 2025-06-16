@@ -30,7 +30,9 @@ export const buildAttendanceMap = (
   return map;
 };
 
-export const generateWeekRanges = (baseDate: Date = new Date()) => {
+import { format, startOfWeek, addWeeks, addDays, startOfMonth, addMonths } from 'date-fns';
+
+export const generateWeekRanges = (baseDate: Date) => {
   return Array.from({ length: 13 }, (_, i) => {
     const offset = i - 6;
     const start = startOfWeek(addWeeks(baseDate, offset), { weekStartsOn: 1 });
@@ -42,10 +44,10 @@ export const generateWeekRanges = (baseDate: Date = new Date()) => {
   });
 };
 
-export const generateMonthRanges = (baseDate: Date = new Date()) => {
+export const generateMonthRanges = (baseDate: Date) => {
   return Array.from({ length: 13 }, (_, i) => {
     const offset = i - 6;
-    const start = startOfMonth(addMonthsFn(baseDate, offset));
+    const start = startOfMonth(addMonths(baseDate, offset));
     return {
       label: format(start, 'MMMM yyyy'),
       value: format(start, 'yyyy-MM-dd'),
@@ -71,7 +73,7 @@ export const calculateWeeklyTotals = (
     }
   });
 
-  const dailyRate = parseFloat((emp.shift_rate ?? 0).toString());
+  const dailyRate = parseFloat((emp.employee.shift_rate ?? 0).toString());
   const hourlyRate = dailyRate / 8;
   const wages = parseFloat((totalHours * hourlyRate).toFixed(2));
 

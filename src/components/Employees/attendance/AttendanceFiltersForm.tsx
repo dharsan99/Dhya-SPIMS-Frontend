@@ -31,6 +31,9 @@ const AttendanceFiltersForm: React.FC<AttendanceFiltersFormProps> = ({
   weekRanges,
   monthRanges,
 }) => {
+
+  console.log('Selected date:', date);
+console.log('Month ranges:', monthRanges);
   const renderDateSelector = () => {
     switch (rangeMode) {
       case 'day':

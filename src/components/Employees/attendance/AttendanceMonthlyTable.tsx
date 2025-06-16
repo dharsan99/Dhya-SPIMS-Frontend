@@ -95,10 +95,10 @@ const AttendanceMonthlyTable: React.FC<Props> = ({
                     className="hover:bg-gray-50 dark:hover:bg-gray-800 transition"
                   >
                     <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-300">
-                      {emp.employee_id || <span className="italic text-gray-400">–</span>}
+                      {emp.employee.token_no || <span className="italic text-gray-400">–</span>}
                     </td>
                     <td className="px-4 py-3 text-gray-900 dark:text-white max-w-[180px] truncate" title={emp.name}>
-                      {emp.name}
+                      {emp.employee.name}
                     </td>
                   </tr>
                 ))}
@@ -177,8 +177,8 @@ const AttendanceMonthlyTable: React.FC<Props> = ({
                       className="hover:bg-gray-50 dark:hover:bg-gray-800 transition"
                     >
                       <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-300">{workDays}</td>
-                      <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-300">{totalOvertime}</td>
-                      <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-300">{totalHours}</td>
+                      <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-300">{totalOvertime.toFixed(3)}</td>
+                      <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-300">{totalHours.toFixed(3)}</td>
                       <td className="px-4 py-3 text-center text-blue-700 dark:text-blue-400 font-semibold">
                         ₹{wages.toFixed(2)}
                       </td>

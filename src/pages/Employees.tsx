@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { FiPlus } from 'react-icons/fi';
 import EmployeeModal from '../components/Employees/EmployeeModal';
 import EmployeeTable from '../components/Employees/EmployeeTable';
@@ -12,31 +12,26 @@ import {
 } from '../api/employees';
 import Loader from '../components/Loader';
 import useAuthStore from '@/hooks/auth';
+import { useQuery } from '@tanstack/react-query';
+
 
 const Employees = () => {
   const [activeTab, setActiveTab] = useState<'employees' | 'attendance'>('attendance');
-  const [employees, setEmployees] = useState<Employee[]>([]);
-  const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const hasPermission = useAuthStore((state) => state.hasPermission);
   const canViewAttendance = hasPermission('Attendance', 'View Attendance'); 
 
-  const fetchEmployees = async () => {
-    try {
-      const res = await getAllEmployees();
-      setEmployees(res);
-    } catch (err) {
-      // ... removed all console.error ...
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { data: employees = [], isLoading, refetch } = useQuery<Employee[]>({
+    queryKey: ['employees'],
+    queryFn: getAllEmployees,
+  });
 
-  useEffect(() => {
-    fetchEmployees();
-  }, []);
+  
+
+  console.log('employees', employees)
+
 
   const handleEdit = (emp: Employee) => {
     setEditingEmployee(emp);
@@ -50,7 +45,7 @@ const Employees = () => {
       } else {
         await createEmployee(data);
       }
-      await fetchEmployees();
+      refetch(); // refresh the list
     } catch (err) {
       // ... removed all console.error ...
     } finally {
@@ -62,7 +57,7 @@ const Employees = () => {
     setConfirmDeleteId(id);
   };
 
-  if (loading) return <Loader />;
+  if (isLoading) return <Loader />;
 
   return (
     <div className="p-6 transition-colors duration-300">
@@ -156,7 +151,7 @@ const Employees = () => {
                   try {
                     await deleteEmployee(confirmDeleteId);
                     setConfirmDeleteId(null);
-                    await fetchEmployees();
+                    refetch();
                   } catch (err) {
                     // ... removed all console.error ...
                   }

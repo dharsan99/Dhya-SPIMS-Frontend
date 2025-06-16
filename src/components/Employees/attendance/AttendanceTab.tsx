@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import format from 'date-fns/format';
 import AttendanceFilters from './AttendanceFilters';
@@ -8,12 +8,13 @@ import AttendanceModeTabs from './AttendanceModeTabs';
 import AttendanceWeeklyTable from './AttendanceWeeklyTable';
 import AttendanceMonthlyTable from './AttendanceMonthlyTable';
 import AttendancePagination from './AttendancePagination';
-import { ShiftType, shiftTimeMap, AttendanceRow } from './AttendanceTypes';
+import { ShiftType, shiftTimeMap, AttendanceRow, AttendanceStatus } from './AttendanceTypes';
 import { useQuery } from '@tanstack/react-query';
 import { buildAttendanceMap } from '@/components/Employees/attendance/utils/attendence';
 import { useAttendanceDates } from './hooks/useAttendanceDates';
-import { getAllAttendances } from '@/api/attendance';
+import { getAllAttendances, getAttendanceInRange } from '@/api/attendance';
 import { AttendanceRecord } from '@/types/attendance';
+import AttendanceHeaderStats from './AttendanceHeaderStats';
 
 
 const AttendanceTab = () => {
@@ -27,14 +28,68 @@ const AttendanceTab = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
+  const { dates, weekDates, monthDates } = useAttendanceDates(rangeMode, date);
+
+  const rangeStart = dates[0];
+  const rangeEnd = dates[dates.length - 1];
+
   const { data: attendancesData, isLoading } = useQuery({
-    queryKey: ['attendance', date],
-    queryFn: () => getAllAttendances(date),
+    queryKey: ['attendance', rangeMode, rangeStart, rangeEnd],
+    queryFn: () => {
+      if (rangeMode === 'day') {
+        return getAllAttendances(date);
+      } else if (rangeMode === 'week' || rangeMode === 'month') {
+        return getAttendanceInRange(rangeStart, rangeEnd);
+      }
+      return Promise.resolve([]);
+    },
   });
+
+
 
 
   const attendances = attendancesData ?? [];
 
+  useEffect(() => {
+    if (!attendancesData) return;
+  
+    const allowedStatuses = ['PRESENT', 'ABSENT', 'LEAVE', 'HALF_DAY'] as const;
+  
+    const initialAttendance: Record<string, AttendanceRow> = {};
+    attendancesData.forEach((record: AttendanceRecord) => {
+      const {
+        employee_id,
+        in_time,
+        out_time,
+        shift,
+        overtime_hours,
+        status,
+        total_hours,
+        department,
+      } = record;
+  
+      const normalizedStatus = typeof status === 'string'
+        ? status.toUpperCase()
+        : 'ABSENT';
+  
+      initialAttendance[employee_id] = {
+        in_time: in_time ? new Date(in_time).toISOString().slice(11, 16) : '',
+        out_time: out_time ? new Date(out_time).toISOString().slice(11, 16) : '',
+        shift: (shift?.toUpperCase() as ShiftType) ?? 'MORNING',
+        overtime_hours: overtime_hours || 0,
+        total_hours: total_hours || 0,
+        status: allowedStatuses.includes(normalizedStatus as AttendanceStatus)
+          ? (normalizedStatus as AttendanceStatus)
+          : 'ABSENT',
+        department: department ?? '', // Add this field based on AttendanceRow
+        overtime: overtime_hours || 0, // assuming `overtime` duplicates `overtime_hours`
+        hours: total_hours || 0,       // assuming `hours` duplicates `total_hours`
+        employee_id,
+      };
+    });
+  
+    setAttendance(initialAttendance);
+  }, [attendancesData]);
   const departments = useMemo(() => {
     return [...new Set(attendances.map((a: AttendanceRecord) => a.department).filter(Boolean))] as string[];
   }, [attendances]);
@@ -56,7 +111,7 @@ const AttendanceTab = () => {
 
   console.log('filteredAttendances', filteredAttendances)
 
-  const { dates, weekDates, monthDates } = useAttendanceDates(rangeMode, date);
+ 
 
   const attendanceMap = useMemo(() => {
     return buildAttendanceMap(dates, filteredAttendances, attendance);
@@ -124,14 +179,22 @@ const AttendanceTab = () => {
     });
   };
 
+  const normalizedDate = useMemo(() => {
+    if (rangeMode === 'month') {
+      const d = new Date(date);
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-01`;
+    }
+    return date;
+  }, [rangeMode, date]);
+
   return (
     <div className="space-y-4">
-     {/*<AttendanceHeaderStats
+     <AttendanceHeaderStats
         employees={filteredAttendances}
         attendance={attendance}
         date={date}
         department={departmentFilter}
-      />*/}
+      />
       <AttendanceModeTabs
         mode={viewMode}
         onModeChange={setViewMode}
@@ -139,7 +202,7 @@ const AttendanceTab = () => {
         onRangeChange={setRangeMode}
       />
       <AttendanceFilters
-        date={date}
+        date={normalizedDate}
         onDateChange={setDate}
         departments={departments}
         department={departmentFilter}
