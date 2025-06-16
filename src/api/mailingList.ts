@@ -43,6 +43,5 @@ export const updateMailingList = (id: string, data: { name: string; buyerIds: st
  * ✅ Delete mailing list
  */
 export const deleteMailingList = (id: string) => {
-  console.log(`🗑️ Deleting mailing list ${id}`);
   return api.delete(`${endpoint}/${id}`);
 };

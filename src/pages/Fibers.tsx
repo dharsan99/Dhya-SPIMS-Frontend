@@ -101,8 +101,7 @@ const Fibers = () => {
     currentPage * rowsPerPage
   );
 
-  const handleTransferSave = (data: CreateFibreTransfer | FibreTransfer) => {
-    console.log('Transfer saved:', data);
+  const handleTransferSave = () => {
     toast.success('Transfer saved (not implemented)');
   };
 

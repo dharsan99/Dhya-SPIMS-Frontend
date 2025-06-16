@@ -1,7 +1,8 @@
 import { FC, useState, useEffect } from 'react';
 import { ProductionRecord, ProductionForm } from '../types/production';
-import { createProduction, updateProduction } from '../api/production';
+import { updateProduction } from '../api/production';
 import toast from 'react-hot-toast';
+import api from '../api/axios';
 
 export interface ProductionModalProps {
   isOpen: boolean;
@@ -89,7 +90,7 @@ const ProductionModal: FC<ProductionModalProps> = ({
         await updateProduction(initialData.id, payload);
         toast.success('Production updated!');
       } else {
-        await createProduction(payload);
+        await api.post('/productions/entry', payload);
         toast.success('Production created!');
       }
       onClose();

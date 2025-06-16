@@ -55,6 +55,15 @@ const AttendanceWeeklyTable: React.FC<Props> = ({
         )
       );
 
+
+          rows.forEach((row: AttendanceRow) => {
+            newMap[date][row.employee_id] = row;
+          });
+        } catch (err) {
+          newMap[date] = {};
+        }
+      }
+
       const newMap: Record<string, Record<string, AttendanceRow>> = {};
       results.forEach(({ date, rows }) => {
         newMap[date] = {};
@@ -62,6 +71,7 @@ const AttendanceWeeklyTable: React.FC<Props> = ({
           newMap[date][row.employee_id] = row;
         });
       });
+
 
       setAttendanceMap(newMap);
       setLoading(false);

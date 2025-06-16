@@ -59,18 +59,15 @@ const AllRecordsPanel = () => {
 
   const kpis = useMemo(() => calculateKPI(filtered), [filtered]);
 
-  const handleEdit = (record: ProductionRecord) => {
-    console.log('Edit record:', record);
+  const handleEdit = () => {
     // Open modal or navigate
   };
 
-  const handleDelete = (id: string) => {
-    console.log('Delete record ID:', id);
+  const handleDelete = () => {
     // Confirm and call delete API
   };
 
-  const handleBulkAction = (action: string, selectedIds: string[]) => {
-    console.log('Bulk Action:', action, selectedIds);
+  const handleBulkAction = (_action: string, _selectedIds: string[]) => {
     // Handle delete/export/finalize
   };
 

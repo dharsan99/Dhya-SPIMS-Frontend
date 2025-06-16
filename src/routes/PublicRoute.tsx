@@ -1,12 +1,8 @@
 import { Navigate } from 'react-router-dom';
 import useAuthStore from '../hooks/auth';
 
-interface PublicRouteProps {
-  children: React.ReactNode;
-}
-
-const PublicRoute = ({ children }: PublicRouteProps) => {
-  const { token, hasHydrated, user } = useAuthStore();
+const PublicRoute = ({ children }: { children: React.ReactNode }) => {
+  const { token, hasHydrated } = useAuthStore();
 
   // ⏳ Waiting for hydration
   if (!hasHydrated) {
@@ -19,10 +15,7 @@ const PublicRoute = ({ children }: PublicRouteProps) => {
 
   // ✅ Redirect if already authenticated
   if (token) {
-    if (import.meta.env.DEV) {
-      console.log('[PublicRoute] Authenticated user detected. Redirecting to /dashboard', user);
-    }
-    return <Navigate to="/app/dashboard" replace />;
+    return <Navigate to="/" />;
   }
 
   // ✅ Show children (e.g., Login page) for unauthenticated users

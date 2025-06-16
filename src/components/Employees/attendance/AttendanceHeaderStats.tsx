@@ -42,7 +42,6 @@ const AttendanceHeaderStats: React.FC<Props> = ({
     .forEach((emp) => {
       const record = attendanceMap[emp.id];
       const status = record?.status?.toUpperCase();
-
       if (status === 'PRESENT') {
         presentCount += 1;
       } else if (status === 'HALF_DAY') {
