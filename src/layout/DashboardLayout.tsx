@@ -1,12 +1,10 @@
-
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { FiChevronDown, FiLogOut } from 'react-icons/fi';
+import { FiChevronDown, FiLogOut, FiMenu } from 'react-icons/fi';
 import { useState } from 'react';
 import logoNsc from '../assets/logo_nsc.jpg';
 import { WhatsNewPanel } from '../components/WhatsNewPanel';
 import useAuthStore from '../hooks/auth';
 import Sidebar from './Sidebar';
-import { Menu } from 'lucide-react';
 
 const getPageTitle = (pathname: string) => {
   if (pathname.includes('/dashboard')) return 'Dashboard';
@@ -19,8 +17,6 @@ const getPageTitle = (pathname: string) => {
   if (pathname.includes('/settings')) return 'Settings';
   return '';
 };
-
-
 
 const DashboardLayout = () => {
   const { user, hasHydrated, logout } = useAuthStore();
@@ -56,12 +52,26 @@ const DashboardLayout = () => {
   }
 
   return (
-
     <div className="flex min-h-screen bg-gray-100 dark:bg-gray-950 transition-colors duration-300 overflow-hidden">
+      {/* Mobile Sidebar Overlay */}
+      {sidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-30 md:hidden"
+          onClick={() => setSidebarOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+
       {/* Sidebar */}
-      <Sidebar />
-      {/* Right Side */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div 
+        className={`fixed md:static inset-y-0 left-0 z-40 transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 transition-transform duration-300 ease-in-out`}
+        style={{ width: 'auto' }}
+      >
+        <Sidebar onLinkClick={() => setSidebarOpen(false)} />
+      </div>
+
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col overflow-hidden relative">
         {/* Accessibility: Skip to content */}
         <a
           href="#main-content"
@@ -71,19 +81,30 @@ const DashboardLayout = () => {
         >
           Skip to main content
         </a>
+
         {/* Header */}
         <header
           className="sticky top-0 z-40 bg-white dark:bg-gray-900 border-b dark:border-gray-800 px-4 md:px-6 py-3 flex items-center justify-between shadow-md h-20"
           role="banner"
         >
-          {/* Left: Logo & Page Title */}
-          <div className="flex items-center gap-6 min-w-0">
-            <img src={logoNsc} alt="SPIMS Logo" className="w-32 h-14 object-contain" />
-            <span className="mx-2 text-gray-300 dark:text-gray-700 hidden sm:inline text-2xl">|</span>
-            <span className="font-extrabold text-blue-700 dark:text-blue-300 text-xl tracking-wide truncate max-w-xs flex items-center" title={getPageTitle(location.pathname)}>
-              {getPageTitle(location.pathname)}
-            </span>
+          {/* Left: Menu Button & Page Title */}
+          <div className="flex items-center gap-4">
+            <button
+              className="md:hidden p-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
+              onClick={() => setSidebarOpen(true)}
+              aria-label="Open menu"
+            >
+              <FiMenu className="w-6 h-6" />
+            </button>
+            <div className="flex items-center gap-6 min-w-0">
+              <img src={logoNsc} alt="SPIMS Logo" className="w-32 h-14 object-contain" />
+              <span className="mx-2 text-gray-300 dark:text-gray-700 hidden sm:inline text-2xl">|</span>
+              <span className="font-extrabold text-blue-700 dark:text-blue-300 text-xl tracking-wide truncate max-w-xs flex items-center" title={getPageTitle(location.pathname)}>
+                {getPageTitle(location.pathname)}
+              </span>
+            </div>
           </div>
+
           {/* Right: User Info & Actions */}
           <div className="flex items-center gap-4">
             {/* User Avatar & Dropdown */}
@@ -109,29 +130,8 @@ const DashboardLayout = () => {
               )}
             </div>
           </div>
-
-        {/* Header */}
-        <header className="sticky top-0 z-40 bg-white dark:bg-gray-900 border-b dark:border-gray-800 px-4 py-3 flex items-center justify-between shadow-sm">
-
-          {/* Mobile Menu Button */}
-          <button
-            className="md:hidden p-2 text-gray-700 dark:text-gray-300"
-            onClick={() => setSidebarOpen(true)}
-          >
-            <Menu className="w-6 h-6" />
-          </button>
-
-          <span className="text-sm text-gray-700 dark:text-gray-300">
-            Logged in as <strong>{user.name}</strong>
-          </span>
-
-          <button
-            onClick={handleLogout}
-            className="bg-red-500 hover:bg-red-600 text-white font-semibold text-xs px-4 py-2 rounded-full transition-all"
-          >
-            Logout
-          </button>
         </header>
+
         <main
           id="main-content"
           className="flex-1 overflow-y-auto p-4 md:p-6 text-gray-800 dark:text-gray-100 transition-all outline-none focus:outline-blue-400"
@@ -140,6 +140,7 @@ const DashboardLayout = () => {
         >
           <Outlet />
         </main>
+
         {/* Global Footer with What's New button */}
         <footer className="w-full bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 py-3 px-6 text-xs text-gray-500 dark:text-gray-400 flex items-center justify-between shadow-inner sticky bottom-0 z-30">
           <span>© {new Date().getFullYear()} NSC Texintelli. All rights reserved.</span>
@@ -152,6 +153,7 @@ const DashboardLayout = () => {
             What's New
           </button>
         </footer>
+
         {/* Floating What's New Panel */}
         {showWhatsNew && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">

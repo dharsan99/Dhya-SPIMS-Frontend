@@ -1,30 +1,18 @@
+import { AttendanceRecord, MarkAttendancePayload, SingleAttendancePayload } from '@/types/attendance';
 import api from './axios';
 
 export type ShiftType = 'SHIFT_1' | 'SHIFT_2' | 'SHIFT_3';
 export type AttendanceStatus = 'PRESENT' | 'HALF_DAY' | 'ABSENT';
 
-export interface AttendanceRecord {
-  employee_id: string;
-  shift: ShiftType;
-  overtime_hours: number;
-  status: AttendanceStatus;
-}
-
-interface SingleAttendancePayload {
-  date: string;
-  employee_id: string;
-  in_time: string;
-  out_time: string;
-  overtime_hours: number;
-  status: 'PRESENT' | 'ABSENT';
-  shift: ShiftType;
-}
 
 
-export interface MarkAttendancePayload {
-  date: string; // Format: yyyy-MM-dd
-  records: AttendanceRecord[];
-}
+export const getAllAttendances = async (date?: string): Promise<AttendanceRecord[]> => {
+  const url = date ? `/attendance/by-date?date=${date}` : '/attendance';
+  const res = await api.get(url);
+  console.log('res', res)
+  return res.data;
+};
+
 
 /**
  * ✅ Submit attendance data
