@@ -1,14 +1,15 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Employee } from '../../../types/employee';
 import { AttendanceRow } from './AttendanceTypes';
 import AttendancePagination from './AttendancePagination';
 import { fetchAttendanceByDate } from '../../../api/attendance';
 import { getStatusBadge } from './StatusBadge';
 import { calculateWeeklyTotals } from './utils/attendence';
 import { formatINR } from './utils/attendence';
+import { AttendanceRecord } from '@/types/attendance';
+
 
 interface Props {
-  employees: Employee[];
+  employees: AttendanceRecord[];
   weekDates: string[]; // Dates in 'YYYY-MM-DD' format
   page: number;
   pageSize: number;
@@ -35,7 +36,7 @@ const AttendanceWeeklyTable: React.FC<Props> = ({
   const weeklyTotals = useMemo(() => {
     const totals: Record<string, ReturnType<typeof calculateWeeklyTotals>> = {};
     employees.forEach((emp) => {
-      totals[emp.id] = calculateWeeklyTotals(emp, attendanceMap, weekDates);
+      totals[emp.employee_id] = calculateWeeklyTotals(emp, attendanceMap, weekDates);
     });
     return totals;
   }, [employees, attendanceMap, weekDates]);
@@ -55,15 +56,6 @@ const AttendanceWeeklyTable: React.FC<Props> = ({
         )
       );
 
-
-          rows.forEach((row: AttendanceRow) => {
-            newMap[date][row.employee_id] = row;
-          });
-        } catch (err) {
-          newMap[date] = {};
-        }
-      }
-
       const newMap: Record<string, Record<string, AttendanceRow>> = {};
       results.forEach(({ date, rows }) => {
         newMap[date] = {};
@@ -71,7 +63,6 @@ const AttendanceWeeklyTable: React.FC<Props> = ({
           newMap[date][row.employee_id] = row;
         });
       });
-
 
       setAttendanceMap(newMap);
       setLoading(false);
@@ -116,15 +107,15 @@ const AttendanceWeeklyTable: React.FC<Props> = ({
           <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
             {paginatedEmployees.length > 0 ? (
               paginatedEmployees.map((emp, idx) => {
-                const { totalHours, totalDays, totalOvertime, wages } = weeklyTotals[emp.id];
+                const { totalHours, totalDays, totalOvertime, wages } = weeklyTotals[emp.employee_id];
 
                 return (
                   <tr
-                    key={emp.id}
+                    key={idx}
                     className="hover:bg-gray-50 dark:hover:bg-gray-800 transition"
                   >
                     <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-300">
-                      {emp.token_no || (page - 1) * pageSize + idx + 1}
+                       (page - 1) * pageSize + idx + 1
                     </td>
                     <td
                       className="px-4 py-3 text-gray-900 dark:text-white max-w-[200px] truncate"
@@ -133,7 +124,7 @@ const AttendanceWeeklyTable: React.FC<Props> = ({
                       {emp.name}
                     </td>
                     {weekDates.map((date) => {
-                      const att = attendanceMap[date]?.[emp.id];
+                      const att = attendanceMap[date]?.[emp.employee_id];
                       return (
                         <td key={date} className="px-4 py-3 text-center">
                           {getStatusBadge(att?.status)}

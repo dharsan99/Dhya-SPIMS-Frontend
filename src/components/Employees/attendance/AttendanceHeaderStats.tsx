@@ -40,7 +40,7 @@ const AttendanceHeaderStats: React.FC<Props> = ({
   employees
     .filter((e) => !department || e.department === department)
     .forEach((emp) => {
-      const record = attendanceMap[emp.id];
+      const record = attendanceMap[emp.employee_id];
       const status = record?.status?.toUpperCase();
       if (status === 'PRESENT') {
         presentCount += 1;

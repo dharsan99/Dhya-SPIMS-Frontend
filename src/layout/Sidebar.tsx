@@ -11,7 +11,6 @@ import {
   FiActivity,
   FiChevronLeft,
   FiChevronRight,
-  FiMenu,
 } from 'react-icons/fi';
 
 import useAuthStore from '../hooks/auth';
@@ -21,7 +20,6 @@ const Sidebar = ({ onLinkClick }: { onLinkClick?: () => void }) => {
   const auth = useAuthStore();
   const email = auth.user?.email || '';
   const [collapsed, setCollapsed] = useState(true);
-  const [mobileOpen, setMobileOpen] = useState(false);
 
   const hasPermission = useAuthStore((state) => state.hasPermission);
   const canViewFibres = hasPermission('Fibres', 'View Fibre');
@@ -58,20 +56,13 @@ const Sidebar = ({ onLinkClick }: { onLinkClick?: () => void }) => {
 
   const isOrderUser = email === 'orders@nscspinning.com';
 
-  const sidebarContent = (
+  return (
     <aside
-      className={`z-40 h-full flex flex-col bg-white dark:bg-gray-900 border-r dark:border-gray-700 shadow-md transition-all duration-300 overflow-y-auto ${collapsed ? 'w-20' : 'w-64'} ${mobileOpen ? 'fixed left-0 top-0 w-64' : 'sticky top-0'}`}
+      className={`h-full flex flex-col bg-white dark:bg-gray-900 border-r dark:border-gray-700 shadow-md transition-all duration-300 overflow-y-auto ${collapsed ? 'w-20' : 'w-64'}`}
       aria-label="Sidebar Navigation"
     >
       {/* Header Section */}
       <div className="flex items-center justify-between mb-6 px-2">
-        <button
-          className="md:hidden p-2 focus:outline-none"
-          onClick={() => setMobileOpen(false)}
-          aria-label="Close sidebar"
-        >
-          <FiChevronLeft className="w-6 h-6" />
-        </button>
         <div className="flex items-center justify-start w-full py-2 transition-all duration-300">
           {!collapsed && (
             <img
@@ -88,13 +79,6 @@ const Sidebar = ({ onLinkClick }: { onLinkClick?: () => void }) => {
           aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
           {collapsed ? <FiChevronRight className="w-6 h-6" /> : <FiChevronLeft className="w-6 h-6" />}
-        </button>
-        <button
-          className="md:hidden p-2 focus:outline-none"
-          onClick={() => setMobileOpen(true)}
-          aria-label="Open sidebar"
-        >
-          <FiMenu className="w-6 h-6" />
         </button>
       </div>
 
@@ -136,34 +120,6 @@ const Sidebar = ({ onLinkClick }: { onLinkClick?: () => void }) => {
 
       <div className="flex-grow" />
     </aside>
-  );
-
-  return (
-    <>
-      {/* Mobile hamburger button */}
-      <button
-        className="fixed top-4 left-4 z-50 md:hidden bg-blue-600 text-white p-2 rounded shadow-lg"
-        onClick={() => setMobileOpen(true)}
-        aria-label="Open sidebar"
-      >
-        <FiMenu className="w-6 h-6" />
-      </button>
-
-      {/* Overlay for mobile */}
-      <div
-        className={`fixed inset-0 z-40 bg-black/30 transition-opacity duration-300 ${mobileOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'} md:opacity-100 md:pointer-events-auto md:static md:bg-transparent`}
-        onClick={() => setMobileOpen(false)}
-        aria-hidden={!mobileOpen}
-      />
-
-      {/* Sidebar */}
-      <div
-        className={`transition-all duration-300 ${mobileOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 md:static md:block`}
-        style={{ zIndex: 60 }}
-      >
-        {sidebarContent}
-      </div>
-    </>
   );
 };
 

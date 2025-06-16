@@ -1,8 +1,6 @@
-// src/components/Employees/attendance/AttendanceTab.tsx
-import { useEffect, useMemo, useState } from 'react';
-import { getAllEmployees } from '../../../api/employees';
+import { useMemo, useState } from 'react';
+
 import format from 'date-fns/format';
-import AttendanceHeaderStats from './AttendanceHeaderStats';
 import AttendanceFilters from './AttendanceFilters';
 import AttendanceEditMode from './AttendanceEditMode';
 import AttendanceViewMode from './AttendanceViewMode';
@@ -12,14 +10,15 @@ import AttendanceMonthlyTable from './AttendanceMonthlyTable';
 import AttendancePagination from './AttendancePagination';
 import { ShiftType, shiftTimeMap, AttendanceRow } from './AttendanceTypes';
 import { useQuery } from '@tanstack/react-query';
-import { buildAttendanceMap, buildEmptyRow } from '@/components/Employees/attendance/utils/attendence';
+import { buildAttendanceMap } from '@/components/Employees/attendance/utils/attendence';
 import { useAttendanceDates } from './hooks/useAttendanceDates';
-import { useEmployeeStore } from './useAttendenceStore';
+import { getAllAttendances } from '@/api/attendance';
+import { AttendanceRecord } from '@/types/attendance';
 
 
 const AttendanceTab = () => {
   const [date, setDate] = useState(() => format(new Date(), 'yyyy-MM-dd'));
-  const [shift, setShift] = useState<ShiftType>('SHIFT_1');
+  const [shift, setShift] = useState<ShiftType>('MORNING');
   const [attendance, setAttendance] = useState<Record<string, AttendanceRow>>({});
   const [departmentFilter, setDepartmentFilter] = useState('');
   const [page, setPage] = useState(1);
@@ -27,55 +26,47 @@ const AttendanceTab = () => {
   const [rangeMode, setRangeMode] = useState<'day' | 'week' | 'month'>('day');
   const [searchQuery, setSearchQuery] = useState('');
   const [itemsPerPage, setItemsPerPage] = useState(10);
-  const setEmployees = useEmployeeStore((state) => state.setEmployees);
 
-  const { data: employees = [] } = useQuery({
-    queryKey: ['employees'],
-    queryFn: getAllEmployees,
+  const { data: attendancesData, isLoading } = useQuery({
+    queryKey: ['attendance', date],
+    queryFn: () => getAllAttendances(date),
   });
 
-  console.log('employees', employees)
 
-  const initialAttendance = useMemo(() => {
-    return employees.reduce((acc, emp) => {
-      acc[emp.id] = buildEmptyRow(emp);
-      return acc;
-    }, {} as Record<string, AttendanceRow>);
-  }, [employees]);
-
-  useEffect(() => {
-    if (employees.length) {
-      setAttendance(initialAttendance);
-      setEmployees(employees)
-    }
-  }, [employees, initialAttendance]);
+  const attendances = attendancesData ?? [];
 
   const departments = useMemo(() => {
-    return [...new Set(employees.map((e) => e.department).filter(Boolean))] as string[];
-  }, [employees]);
+    return [...new Set(attendances.map((a: AttendanceRecord) => a.department).filter(Boolean))] as string[];
+  }, [attendances]);
 
-  const filteredEmployees = useMemo(() => {
-    return employees.filter((e) => {
-      const matchesDept = departmentFilter ? e.department === departmentFilter : true;
+  const filteredAttendances = useMemo(() => {
+    return attendances.filter((emp: AttendanceRecord) => {
+      const matchesDept = departmentFilter
+        ? emp.department === departmentFilter
+        : true;
+  
       const q = searchQuery.toLowerCase();
       const matchesSearch =
-        e.name.toLowerCase().includes(q) ||
-        e.id.toLowerCase().includes(q) ||
-        (e.token_no?.toLowerCase().includes(q) ?? false);
+        emp.name?.toLowerCase().includes(q) ||
+        emp.employee_id?.toLowerCase().includes(q);
+  
       return matchesDept && matchesSearch;
     });
-  }, [employees, departmentFilter, searchQuery]);
+  }, [attendances, departmentFilter, searchQuery]);
 
-  // ---------- Dates ----------
-const { dates, weekDates, monthDates } = useAttendanceDates(rangeMode, date);
+  console.log('filteredAttendances', filteredAttendances)
 
-  const attendanceMap = useMemo(() => buildAttendanceMap(dates, filteredEmployees, attendance), [dates, filteredEmployees, attendance]);
+  const { dates, weekDates, monthDates } = useAttendanceDates(rangeMode, date);
 
-  // ---------- Pagination ----------
+  const attendanceMap = useMemo(() => {
+    return buildAttendanceMap(dates, filteredAttendances, attendance);
+  }, [dates, filteredAttendances, attendance]);
+
   const startIdx = (page - 1) * itemsPerPage;
-  const paginatedEmployees = filteredEmployees.slice(startIdx, startIdx + itemsPerPage);
+  const paginatedAttendances = filteredAttendances.slice(startIdx, startIdx + itemsPerPage);
+  console.log('filteredAttendances', filteredAttendances)
 
-  // ---------- Handlers ----------
+  console.log('paginatedAttendances', paginatedAttendances)
   const handleTimeChange = (
     id: string,
     field: 'in_time' | 'out_time' | 'shift',
@@ -92,7 +83,7 @@ const { dates, weekDates, monthDates } = useAttendanceDates(rangeMode, date);
             total_hours: 0,
             status: 'ABSENT',
           });
-        } } else if (value && shiftTimeMap[value as ShiftType]) {
+        } else if (value && shiftTimeMap[value as ShiftType]) {
           const { in_time, out_time } = shiftTimeMap[value as ShiftType];
           updated.in_time = in_time;
           updated.out_time = out_time;
@@ -101,6 +92,7 @@ const { dates, weekDates, monthDates } = useAttendanceDates(rangeMode, date);
         } else {
           console.warn(`Invalid shift value: ${value}`);
         }
+      }
 
       if (field === 'in_time' || field === 'out_time') {
         const inTime = field === 'in_time' ? value : updated.in_time;
@@ -134,20 +126,18 @@ const { dates, weekDates, monthDates } = useAttendanceDates(rangeMode, date);
 
   return (
     <div className="space-y-4">
-
-      <AttendanceHeaderStats
-        employees={employees}
-        attendance={attendance} // ✅ Fix: pass this prop
+     {/*<AttendanceHeaderStats
+        employees={filteredAttendances}
+        attendance={attendance}
         date={date}
         department={departmentFilter}
-      />
+      />*/}
       <AttendanceModeTabs
         mode={viewMode}
         onModeChange={setViewMode}
         range={rangeMode}
         onRangeChange={setRangeMode}
       />
-
       <AttendanceFilters
         date={date}
         onDateChange={setDate}
@@ -160,53 +150,52 @@ const { dates, weekDates, monthDates } = useAttendanceDates(rangeMode, date);
         onSearchChange={setSearchQuery}
         rangeMode={rangeMode}
         onRangeChange={setRangeMode}
-        employees={employees}
+        employees={filteredAttendances}
         attendanceMap={attendanceMap}
         dates={dates}
-      />
-
+      /> 
       {rangeMode === 'day' ? (
         viewMode === 'edit' ? (
-            <AttendanceEditMode
-            employees={paginatedEmployees}
+          <AttendanceEditMode
+            employees={paginatedAttendances}
             attendance={attendance}
-            onTimeChange={handleTimeChange} // ✅ Now supports "shift"
+            onTimeChange={handleTimeChange}
             onOvertimeChange={handleOvertimeChange}
             pageStart={startIdx}
             shift={shift}
             date={date}
           />
         ) : (
-            <AttendanceViewMode
-            employees={paginatedEmployees}
+          <AttendanceViewMode
+            employees={paginatedAttendances}
             pageStart={startIdx}
             date={date}
+            loading={isLoading}
           />
         )
       ) : rangeMode === 'week' ? (
         <AttendanceWeeklyTable
-  employees={filteredEmployees}
-  weekDates={weekDates}
-  page={page}
-  pageSize={itemsPerPage}
-  onPageChange={setPage}
-  onPageSizeChange={setItemsPerPage}
-/>
+          employees={filteredAttendances}
+          weekDates={weekDates}
+          page={page}
+          pageSize={itemsPerPage}
+          onPageChange={setPage}
+          onPageSizeChange={setItemsPerPage}
+        />
       ) : (
         <AttendanceMonthlyTable
-  employees={filteredEmployees}
-  monthDates={monthDates}
-  page={page}
-  pageSize={itemsPerPage}
-  onPageChange={setPage}
-  onPageSizeChange={setItemsPerPage}
-/>
+          employees={filteredAttendances}
+          monthDates={monthDates}
+          page={page}
+          pageSize={itemsPerPage}
+          onPageChange={setPage}
+          onPageSizeChange={setItemsPerPage}
+        />
       )}
-
       {rangeMode === 'day' && (
         <AttendancePagination
           page={page}
-          total={filteredEmployees.length}
+          total={filteredAttendances.length}
           pageSize={itemsPerPage}
           onPageChange={setPage}
           onPageSizeChange={setItemsPerPage}

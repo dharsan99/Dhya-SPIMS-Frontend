@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Employee } from '../../../types/employee';
+import { AttendanceRecord } from '@/types/attendance';
 import { AttendanceRow } from './AttendanceTypes';
 import AttendancePagination from './AttendancePagination';
 import { fetchAttendanceByDate } from '../../../api/attendance';
 
 interface Props {
-  employees: Employee[];
+  employees: AttendanceRecord[];
   monthDates: string[]; // format: YYYY-MM-DD
   page: number;
   pageSize: number;
@@ -91,11 +91,11 @@ const AttendanceMonthlyTable: React.FC<Props> = ({
               <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
                 {paginatedEmployees.map((emp) => (
                   <tr
-                    key={emp.id}
+                    key={emp.employee_id}
                     className="hover:bg-gray-50 dark:hover:bg-gray-800 transition"
                   >
                     <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-300">
-                      {emp.token_no || <span className="italic text-gray-400">–</span>}
+                      {emp.employee_id || <span className="italic text-gray-400">–</span>}
                     </td>
                     <td className="px-4 py-3 text-gray-900 dark:text-white max-w-[180px] truncate" title={emp.name}>
                       {emp.name}
@@ -125,11 +125,11 @@ const AttendanceMonthlyTable: React.FC<Props> = ({
               <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
                 {paginatedEmployees.map((emp) => (
                   <tr
-                    key={emp.id}
+                    key={emp.employee_id}
                     className="hover:bg-gray-50 dark:hover:bg-gray-800 transition"
                   >
                     {monthDates.map((date) => {
-                      const att = attendanceMap[date]?.[emp.id];
+                      const att = attendanceMap[date]?.[emp.employee_id];
                       return (
                         <td key={date} className="px-4 py-3 text-center">
                           {getStatusBadge(att?.status)}
@@ -160,7 +160,7 @@ const AttendanceMonthlyTable: React.FC<Props> = ({
                   let totalOvertime = 0;
 
                   monthDates.forEach((date) => {
-                    const att = attendanceMap[date]?.[emp.id];
+                    const att = attendanceMap[date]?.[emp.employee_id];
                     if (att && ['PRESENT', 'HALF_DAY'].includes(att.status)) {
                       totalHours += att.total_hours;
                       totalOvertime += att.overtime_hours;
@@ -168,12 +168,12 @@ const AttendanceMonthlyTable: React.FC<Props> = ({
                     }
                   });
 
-                  const hourlyRate = parseFloat(emp.shift_rate.toString()) / 8;
+                  const hourlyRate = (emp.shift_rate || 0) / 8;
                   const wages = parseFloat((hourlyRate * totalHours).toFixed(2));
 
                   return (
                     <tr
-                      key={emp.id}
+                      key={emp.employee_id}
                       className="hover:bg-gray-50 dark:hover:bg-gray-800 transition"
                     >
                       <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-300">{workDays}</td>

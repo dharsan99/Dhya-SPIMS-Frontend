@@ -1,12 +1,9 @@
 import { AttendanceRow } from "@/components/Employees/attendance/AttendanceTypes";
-import { Employee } from "@/types/employee";
+import { AttendanceRecord } from "@/types/attendance";
 import { format, addDays, addWeeks, startOfWeek, startOfMonth, addMonths as addMonthsFn } from 'date-fns';
 
-
-
-
-export const buildEmptyRow = (emp: Employee): AttendanceRow => ({
-    employee_id: emp.id,
+export const buildEmptyRow = (emp: AttendanceRecord): AttendanceRow => ({
+    employee_id: emp.employee_id,
     in_time: '',
     out_time: '',
     total_hours: 0,
@@ -16,19 +13,18 @@ export const buildEmptyRow = (emp: Employee): AttendanceRow => ({
     status: 'ABSENT',
     shift: 'ABSENT',
     department: emp.department || '',
-  });
-
+});
 
 export const buildAttendanceMap = (
   dates: string[],
-  employees: Employee[],
+  employees: AttendanceRecord[],
   attendance: Record<string, AttendanceRow>
 ) => {
   const map: Record<string, Record<string, AttendanceRow>> = {};
   dates.forEach((d) => {
     map[d] = {};
     employees.forEach((emp) => {
-      map[d][emp.id] = attendance[emp.id] || buildEmptyRow(emp);
+      map[d][emp.employee_id] = attendance[emp.employee_id] || buildEmptyRow(emp);
     });
   });
   return map;
@@ -58,7 +54,7 @@ export const generateMonthRanges = (baseDate: Date = new Date()) => {
 };
 
 export const calculateWeeklyTotals = (
-  emp: Employee,
+  emp: AttendanceRecord,
   attendanceMap: Record<string, Record<string, AttendanceRow>>,
   weekDates: string[]
 ) => {
@@ -67,7 +63,7 @@ export const calculateWeeklyTotals = (
   let totalOvertime = 0;
 
   weekDates.forEach((date) => {
-    const att = attendanceMap[date]?.[emp.id];
+    const att = attendanceMap[date]?.[emp.employee_id];
     if (att && att.status !== 'ABSENT') {
       totalHours += att.total_hours;
       totalOvertime += att.overtime_hours;
@@ -75,7 +71,7 @@ export const calculateWeeklyTotals = (
     }
   });
 
-  const dailyRate = parseFloat(emp.shift_rate.toString());
+  const dailyRate = parseFloat((emp.shift_rate ?? 0).toString());
   const hourlyRate = dailyRate / 8;
   const wages = parseFloat((totalHours * hourlyRate).toFixed(2));
 

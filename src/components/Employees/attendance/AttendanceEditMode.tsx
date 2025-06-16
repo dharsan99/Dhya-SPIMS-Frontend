@@ -1,8 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { AttendanceEditModeProps, ShiftType, shiftTimeMap } from './AttendanceTypes';
-import { markAttendance, fetchAttendanceByDate, MarkAttendancePayload, markSingleAttendance } from '../../../api/attendance';
+import { markAttendance, fetchAttendanceByDate,  markSingleAttendance } from '../../../api/attendance';
 import { TailwindDialog } from '../../ui/Dialog';
 import { useQueryClient } from '@tanstack/react-query';
+import { MarkAttendancePayload } from '@/types/attendance';
+
+const normalizeShift = (shift: string): ShiftType | 'ABSENT' => {
+  const upper = shift.toUpperCase();
+  if (upper === 'MORNING' || upper === 'EVENING' || upper === 'NIGHT') return upper as ShiftType;
+  if (upper === 'ABSENT') return 'ABSENT';
+  console.warn('⚠️ Invalid normalized shift:', shift);
+  return 'ABSENT';
+};
 
 const AttendanceEditMode: React.FC<
   AttendanceEditModeProps & {
@@ -21,7 +30,7 @@ const AttendanceEditMode: React.FC<
           records.forEach((rec: any) => {
             const existing = attendance[rec.employee_id];
             if (!existing?.shift || existing.shift === 'ABSENT') {
-              onTimeChange(rec.employee_id, 'shift', rec.shift);
+              onTimeChange(rec.employee_id, 'shift', normalizeShift(rec.shift));
               onTimeChange(rec.employee_id, 'in_time', shiftTimeMap[rec.shift as ShiftType]?.in_time || '');
               onTimeChange(rec.employee_id, 'out_time', shiftTimeMap[rec.shift as ShiftType]?.out_time || '');
               onOvertimeChange(rec.employee_id, rec.overtime_hours || 0);
@@ -54,12 +63,12 @@ const AttendanceEditMode: React.FC<
       const payload: MarkAttendancePayload = {
         date,
         records: employees.map((emp) => {
-          const att = attendance[emp.id];
+          const att = attendance[emp.employee_id];
           const overtime = att?.overtime_hours || 0;
           const isPresent = att?.shift !== 'ABSENT';
 
           return {
-            employee_id: emp.id,
+            employee_id: emp.employee_id,
             in_time: att?.in_time || '',
             out_time: att?.out_time || '',
             total_hours: isPresent ? 8 + overtime : 0,
@@ -100,34 +109,38 @@ const AttendanceEditMode: React.FC<
           </thead>
           <tbody>
             {employees.map((emp, idx) => {
-              const att = attendance[emp.id];
+              const att = attendance[emp.employee_id];
               const shiftValue = att?.shift || 'ABSENT';
               const isPresent = shiftValue !== 'ABSENT';
               const overtime = att?.overtime_hours ?? 0;
               const totalHours = isPresent ? 8 + overtime : 0;
 
               return (
-                <tr key={emp.id} className="border-t dark:border-gray-700 even:bg-gray-50 dark:even:bg-gray-900">
-                  <td className="px-3 py-2 text-center">{emp.token_no || pageStart + idx + 1}</td>
+                <tr key={idx} className="border-t dark:border-gray-700 even:bg-gray-50 dark:even:bg-gray-900">
+                  <td className="px-3 py-2 text-center">{pageStart + idx + 1}</td>
                   <td className="px-3 py-2 text-left truncate max-w-[160px]">{emp.name}</td>
                   <td className="px-3 py-2 text-center">
-                    <select
+                  <select
                       value={shiftValue}
-                      onChange={(e) => handleShiftChange(emp.id, e.target.value)}
+                      onChange={(e) => handleShiftChange(emp.employee_id, e.target.value)}
                       className="w-28 px-2 py-1 rounded border text-sm dark:bg-gray-800 dark:text-white"
                     >
                       <option value="ABSENT">Absent</option>
-                      <option value="SHIFT_1">Shift 1</option>
-                      <option value="SHIFT_2">Shift 2</option>
-                      <option value="SHIFT_3">Shift 3</option>
+                      <option value="MORNING">Morning</option>
+                      <option value="EVENING">Evening</option>
+                      <option value="NIGHT">Night</option>
                     </select>
+
                   </td>
                   <td className="px-3 py-2 text-center">
                     <input
                       type="number"
                       min={0}
-                      value={overtime}
-                      onChange={(e) => onOvertimeChange(emp.id, Number(e.target.value))}
+                      value={overtime || ''}
+                      onChange={(e) => {
+                        const value = e.target.value === '' ? 0 : +e.target.value;
+                        onOvertimeChange(emp.employee_id, value);
+                      }}
                       className="w-20 px-2 py-1 rounded border text-center dark:bg-gray-800 dark:text-white"
                     />
                   </td>
@@ -138,7 +151,7 @@ const AttendanceEditMode: React.FC<
                       <button
                         className="px-2 py-1 text-sm bg-green-600 hover:bg-green-700 text-white rounded"
                         onClick={async () => {
-                          const att = attendance[emp.id];
+                          const att = attendance[emp.employee_id];
                           if (!att || att.shift === 'ABSENT') {
                             alert('Cannot update attendance for absent employees.');
                             return;
@@ -151,7 +164,7 @@ const AttendanceEditMode: React.FC<
                         
                             const payload = {
                               date,
-                              employee_id: emp.id,
+                              employee_id: emp.employee_id,
                               in_time: inDateTime.toISOString(),
                               out_time: outDateTime.toISOString(),
                               overtime_hours: att.overtime_hours || 0,
@@ -160,7 +173,7 @@ const AttendanceEditMode: React.FC<
                             };
                         
                             await markSingleAttendance(payload);
-                            alert(`✅ Attendance updated for ${emp.name}`);
+                            alert(`✅ Attendance updated for ${emp.employee.name}`);
                             queryClient.invalidateQueries({ queryKey: ['attendance'] });
                           } catch (error) {
                             console.error('❌ Failed to update single attendance:', error);
