@@ -89,6 +89,8 @@ const UploadPurchaseOrderModal: React.FC<Props> = ({
     setError('');
     setFormData(null);
 
+
+
     try {
       const createdPO = await uploadAndParsePurchaseOrder(file);
 

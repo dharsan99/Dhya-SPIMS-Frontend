@@ -55,43 +55,49 @@ const AttendanceMonthlyTable: React.FC<Props> = ({
     const normalized = status?.toUpperCase();
     switch (normalized) {
       case 'PRESENT':
-        return <span className="text-green-600">✅</span>;
+        return <span className="text-green-600 dark:text-green-400">✅</span>;
       case 'HALF_DAY':
-        return <span className="text-yellow-500">½</span>;
+        return <span className="text-yellow-500 dark:text-yellow-400">½</span>;
       case 'LEAVE':
-        return <span className="text-blue-500">📘</span>;
+        return <span className="text-blue-500 dark:text-blue-400">📘</span>;
       default:
-        return <span className="text-red-500">❌</span>;
+        return <span className="text-red-500 dark:text-red-400">❌</span>;
     }
   };
 
   if (loading) {
-    return <div className="text-center py-6 text-gray-500">Loading monthly attendance...</div>;
+    return (
+      <div className="w-full overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm bg-white dark:bg-gray-900">
+        <div className="text-center py-6 text-gray-500 italic dark:text-gray-400">
+          Loading monthly attendance...
+        </div>
+      </div>
+    );
   }
 
   return (
     <div className="space-y-4">
-      <div className="border rounded-lg shadow-sm dark:border-gray-700 overflow-hidden">
+      <div className="w-full overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm bg-white dark:bg-gray-900">
         <div className="grid grid-cols-[180px_1fr_240px]">
           {/* Left Fixed Columns */}
           <div>
-            <table className="text-sm w-full border-separate border-spacing-0">
-              <thead className="bg-gray-100 dark:bg-gray-800 sticky top-0 z-10 text-gray-800 dark:text-gray-100">
+            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 text-sm">
+              <thead className="bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-semibold sticky top-0 z-10">
                 <tr>
-                  <th className="border-b px-3 py-2 dark:border-gray-700">T.No</th>
-                  <th className="border-b px-3 py-2 dark:border-gray-700">Employee</th>
+                  <th className="px-4 py-3 text-center">T.No</th>
+                  <th className="px-4 py-3 text-left">Employee</th>
                 </tr>
               </thead>
-              <tbody>
-                {paginatedEmployees.map((emp, i) => (
+              <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+                {paginatedEmployees.map((emp) => (
                   <tr
                     key={emp.id}
-                    className={i % 2 === 0 ? 'bg-white dark:bg-gray-900' : 'bg-gray-50 dark:bg-gray-800'}
+                    className="hover:bg-gray-50 dark:hover:bg-gray-800 transition"
                   >
-                    <td className="px-3 py-2 text-center border-b dark:border-gray-700">
-                      {emp.token_no || '-'}
+                    <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-300">
+                      {emp.token_no || <span className="italic text-gray-400">–</span>}
                     </td>
-                    <td className="px-3 py-2 border-b dark:border-gray-700 max-w-[180px] truncate" title={emp.name}>
+                    <td className="px-4 py-3 text-gray-900 dark:text-white max-w-[180px] truncate" title={emp.name}>
                       {emp.name}
                     </td>
                   </tr>
@@ -102,30 +108,30 @@ const AttendanceMonthlyTable: React.FC<Props> = ({
 
           {/* Scrollable Dates Table */}
           <div className="overflow-x-auto">
-            <table className="text-sm w-full border-separate border-spacing-0">
-              <thead className="bg-gray-100 dark:bg-gray-800 sticky top-0 z-10 text-gray-800 dark:text-gray-100">
+            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 text-sm">
+              <thead className="bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-semibold sticky top-0 z-10">
                 <tr>
                   {monthDates.map((date) => (
                     <th
                       key={date}
                       title={date}
-                      className="px-3 py-2 border-b text-center whitespace-nowrap dark:border-gray-700"
+                      className="px-4 py-3 text-center whitespace-nowrap"
                     >
                       {date.slice(8)}
                     </th>
                   ))}
                 </tr>
               </thead>
-              <tbody>
-                {paginatedEmployees.map((emp, i) => (
+              <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+                {paginatedEmployees.map((emp) => (
                   <tr
                     key={emp.id}
-                    className={i % 2 === 0 ? 'bg-white dark:bg-gray-900' : 'bg-gray-50 dark:bg-gray-800'}
+                    className="hover:bg-gray-50 dark:hover:bg-gray-800 transition"
                   >
                     {monthDates.map((date) => {
                       const att = attendanceMap[date]?.[emp.id];
                       return (
-                        <td key={date} className="px-3 py-2 text-center border-b dark:border-gray-700">
+                        <td key={date} className="px-4 py-3 text-center">
                           {getStatusBadge(att?.status)}
                         </td>
                       );
@@ -138,17 +144,17 @@ const AttendanceMonthlyTable: React.FC<Props> = ({
 
           {/* Right Summary Columns */}
           <div>
-            <table className="text-sm w-full border-separate border-spacing-0">
-              <thead className="bg-gray-100 dark:bg-gray-800 sticky top-0 z-10 text-gray-800 dark:text-gray-100">
+            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 text-sm">
+              <thead className="bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-semibold sticky top-0 z-10">
                 <tr>
-                  <th className="border-b px-3 py-2 dark:border-gray-700">WD</th>
-                  <th className="border-b px-3 py-2 dark:border-gray-700">OT</th>
-                  <th className="border-b px-3 py-2 dark:border-gray-700">TH</th>
-                  <th className="border-b px-3 py-2 dark:border-gray-700">Wages</th>
+                  <th className="px-4 py-3 text-center">WD</th>
+                  <th className="px-4 py-3 text-center">OT</th>
+                  <th className="px-4 py-3 text-center">TH</th>
+                  <th className="px-4 py-3 text-center">Wages</th>
                 </tr>
               </thead>
-              <tbody>
-                {paginatedEmployees.map((emp, i) => {
+              <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+                {paginatedEmployees.map((emp) => {
                   let workDays = 0;
                   let totalHours = 0;
                   let totalOvertime = 0;
@@ -168,12 +174,14 @@ const AttendanceMonthlyTable: React.FC<Props> = ({
                   return (
                     <tr
                       key={emp.id}
-                      className={i % 2 === 0 ? 'bg-white dark:bg-gray-900' : 'bg-gray-50 dark:bg-gray-800'}
+                      className="hover:bg-gray-50 dark:hover:bg-gray-800 transition"
                     >
-                      <td className="px-3 py-2 text-center border-b dark:border-gray-700">{workDays}</td>
-                      <td className="px-3 py-2 text-center border-b dark:border-gray-700">{totalOvertime}</td>
-                      <td className="px-3 py-2 text-center border-b dark:border-gray-700">{totalHours}</td>
-                      <td className="px-3 py-2 text-center border-b dark:border-gray-700">₹{wages.toFixed(2)}</td>
+                      <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-300">{workDays}</td>
+                      <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-300">{totalOvertime}</td>
+                      <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-300">{totalHours}</td>
+                      <td className="px-4 py-3 text-center text-blue-700 dark:text-blue-400 font-semibold">
+                        ₹{wages.toFixed(2)}
+                      </td>
                     </tr>
                   );
                 })}

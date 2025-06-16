@@ -18,10 +18,13 @@ import FibreSuppliersPanel from '../components/Fibers/FibreSuppliersPanel';
 import FibreTransfersPanel from '../components/Fibers/FibreTransfersPanel';
 import FibersToolbar from '../components/Fibers/FibersToolbar';
 import FibersTable from '../components/Fibers/FibersTable';
+import { CreateFibreTransfer, FibreTransfer } from '../types/fibreTransfer';
+import FiberStocksPanel from '@/components/Fibers/FibreStocksPanel';
+import useAuthStore from '@/hooks/auth';
 
 const Fibers = () => {
   const queryClient = useQueryClient();
-  const [tab, setTab] = useState<'fibres' | 'categories' | 'suppliers' | 'transfers'>('fibres');
+  const [tab, setTab] = useState<'fibres' | 'categories' | 'suppliers' | 'transfers' | 'stock'>('fibres');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [fiberToEdit, setFiberToEdit] = useState<Fiber | null>(null);
   const [stockModalFibre, setStockModalFibre] = useState<Fiber | null>(null);
@@ -29,6 +32,11 @@ const Fibers = () => {
   const [search, setSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const hasPermission = useAuthStore((state) => state.hasPermission); // 👈 get permission checker
+
+  const canViewSuppliers = hasPermission('Suppliers', 'View Supplier');
+  const canViewStocks = hasPermission('Stocks', 'View Stock');
+    // 👈 permission check
 
   const { data: fibres = [], isLoading: loadingFibres } = useQuery<Fiber[]>({
     queryKey: ['fibres'],
@@ -115,10 +123,10 @@ const Fibers = () => {
   }
 
   return (
-    <div className="p-6 transition-colors duration-300">
+    <div className="p-4 transition-colors duration-300">
       {/* Tab Buttons */}
-      <div className="flex border-b border-gray-200 dark:border-gray-700 mb-4">
-        {(['fibres', 'categories', 'suppliers', 'transfers'] as const).map((key) => (
+     <div className="flex border-b border-gray-200 dark:border-gray-700 mb-4">
+        {(['fibres', 'stock', 'categories', 'suppliers', 'transfers'] as const).map((key) => (
           <button
             key={key}
             onClick={() => setTab(key)}
@@ -136,7 +144,18 @@ const Fibers = () => {
       {/* Tab Content */}
       <div className="relative">
         {tab === 'categories' && <FibreCategoriesPanel />}
-        {tab === 'suppliers' && <FibreSuppliersPanel />}
+        {tab === 'stock' && canViewStocks && <FiberStocksPanel />}
+        {tab === 'stock' && !canViewStocks && (
+          <div className="p-4 text-red-500 dark:text-red-400">
+            You do not have permission to view stocks.
+          </div>
+        )}
+        {tab === 'suppliers' && canViewSuppliers && <FibreSuppliersPanel />}
+          {tab === 'suppliers' && !canViewSuppliers && (
+            <div className="p-4 text-red-500 dark:text-red-400">
+              You do not have permission to view suppliers.
+            </div>
+          )}
         {tab === 'transfers' && (
           <FibreTransfersPanel
             fibres={fibres}

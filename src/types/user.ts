@@ -1,7 +1,7 @@
 export interface Role {
   id: string;
   name: string;
-  permissions: string[];
+  permissions: Record<string, string[]>;
 }
 
 export interface User {
@@ -13,4 +13,5 @@ export interface User {
   role?: Role;
   tenant_id?: string;
   is_active?: boolean;
+  user_roles?: any[]
 }

@@ -10,6 +10,17 @@ export interface AttendanceRecord {
   status: AttendanceStatus;
 }
 
+interface SingleAttendancePayload {
+  date: string;
+  employee_id: string;
+  in_time: string;
+  out_time: string;
+  overtime_hours: number;
+  status: 'PRESENT' | 'ABSENT';
+  shift: ShiftType;
+}
+
+
 export interface MarkAttendancePayload {
   date: string; // Format: yyyy-MM-dd
   records: AttendanceRecord[];
@@ -20,6 +31,11 @@ export interface MarkAttendancePayload {
  */
 export const markAttendance = async (payload: MarkAttendancePayload) => {
   const res = await api.post('/attendance/mark', payload);
+  return res.data;
+};
+
+export const markSingleAttendance = async (payload: SingleAttendancePayload) => {
+  const res = await api.post('/attendance', payload);
   return res.data;
 };
 

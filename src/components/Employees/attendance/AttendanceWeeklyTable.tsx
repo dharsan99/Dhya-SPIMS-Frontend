@@ -1,8 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Employee } from '../../../types/employee';
 import { AttendanceRow } from './AttendanceTypes';
 import AttendancePagination from './AttendancePagination';
 import { fetchAttendanceByDate } from '../../../api/attendance';
+import { getStatusBadge } from './StatusBadge';
+import { calculateWeeklyTotals } from './utils/attendence';
+import { formatINR } from './utils/attendence';
 
 interface Props {
   employees: Employee[];
@@ -24,18 +27,34 @@ const AttendanceWeeklyTable: React.FC<Props> = ({
   const [attendanceMap, setAttendanceMap] = useState<Record<string, Record<string, AttendanceRow>>>({});
   const [loading, setLoading] = useState(true);
 
-  const startIndex = (page - 1) * pageSize;
-  const paginatedEmployees = employees.slice(startIndex, startIndex + pageSize);
+  const paginatedEmployees = useMemo(() => {
+    const startIndex = (page - 1) * pageSize;
+    return employees.slice(startIndex, startIndex + pageSize);
+  }, [employees, page, pageSize]);
+
+  const weeklyTotals = useMemo(() => {
+    const totals: Record<string, ReturnType<typeof calculateWeeklyTotals>> = {};
+    employees.forEach((emp) => {
+      totals[emp.id] = calculateWeeklyTotals(emp, attendanceMap, weekDates);
+    });
+    return totals;
+  }, [employees, attendanceMap, weekDates]);
 
   useEffect(() => {
     const fetchAllAttendance = async () => {
       setLoading(true);
-      const newMap: Record<string, Record<string, AttendanceRow>> = {};
 
-      for (const date of weekDates) {
-        try {
-          const rows = await fetchAttendanceByDate(date);
-          newMap[date] = {};
+      const results = await Promise.all(
+        weekDates.map((date) =>
+          fetchAttendanceByDate(date)
+            .then((rows) => ({ date, rows }))
+            .catch((err) => {
+              console.error(`❌ Error fetching attendance for ${date}:`, err);
+              return { date, rows: [] };
+            })
+        )
+      );
+
 
           rows.forEach((row: AttendanceRow) => {
             newMap[date][row.employee_id] = row;
@@ -45,6 +64,15 @@ const AttendanceWeeklyTable: React.FC<Props> = ({
         }
       }
 
+      const newMap: Record<string, Record<string, AttendanceRow>> = {};
+      results.forEach(({ date, rows }) => {
+        newMap[date] = {};
+        rows.forEach((row: any) => {
+          newMap[date][row.employee_id] = row;
+        });
+      });
+
+
       setAttendanceMap(newMap);
       setLoading(false);
     };
@@ -52,107 +80,91 @@ const AttendanceWeeklyTable: React.FC<Props> = ({
     fetchAllAttendance();
   }, [weekDates]);
 
-  const getStatusBadge = (status?: string) => {
-    const normalized = status?.toUpperCase?.();
-
-    switch (normalized) {
-      case 'PRESENT':
-        return <span className="text-green-600">✅</span>;
-      case 'HALF_DAY':
-        return <span className="text-yellow-500">½</span>;
-      case 'LEAVE':
-        return <span className="text-blue-500">📘</span>;
-      case 'ABSENT':
-        return <span className="text-red-500">❌</span>;
-      default:
-        return <span className="text-gray-400">–</span>;
-    }
-  };
-
-const calculateWeeklyTotals = (emp: Employee) => {
-  let totalHours = 0;
-  let totalDays = 0;
-  let totalOvertime = 0;
-
-  weekDates.forEach((date) => {
-    const att = attendanceMap[date]?.[emp.id];
-
-    if (att && att.status !== 'ABSENT') {
-      totalHours += att.total_hours;
-      totalOvertime += att.overtime_hours;
-
-      if (att.status === 'PRESENT') {
-        totalDays += 1;
-      } else if (att.status === 'HALF_DAY') {
-        totalDays += 0.5;
-      }
-    }
-  });
-
-  const dailyRate = parseFloat(emp.shift_rate.toString());
-  const hourlyRate = dailyRate / 8;
-  const wages = parseFloat((totalHours * hourlyRate).toFixed(2));
-
-  return { totalHours, totalDays, totalOvertime, wages };
-};
-
   if (loading) {
-    return <div className="text-center py-6 text-sm text-gray-500">Loading weekly attendance...</div>;
+    return (
+      <div className="w-full overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm bg-white dark:bg-gray-900">
+        <div className="text-center py-6 text-gray-500 italic dark:text-gray-400">
+          Loading weekly attendance...
+        </div>
+      </div>
+    );
   }
 
   return (
     <div className="space-y-4">
-      <div className="overflow-x-auto rounded border dark:border-gray-700 shadow-sm">
-        <table className="min-w-full text-sm text-left border-collapse">
-          <thead className="sticky top-0 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 z-10">
+      <div className="w-full overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm bg-white dark:bg-gray-900">
+        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 text-sm">
+          <thead className="bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-semibold sticky top-0 z-10">
             <tr>
-              <th className="px-4 py-2 border dark:border-gray-700">T.No</th>
-              <th className="px-4 py-2 border dark:border-gray-700">Employee</th>
+              <th className="px-4 py-3 text-center">T.No</th>
+              <th className="px-4 py-3 text-left">Employee</th>
               {weekDates.map((date) => (
                 <th
                   key={date}
-                  className="px-3 py-2 border dark:border-gray-700 text-center whitespace-nowrap"
+                  className="px-4 py-3 text-center whitespace-nowrap"
                   title={date}
                 >
                   {date.slice(5)} {/* shows MM-DD */}
                 </th>
               ))}
-              <th className="px-3 py-2 border dark:border-gray-700 text-center">Total Hrs</th>
-              <th className="px-3 py-2 border dark:border-gray-700 text-center">Days</th>
-              <th className="px-3 py-2 border dark:border-gray-700 text-center">Overtime</th>
-              <th className="px-3 py-2 border dark:border-gray-700 text-center">Wages</th>
+              <th className="px-4 py-3 text-center">Total Hrs</th>
+              <th className="px-4 py-3 text-center">Days</th>
+              <th className="px-4 py-3 text-center">Overtime</th>
+              <th className="px-4 py-3 text-center">Wages</th>
             </tr>
           </thead>
-          <tbody>
-            {paginatedEmployees.map((emp, i) => {
-              const { totalHours, totalDays, totalOvertime, wages } = calculateWeeklyTotals(emp);
+          <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+            {paginatedEmployees.length > 0 ? (
+              paginatedEmployees.map((emp, idx) => {
+                const { totalHours, totalDays, totalOvertime, wages } = weeklyTotals[emp.id];
 
-              return (
-                <tr
-                  key={emp.id}
-                  className={`border-t dark:border-gray-700 ${
-                    i % 2 === 0 ? 'bg-white dark:bg-gray-900' : 'bg-gray-50 dark:bg-gray-800'
-                  }`}
+                return (
+                  <tr
+                    key={emp.id}
+                    className="hover:bg-gray-50 dark:hover:bg-gray-800 transition"
+                  >
+                    <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-300">
+                      {emp.token_no || (page - 1) * pageSize + idx + 1}
+                    </td>
+                    <td
+                      className="px-4 py-3 text-gray-900 dark:text-white max-w-[200px] truncate"
+                      title={emp.name}
+                    >
+                      {emp.name}
+                    </td>
+                    {weekDates.map((date) => {
+                      const att = attendanceMap[date]?.[emp.id];
+                      return (
+                        <td key={date} className="px-4 py-3 text-center">
+                          {getStatusBadge(att?.status)}
+                        </td>
+                      );
+                    })}
+                    <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-300">
+                      {totalHours}
+                    </td>
+                    <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-300">
+                      {totalDays}
+                    </td>
+                    <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-300">
+                      {totalOvertime}
+                    </td>
+                    <td className="px-4 py-3 text-center text-blue-700 dark:text-blue-400">
+                      {formatINR(wages)}
+                    </td>
+                  </tr>
+                );
+              })
+            ) : (
+              <tr>
+                <td
+                  colSpan={7 + weekDates.length}
+                  className="text-center py-6 text-gray-500 italic dark:text-gray-400"
                 >
-                  <td className="px-4 py-2 text-center">{emp.token_no || '-'}</td>
-                  <td className="px-4 py-2 max-w-[120px] truncate">{emp.name}</td>
-                  {weekDates.map((date) => {
-                    const att = attendanceMap[date]?.[emp.id];
-                    return (
-                      <td key={date} className="px-2 py-2 text-center">
-                        {getStatusBadge(att?.status)}
-                      </td>
-                    );
-                  })}
-                  <td className="px-2 py-2 text-center">{totalHours}</td>
-                  <td className="px-2 py-2 text-center">{totalDays}</td>
-                  <td className="px-2 py-2 text-center">{totalOvertime}</td>
-                  <td className="px-2 py-2 text-center font-semibold text-green-600 dark:text-green-400">
-                    ₹{wages.toFixed(2)}
-                  </td>
-                </tr>
-              );
-            })}
+                  No employees found.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>

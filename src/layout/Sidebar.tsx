@@ -1,14 +1,34 @@
 import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { FiGrid, FiLayers, FiMapPin, FiSettings, FiPackage, FiUsers, FiMail, FiActivity, FiChevronLeft, FiChevronRight, FiMenu } from 'react-icons/fi';
+import {
+  FiGrid,
+  FiLayers,
+  FiMapPin,
+  FiSettings,
+  FiPackage,
+  FiUsers,
+  FiMail,
+  FiActivity,
+  FiChevronLeft,
+  FiChevronRight,
+  FiMenu,
+} from 'react-icons/fi';
+
 import useAuthStore from '../hooks/auth';
 import logo from '../assets/dhya_texintelli.png';
 
-const Sidebar = () => {
+const Sidebar = ({ onLinkClick }: { onLinkClick?: () => void }) => {
   const auth = useAuthStore();
   const email = auth.user?.email || '';
   const [collapsed, setCollapsed] = useState(true);
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  const hasPermission = useAuthStore((state) => state.hasPermission);
+  const canViewFibres = hasPermission('Fibres', 'View Fibre');
+  const canViewShades = hasPermission('Shades', 'View Shade');
+  const canViewEmployees = hasPermission('Employees', 'View Employee');
+  const canViewMarketing = hasPermission('Marketing', 'View Marketing');
+  const canViewSettings = hasPermission('Settings', 'View Settings');
 
   const navLinkStyles = collapsed
     ? 'flex items-center justify-center px-0 py-2 rounded-lg transition-colors duration-200 text-xl'
@@ -26,25 +46,24 @@ const Sidebar = () => {
     <NavLink
       to={to}
       aria-label={label}
+      onClick={onLinkClick}
       className={({ isActive }) =>
         `${navLinkStyles} ${isActive ? activeLink : inactiveLink}`
       }
-      tabIndex={0}
     >
       <Icon className={collapsed ? 'w-6 h-6 shrink-0' : 'w-5 h-5 shrink-0'} />
       {!collapsed && <span className="truncate">{label}</span>}
     </NavLink>
-  ); 
+  );
 
   const isOrderUser = email === 'orders@nscspinning.com';
 
-  // Sidebar content
   const sidebarContent = (
     <aside
       className={`z-40 h-full flex flex-col bg-white dark:bg-gray-900 border-r dark:border-gray-700 shadow-md transition-all duration-300 overflow-y-auto ${collapsed ? 'w-20' : 'w-64'} ${mobileOpen ? 'fixed left-0 top-0 w-64' : 'sticky top-0'}`}
       aria-label="Sidebar Navigation"
     >
-      {/* Collapse/Expand & Mobile Hamburger */}
+      {/* Header Section */}
       <div className="flex items-center justify-between mb-6 px-2">
         <button
           className="md:hidden p-2 focus:outline-none"
@@ -53,7 +72,7 @@ const Sidebar = () => {
         >
           <FiChevronLeft className="w-6 h-6" />
         </button>
-        <div className={`flex items-center justify-start w-full py-2 transition-all duration-300`}>
+        <div className="flex items-center justify-start w-full py-2 transition-all duration-300">
           {!collapsed && (
             <img
               src={logo}
@@ -90,22 +109,22 @@ const Sidebar = () => {
             {createNavLink('/app/production', 'Production', FiActivity)}
           </div>
         </div>
-        <hr className="my-2 border-gray-200 dark:border-gray-700" />
+
         {/* Master Data */}
-        {!isOrderUser && (
+        {(canViewFibres || canViewShades || canViewEmployees || canViewMarketing) && (
           <div>
             <h3 className={`text-xs font-bold uppercase px-2 mb-3 tracking-wide ${collapsed ? 'hidden' : 'text-gray-400 dark:text-gray-500'}`}>Master Data</h3>
             <div className="flex flex-col gap-1">
-              {createNavLink('/app/fibers', 'Fibres', FiLayers)}
-              {createNavLink('/app/shades', 'Shades', FiMapPin)}
-              {createNavLink('/app/employees', 'Employees', FiUsers)}
-              {createNavLink('/app/marketing', 'Marketing', FiMail)}
+              {canViewFibres && createNavLink('/app/fibers', 'Fibres', FiLayers)}
+              {canViewShades && createNavLink('/app/shades', 'Shades', FiMapPin)}
+              {canViewEmployees && createNavLink('/app/employees', 'Employees', FiUsers)}
+              {canViewMarketing && createNavLink('/app/marketing', 'Marketing', FiMail)}
             </div>
           </div>
         )}
-        <hr className="my-2 border-gray-200 dark:border-gray-700" />
-        {/* Settings */}
-        {!isOrderUser && (
+
+        {/* Configuration */}
+        {canViewSettings && !isOrderUser && (
           <div>
             <h3 className={`text-xs font-bold uppercase px-2 mb-3 tracking-wide ${collapsed ? 'hidden' : 'text-gray-400 dark:text-gray-500'}`}>Configuration</h3>
             <div className="flex flex-col gap-1">
@@ -114,14 +133,14 @@ const Sidebar = () => {
           </div>
         )}
       </nav>
+
       <div className="flex-grow" />
     </aside>
   );
 
-  // Mobile overlay
   return (
     <>
-      {/* Hamburger for mobile */}
+      {/* Mobile hamburger button */}
       <button
         className="fixed top-4 left-4 z-50 md:hidden bg-blue-600 text-white p-2 rounded shadow-lg"
         onClick={() => setMobileOpen(true)}
@@ -129,12 +148,17 @@ const Sidebar = () => {
       >
         <FiMenu className="w-6 h-6" />
       </button>
-      {/* Sidebar (desktop or mobile) */}
-      <div className={`fixed inset-0 z-40 bg-black/30 transition-opacity duration-300 ${mobileOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'} md:opacity-100 md:pointer-events-auto md:static md:bg-transparent`}
+
+      {/* Overlay for mobile */}
+      <div
+        className={`fixed inset-0 z-40 bg-black/30 transition-opacity duration-300 ${mobileOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'} md:opacity-100 md:pointer-events-auto md:static md:bg-transparent`}
         onClick={() => setMobileOpen(false)}
         aria-hidden={!mobileOpen}
       />
-      <div className={`transition-all duration-300 ${mobileOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 md:static md:block`}
+
+      {/* Sidebar */}
+      <div
+        className={`transition-all duration-300 ${mobileOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 md:static md:block`}
         style={{ zIndex: 60 }}
       >
         {sidebarContent}
@@ -144,3 +168,4 @@ const Sidebar = () => {
 };
 
 export default Sidebar;
+

@@ -3,9 +3,16 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getAllSuppliers, deleteSupplier } from '../api/suppliers';
 import toast from 'react-hot-toast';
 import { Supplier } from '../types/supplier';
+import useAuthStore from '@/hooks/auth';
 
 const SupplierTable = ({ onEdit }: { onEdit: (supplier: Supplier) => void }) => {
   const queryClient = useQueryClient();
+
+  const hasPermission = useAuthStore((state) => state.hasPermission);
+
+  const canEdit = hasPermission('Suppliers', 'Update Supplier');
+  const canDelete = hasPermission('Suppliers', 'Delete Supplier');
+  const showActions = canEdit || canDelete;
 
   const { data: suppliers = [], isLoading, isError } = useQuery<Supplier[]>({
     queryKey: ['suppliers'],
@@ -41,7 +48,11 @@ const SupplierTable = ({ onEdit }: { onEdit: (supplier: Supplier) => void }) => 
                 <th className="p-3 border-b border-gray-200 dark:border-gray-700">Contact</th>
                 <th className="p-3 border-b border-gray-200 dark:border-gray-700">Email</th>
                 <th className="p-3 border-b border-gray-200 dark:border-gray-700">Address</th>
-                <th className="p-3 border-b border-gray-200 dark:border-gray-700 text-center">Actions</th>
+                {showActions && (
+                  <th className="p-3 border-b border-gray-200 dark:border-gray-700 text-center">
+                    Actions
+                  </th>
+                )}
               </tr>
             </thead>
             <tbody className="text-gray-800 dark:text-gray-200">
@@ -51,20 +62,28 @@ const SupplierTable = ({ onEdit }: { onEdit: (supplier: Supplier) => void }) => 
                   <td className="p-3">{s.contact || '-'}</td>
                   <td className="p-3">{s.email || '-'}</td>
                   <td className="p-3">{s.address || '-'}</td>
-                  <td className="p-3 text-center flex gap-2 justify-center">
-                    <button
-                      onClick={() => onEdit(s)}
-                      className="text-xs bg-yellow-500 hover:bg-yellow-600 text-white px-2 py-1 rounded"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => mutationDelete.mutate(s.id)}
-                      className="text-xs bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded"
-                    >
-                      Delete
-                    </button>
-                  </td>
+                  {showActions && (
+                    <td className="p-3 text-center">
+                      <div className="flex gap-2 justify-center">
+                        {canEdit && (
+                          <button
+                            onClick={() => onEdit(s)}
+                            className="text-xs bg-yellow-500 hover:bg-yellow-600 text-white px-2 py-1 rounded"
+                          >
+                            Edit
+                          </button>
+                        )}
+                        {canDelete && (
+                          <button
+                            onClick={() => mutationDelete.mutate(s.id)}
+                            className="text-xs bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded"
+                          >
+                            Delete
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  )}
                 </tr>
               ))}
               {suppliers.length === 0 && (

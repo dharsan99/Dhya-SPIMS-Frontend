@@ -41,6 +41,14 @@ body {
   z-index: 9999 !important;
 }
 
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
 /* Custom animation using @layer utilities */
 @layer utilities {
   @keyframes fadeInUp {

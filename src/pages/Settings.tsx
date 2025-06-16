@@ -5,9 +5,11 @@ import AppPreferences from '../components/settings/AppPreferences';
 import Notifications from '../components/settings/Notifications';
 import Billing from '../components/settings/Billing';
 import Integrations from '../components/settings/Integrations';
+import useAuthStore from '@/hooks/auth';
 
 const Settings = () => {
   const [tab, setTab] = useState('organization');
+  const { user } = useAuthStore();
 
   const tabList = [
     { key: 'organization', label: 'Organization' },
@@ -17,6 +19,8 @@ const Settings = () => {
     { key: 'billing', label: 'Billing' },
     { key: 'integrations', label: 'Integrations' },
   ];
+
+  console.log('user', user)
 
   const renderTabContent = () => {
     switch (tab) {
@@ -42,12 +46,13 @@ const Settings = () => {
       <h1 className="text-2xl font-bold text-blue-700 dark:text-blue-400 mb-4">Settings</h1>
 
       {/* Tabs */}
-      <div className="flex gap-4 border-b border-gray-200 dark:border-gray-700 mb-6">
+     <div className="overflow-x-auto hide-scrollbar">
+      <div className="flex gap-4 border-b border-gray-200 dark:border-gray-700 mb-6 whitespace-nowrap">
         {tabList.map(({ key, label }) => (
           <button
             key={key}
             onClick={() => setTab(key)}
-            className={`px-4 py-2 border-b-2 transition-colors duration-300 ${
+            className={`px-4 py-2 border-b-2 transition-colors duration-300 shrink-0 ${
               tab === key
                 ? 'border-blue-600 text-blue-600 dark:text-blue-400'
                 : 'border-transparent text-gray-500 hover:text-blue-600 dark:hover:text-blue-400'
@@ -57,6 +62,7 @@ const Settings = () => {
           </button>
         ))}
       </div>
+    </div>
 
       {/* Content */}
       <div className="bg-white dark:bg-gray-800 p-6 rounded shadow transition-colors duration-300">

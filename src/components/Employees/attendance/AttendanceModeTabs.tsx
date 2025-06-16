@@ -1,3 +1,4 @@
+import useAuthStore from '@/hooks/auth';
 import React from 'react';
 
 export type AttendanceViewMode = 'edit' | 'view';
@@ -18,8 +19,11 @@ const AttendanceModeTabs: React.FC<AttendanceModeTabsProps> = ({
 }) => {
   const isEditDisabled = range !== 'day';
 
+  const hasPermission = useAuthStore((state) => state.hasPermission);
+  const canEdit = hasPermission('Attendance', 'Update Attendance');
+
   return (
-    <div className="flex justify-between items-center flex-wrap gap-4">
+    <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-8">
       {/* 👇 Range Tabs */}
       <div className="flex border rounded overflow-hidden bg-white dark:bg-gray-800 shadow-sm">
         {(['day', 'week', 'month'] as AttendanceRangeMode[]).map((r) => (
@@ -41,32 +45,35 @@ const AttendanceModeTabs: React.FC<AttendanceModeTabsProps> = ({
 
       {/* 👇 Mode Tabs */}
       <div className="flex border rounded overflow-hidden bg-white dark:bg-gray-800 shadow-sm">
-        <button
-          onClick={() => onModeChange('view')}
-          className={`px-4 py-2 text-sm font-medium transition ${
-            mode === 'view'
-              ? 'bg-blue-600 text-white'
-              : 'text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
-          }`}
-        >
-          View Mode
-        </button>
-        <button
-          onClick={() => {
-            if (!isEditDisabled) onModeChange('edit');
-          }}
-          disabled={isEditDisabled}
-          className={`px-4 py-2 text-sm font-medium transition ${
-            mode === 'edit'
-              ? 'bg-blue-600 text-white'
-              : isEditDisabled
-              ? 'text-gray-400 cursor-not-allowed opacity-50'
-              : 'text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
-          }`}
-        >
-          Edit Mode
-        </button>
-      </div>
+            <button
+              onClick={() => onModeChange('view')}
+              className={`px-4 py-2 text-sm font-medium transition ${
+                mode === 'view'
+                  ? 'bg-blue-600 text-white'
+                  : 'text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
+              }`}
+            >
+              View Mode
+            </button>
+
+            {canEdit && (
+              <button
+                onClick={() => {
+                  if (!isEditDisabled) onModeChange('edit');
+                }}
+                disabled={isEditDisabled}
+                className={`px-4 py-2 text-sm font-medium transition ${
+                  mode === 'edit'
+                    ? 'bg-blue-600 text-white'
+                    : isEditDisabled
+                    ? 'text-gray-400 cursor-not-allowed opacity-50'
+                    : 'text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
+                }`}
+              >
+                Edit Mode
+              </button>
+            )}
+          </div>
     </div>
   );
 };

@@ -1,6 +1,4 @@
-// src/components/settings/UserAccess.tsx
-
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import RoleTable from './useraccess/RoleTable';
 import UserTable from './useraccess/UserTable';
 import RoleModal from './useraccess/RoleModal';
@@ -22,50 +20,62 @@ import {
 
 import { Role, User } from '../../types/user';
 import useAuthStore from '../../hooks/auth';
-import { toast } from 'react-hot-toast'; // ✅ (Optional but better UX)
+import { toast } from 'react-hot-toast';
+import { useQuery } from '@tanstack/react-query';
 
 const UserAccess = () => {
   const auth = useAuthStore();
   const tenantId = auth.user?.tenant_id || '';
 
-  const [roles, setRoles] = useState<Role[]>([]);
-  const [users, setUsers] = useState<User[]>([]);
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isRoleModalOpen, setIsRoleModalOpen] = useState(false);
   const [isUserModalOpen, setIsUserModalOpen] = useState(false);
 
-  const fetchData = async () => {
-    try {
-      const [roleRes, userRes] = await Promise.all([
-        getRolesByTenant(),
-        getAllUsers(),
-      ]);
-      setRoles(roleRes.data);
-      setUsers(userRes.data);
-    } catch (err) {
-      console.error('Error fetching user access data:', err);
-      toast.error('Failed to fetch data');
-    }
-  };
+  // ✅ Use useQuery to fetch roles
+  const {
+    data: roles = [],
+    isLoading: rolesLoading,
+    refetch: refetchRoles,
+  } = useQuery({
+    queryKey: ['roles', tenantId], // include tenantId for cache key
+    queryFn: () => getRolesByTenant(tenantId),
+    select: (res) => res.data,
+    enabled: !!tenantId, // only run query if tenantId exists
+  });
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+
+
+  // ✅ Use useQuery to fetch users
+  const {
+    data: users = [],
+    refetch: refetchUsers,
+  } = useQuery({
+    queryKey: ['users'],
+    queryFn: getAllUsers,
+    select: (res) => res.data,
+  });
+
+  /*👇 Manual refetch when needed after save/delete
+  const refetchAll = () => {
+    refetchRoles();
+    refetchUsers();
+  };*/
 
   // ✅ Role Operations
-  const handleSaveRole = async (data: { id?: string; name: string; permissions: string[] }) => {
+  const handleSaveRole = async (data: { id?: string; name: string; permissions: Record<string, string[]> }) => {
     try {
+       const description = `This is description of ${data.name}`;
       if (data.id) {
-        await updateRole(data.id, { name: data.name, permissions: data.permissions });
+        await updateRole(data.id, { name: data.name, permissions: data.permissions, description: data.name, });
         toast.success('Role updated successfully');
       } else {
-        await createRole({ name: data.name, permissions: data.permissions, tenant_id: tenantId });
+        await createRole({ name: data.name, permissions: data.permissions, tenant_id: tenantId, description});
         toast.success('Role created successfully');
       }
       setIsRoleModalOpen(false);
       setSelectedRole(null);
-      fetchData();
+      refetchRoles();
     } catch (err) {
       console.error('Error saving role:', err);
       toast.error('Failed to save role');
@@ -77,7 +87,7 @@ const UserAccess = () => {
     try {
       await deleteRole(id);
       toast.success('Role deleted successfully');
-      fetchData();
+      refetchRoles();
     } catch (err) {
       console.error('Error deleting role:', err);
       toast.error('Failed to delete role');
@@ -87,22 +97,19 @@ const UserAccess = () => {
   // ✅ User Operations
   const handleSaveUser = async (user: Omit<User, 'id'> | User) => {
     try {
-
       if ('id' in user) {
-        // ✅ Update existing user
         await updateUser(user.id, {
           name: user.name,
           email: user.email,
           is_active: user.is_active ?? true,
-          role_id: user.role_id, // 🔥 send role (string) here (not role_id)
+          role_id: user.role_id,
         });
         toast.success('User updated successfully');
       } else {
-        // ✅ Create new user
         await createUser({
           name: user.name,
           email: user.email,
-          password: 'password123', // ✅ You can change this to random generator later
+          password: 'password123',
           tenant_id: tenantId,
           role_id: user.role_id,
           is_active: user.is_active ?? true,
@@ -112,7 +119,7 @@ const UserAccess = () => {
 
       setIsUserModalOpen(false);
       setSelectedUser(null);
-      fetchData();
+      refetchUsers();
     } catch (err) {
       console.error('Error saving user:', err);
       toast.error('Failed to save user');
@@ -124,7 +131,7 @@ const UserAccess = () => {
     try {
       await deleteUser(id);
       toast.success('User deleted successfully');
-      fetchData();
+      refetchUsers();
     } catch (err) {
       console.error('Error deleting user:', err);
       toast.error('Failed to delete user');
@@ -134,7 +141,7 @@ const UserAccess = () => {
   return (
     <div className="space-y-10 transition-colors duration-300">
       {/* 🔐 Role Management */}
-      <section className="bg-white dark:bg-gray-900 p-6 rounded shadow">
+      <section className="bg-white dark:bg-gray-900 p-6 rounded">
         <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">Role Management</h2>
         <RoleTable
           roles={roles}
@@ -147,16 +154,17 @@ const UserAccess = () => {
             setSelectedRole(null);
             setIsRoleModalOpen(true);
           }}
+          loading={rolesLoading}
         />
       </section>
 
       {/* 👤 User Management */}
-      <section className="bg-white dark:bg-gray-900 p-6 rounded shadow">
+      <section className="bg-white dark:bg-gray-900 p-6 rounded">
         <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">User Management</h2>
         <UserTable
-          users={users.map((u) => ({
+          users={users.map((u: any) => ({
             ...u,
-            role: roles.find((r) => r.id === u.role_id),
+            role: roles.find((r: any) => r.id === u.role_id),
           }))}
           roles={roles}
           onSave={handleSaveUser}
@@ -173,6 +181,7 @@ const UserAccess = () => {
         }}
         onSave={handleSaveRole}
         roleToEdit={selectedRole}
+
       />
 
       {/* 🧑‍💻 User Modal */}

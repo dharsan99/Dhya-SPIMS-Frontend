@@ -1,5 +1,6 @@
 import React from 'react';
 import { Employee } from '../../types/employee';
+import useAuthStore from '../../hooks/auth';
 
 interface EmployeeTableProps {
   employees: Employee[];
@@ -8,6 +9,12 @@ interface EmployeeTableProps {
 }
 
 const EmployeeTable: React.FC<EmployeeTableProps> = ({ employees, onEdit, onDelete }) => {
+  const hasPermission = useAuthStore((state) => state.hasPermission);
+
+  const canEdit = hasPermission('Employees', 'Update Employee');
+  const canDelete = hasPermission('Employees', 'Delete Employee');
+  const showActions = canEdit || canDelete;
+
   return (
     <div className="overflow-x-auto rounded-xl shadow border border-gray-200 dark:border-gray-700">
       <table className="min-w-full text-sm text-left bg-white dark:bg-gray-900">
@@ -21,7 +28,7 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({ employees, onEdit, onDele
             <th className="px-4 py-3">Bank Acc 2</th>
             <th className="px-4 py-3">Department</th>
             <th className="px-4 py-3">Join Date</th>
-            <th className="px-4 py-3 text-center">Actions</th>
+            {showActions && <th className="px-4 py-3 text-center">Actions</th>}
           </tr>
         </thead>
         <tbody>
@@ -53,27 +60,36 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({ employees, onEdit, onDele
                     <span className="italic text-gray-400">Not Provided</span>
                   )}
                 </td>
-                <td className="px-4 py-2 text-center">
-                  <div className="flex items-center justify-center gap-2">
-                    <button
-                      onClick={() => onEdit(emp)}
-                      className="px-3 py-1 text-xs font-medium bg-yellow-500 hover:bg-yellow-600 text-white rounded shadow-sm"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => onDelete(emp.id)}
-                      className="px-3 py-1 text-xs font-medium bg-red-600 hover:bg-red-700 text-white rounded shadow-sm"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </td>
+                {showActions && (
+                  <td className="px-4 py-2 text-center">
+                    <div className="flex items-center justify-center gap-2">
+                      {canEdit && (
+                        <button
+                          onClick={() => onEdit(emp)}
+                          className="px-3 py-1 text-xs font-medium bg-yellow-500 hover:bg-yellow-600 text-white rounded shadow-sm"
+                        >
+                          Edit
+                        </button>
+                      )}
+                      {canDelete && (
+                        <button
+                          onClick={() => onDelete(emp.id)}
+                          className="px-3 py-1 text-xs font-medium bg-red-600 hover:bg-red-700 text-white rounded shadow-sm"
+                        >
+                          Delete
+                        </button>
+                      )}
+                    </div>
+                  </td>
+                )}
               </tr>
             ))
           ) : (
             <tr>
-              <td colSpan={9} className="text-center py-6 text-gray-500 italic dark:text-gray-400">
+              <td
+                colSpan={showActions ? 9 : 8}
+                className="text-center py-6 text-gray-500 italic dark:text-gray-400"
+              >
                 No employees found.
               </td>
             </tr>

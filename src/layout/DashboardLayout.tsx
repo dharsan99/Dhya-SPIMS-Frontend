@@ -1,10 +1,12 @@
+
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import useAuthStore from '../hooks/auth';
-import Sidebar from './Sidebar';
 import { FiChevronDown, FiLogOut } from 'react-icons/fi';
 import { useState } from 'react';
 import logoNsc from '../assets/logo_nsc.jpg';
 import { WhatsNewPanel } from '../components/WhatsNewPanel';
+import useAuthStore from '../hooks/auth';
+import Sidebar from './Sidebar';
+import { Menu } from 'lucide-react';
 
 const getPageTitle = (pathname: string) => {
   if (pathname.includes('/dashboard')) return 'Dashboard';
@@ -18,13 +20,16 @@ const getPageTitle = (pathname: string) => {
   return '';
 };
 
+
+
 const DashboardLayout = () => {
   const { user, hasHydrated, logout } = useAuthStore();
   const navigate = useNavigate();
   const location = useLocation();
   const [profileOpen, setProfileOpen] = useState(false);
   const [showWhatsNew, setShowWhatsNew] = useState(false);
-
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+    
   const handleLogout = () => {
     if (logout) logout();
     localStorage.removeItem('token');
@@ -37,7 +42,6 @@ const DashboardLayout = () => {
     if (main) main.focus();
   };
 
-  // ⏳ Avoid flicker/error during hydration
   if (!hasHydrated) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-300 transition-colors">
@@ -46,13 +50,13 @@ const DashboardLayout = () => {
     );
   }
 
-  // 🔐 Extra guard (double protection)
   if (!user) {
     navigate('/login', { replace: true });
     return null;
   }
 
   return (
+
     <div className="flex min-h-screen bg-gray-100 dark:bg-gray-950 transition-colors duration-300 overflow-hidden">
       {/* Sidebar */}
       <Sidebar />
@@ -105,8 +109,29 @@ const DashboardLayout = () => {
               )}
             </div>
           </div>
+
+        {/* Header */}
+        <header className="sticky top-0 z-40 bg-white dark:bg-gray-900 border-b dark:border-gray-800 px-4 py-3 flex items-center justify-between shadow-sm">
+
+          {/* Mobile Menu Button */}
+          <button
+            className="md:hidden p-2 text-gray-700 dark:text-gray-300"
+            onClick={() => setSidebarOpen(true)}
+          >
+            <Menu className="w-6 h-6" />
+          </button>
+
+          <span className="text-sm text-gray-700 dark:text-gray-300">
+            Logged in as <strong>{user.name}</strong>
+          </span>
+
+          <button
+            onClick={handleLogout}
+            className="bg-red-500 hover:bg-red-600 text-white font-semibold text-xs px-4 py-2 rounded-full transition-all"
+          >
+            Logout
+          </button>
         </header>
-        {/* Main Content Scrollable */}
         <main
           id="main-content"
           className="flex-1 overflow-y-auto p-4 md:p-6 text-gray-800 dark:text-gray-100 transition-all outline-none focus:outline-blue-400"
