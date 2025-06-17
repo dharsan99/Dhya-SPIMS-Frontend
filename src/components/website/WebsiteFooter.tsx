@@ -1,32 +1,32 @@
 import { Link } from "react-router-dom";
 import { FiMail, FiMapPin } from "react-icons/fi";
-import ThemeSelector from "../ThemeSelector"; // ✅ Import your ThemeSelector here
+import { scrollToTop } from '@/utils/scrollToTop';
 
 const WebsiteFooter = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-gradient-to-br from-gray-100 to-white dark:from-gray-900 dark:to-gray-800 text-gray-600 dark:text-gray-400 text-sm pt-12">
+    <footer className="bg-gradient-to-br from-gray-100 to-white text-gray-600 text-sm pt-12">
       <div className="max-w-7xl mx-auto px-6 md:px-12 grid grid-cols-1 md:grid-cols-4 gap-10 pb-12">
 
         {/* Logo + About */}
         <div>
           <Link to="/" className="flex items-center gap-2 mb-4">
-            <span className="text-2xl font-extrabold text-blue-600 dark:text-white">
+            <span className="text-2xl font-extrabold text-blue-600">
               Dhya
             </span>
-            <span className="text-lg font-semibold text-gray-800 dark:text-gray-300 tracking-wide">
+            <span className="text-lg font-semibold text-gray-800 tracking-wide">
               SPIMS
             </span>
           </Link>
-          <p className="leading-relaxed max-w-xs text-gray-600 dark:text-gray-400">
+          <p className="leading-relaxed max-w-xs text-gray-600">
             Smart Production & Inventory Management System. Simplify textile operations through technology.
           </p>
         </div>
 
         {/* Quick Links */}
         <div>
-          <h4 className="text-lg font-bold text-gray-800 dark:text-white mb-5">Quick Links</h4>
+          <h4 className="text-lg font-bold text-gray-800 mb-5">Quick Links</h4>
           <ul className="space-y-3">
             {[
               { label: "Home", path: "/" },
@@ -48,7 +48,7 @@ const WebsiteFooter = () => {
 
         {/* Resources */}
         <div>
-          <h4 className="text-lg font-bold text-gray-800 dark:text-white mb-5">Resources</h4>
+          <h4 className="text-lg font-bold text-gray-800 mb-5">Resources</h4>
           <ul className="space-y-3">
             <li><a href="/docs" className="hover:text-blue-600 hover:underline transition">Documentation</a></li>
             <li><a href="/docs#faq" className="hover:text-blue-600 hover:underline transition">FAQ</a></li>
@@ -61,7 +61,7 @@ const WebsiteFooter = () => {
 
         {/* Contact Info */}
         <div>
-          <h4 className="text-lg font-bold text-gray-800 dark:text-white mb-5">Contact</h4>
+          <h4 className="text-lg font-bold text-gray-800 mb-5">Contact</h4>
           <ul className="space-y-4">
             <li className="flex items-center gap-3">
               <FiMail className="text-blue-600" />
@@ -79,22 +79,14 @@ const WebsiteFooter = () => {
       </div>
 
       {/* Divider */}
-      <div className="border-t border-gray-300 dark:border-gray-700"></div>
+      <div className="border-t border-gray-300"></div>
 
       {/* Bottom Bar */}
-      <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-gray-500 dark:text-gray-500 py-4 max-w-7xl mx-auto px-6 md:px-12">
-
+      <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-gray-500 py-4 max-w-7xl mx-auto px-6 md:px-12">
         {/* Copyright */}
         <div className="text-center md:text-left">
           &copy; {currentYear} Dhya Innovations Private Limited. All rights reserved.
         </div>
-
-        {/* Small Theme Selector */}
-        <div className="flex items-center gap-2">
-          <span className="text-gray-600 dark:text-gray-400 text-xs">Theme:</span>
-          <ThemeSelector />
-        </div>
-
       </div>
     </footer>
   );

@@ -1,125 +1,107 @@
 import { motion } from "framer-motion";
-import { FaBoxes, FaExchangeAlt, FaChartLine, FaSearch, FaExclamationTriangle, FaHistory } from "react-icons/fa";
+import { FaMoneyBillWave, FaChartLine, FaFileInvoiceDollar, FaBalanceScale, FaCalculator, FaChartPie, FaExchangeAlt, FaFileAlt } from "react-icons/fa";
 
-export default function InventoryManagementSection() {
+export default function FinancialManagementSection() {
   const features = [
     {
-      icon: <FaBoxes className="w-8 h-8 text-blue-600" />,
-      title: "Real-Time Stock Tracking",
-      description: "Monitor inventory levels across all materials and locations",
+      icon: <FaMoneyBillWave className="w-8 h-8 text-blue-600" />,
+      title: "Financial Tracking",
+      description: "Comprehensive financial management",
       details: [
-        "Live stock updates for fibers and yarns",
-        "Multi-location inventory tracking",
-        "Batch-wise stock management",
-        "Quality grade segregation"
+        "Revenue tracking",
+        "Expense management",
+        "Profit analysis",
+        "Cost control"
       ]
     },
     {
-      icon: <FaExchangeAlt className="w-8 h-8 text-blue-600" />,
-      title: "Material Movement",
-      description: "Track all material movements and transfers",
+      icon: <FaFileInvoiceDollar className="w-8 h-8 text-blue-600" />,
+      title: "Invoice Management",
+      description: "Streamlined invoicing process",
       details: [
-        "Production floor transfers",
-        "Inter-location transfers",
-        "Quality inspection movements",
-        "Return and rejection handling"
+        "Invoice generation",
+        "Payment tracking",
+        "Credit management",
+        "Payment reminders"
       ]
     },
     {
-      icon: <FaChartLine className="w-8 h-8 text-blue-600" />,
-      title: "Stock Analysis",
-      description: "Analyze inventory patterns and trends",
+      icon: <FaCalculator className="w-8 h-8 text-blue-600" />,
+      title: "Cost Analysis",
+      description: "Detailed cost tracking",
       details: [
-        "Consumption analysis",
-        "Stock aging reports",
-        "Turnover ratios",
-        "Value analysis"
+        "Production costs",
+        "Material costs",
+        "Labor costs",
+        "Overhead analysis"
       ]
     },
     {
-      icon: <FaSearch className="w-8 h-8 text-blue-600" />,
-      title: "Stock Verification",
-      description: "Conduct physical stock verification",
+      icon: <FaChartPie className="w-8 h-8 text-blue-600" />,
+      title: "Financial Reports",
+      description: "Comprehensive reporting",
       details: [
-        "Scheduled stock counts",
-        "Random verification",
-        "Variance analysis",
-        "Reconciliation reports"
+        "Profit & loss",
+        "Balance sheets",
+        "Cash flow",
+        "Financial ratios"
       ]
     }
   ];
 
   const processes = [
     {
-      title: "Stock Receipt",
-      steps: [
-        "Verify delivery documents",
-        "Check material specifications",
-        "Record quality parameters",
-        "Update stock ledger"
+      title: "Accounts Receivable",
+      items: [
+        "Customer invoicing",
+        "Payment tracking",
+        "Credit management",
+        "Collection follow-up"
       ]
     },
     {
-      title: "Stock Issue",
-      steps: [
-        "Validate issue request",
-        "Check stock availability",
-        "Process material issue",
-        "Update inventory records"
+      title: "Accounts Payable",
+      items: [
+        "Vendor payments",
+        "Payment scheduling",
+        "Expense tracking",
+        "Payment approval"
       ]
     },
     {
-      title: "Stock Transfer",
-      steps: [
-        "Initiate transfer request",
-        "Verify source and destination",
-        "Process physical movement",
-        "Update both locations"
-      ]
-    },
-    {
-      title: "Stock Adjustment",
-      steps: [
-        "Identify adjustment need",
-        "Document reason for adjustment",
-        "Process quantity changes",
-        "Update financial records"
+      title: "Financial Planning",
+      items: [
+        "Budget planning",
+        "Cost forecasting",
+        "Financial projections",
+        "Resource allocation"
       ]
     }
   ];
 
   const reports = [
     {
-      title: "Stock Status",
+      title: "Financial Reports",
       items: [
-        "Current stock levels",
-        "Stock value",
-        "Age-wise analysis",
-        "Location-wise summary"
+        "Profit & loss statements",
+        "Balance sheets",
+        "Cash flow statements",
+        "Financial ratios"
       ]
     },
     {
-      title: "Movement Reports",
+      title: "Analytics",
       items: [
-        "Receipt summary",
-        "Issue analysis",
-        "Transfer history",
-        "Adjustment records"
-      ]
-    },
-    {
-      title: "Analysis Reports",
-      items: [
-        "Consumption trends",
-        "Stock turnover",
-        "Value analysis",
-        "Quality metrics"
+        "Revenue analysis",
+        "Cost analysis",
+        "Profitability metrics",
+        "Trend analysis"
       ]
     }
   ];
 
   return (
-    <section id="inventory-management" className="px-6 bg-white">
+    <section id="financial-management" className="px-6 bg-white">
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -130,10 +112,10 @@ export default function InventoryManagementSection() {
         {/* Hero Section */}
         <div className="text-center mb-16">
           <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-6">
-            Inventory Management
+            Financial Management
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Comprehensive inventory management system for tracking, analyzing, and optimizing your spinning mill's material resources.
+            Take control of your financial operations with SPIMS. From invoicing to financial reporting, manage your spinning mill's finances efficiently.
           </p>
         </div>
 
@@ -172,12 +154,12 @@ export default function InventoryManagementSection() {
           </div>
         </div>
 
-        {/* Inventory Processes */}
+        {/* Processes */}
         <div className="mb-16">
           <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
-            Inventory Processes
+            Financial Processes
           </h2>
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid md:grid-cols-3 gap-6">
             {processes.map((process, index) => (
               <motion.div
                 key={index}
@@ -188,27 +170,25 @@ export default function InventoryManagementSection() {
                 className="bg-gray-50 p-6 rounded-xl"
               >
                 <h3 className="text-xl font-bold text-gray-900 mb-4">{process.title}</h3>
-                <ol className="space-y-3">
-                  {process.steps.map((step, idx) => (
-                    <li key={idx} className="flex items-start gap-3 text-gray-600">
-                      <span className="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-semibold">
-                        {idx + 1}
-                      </span>
-                      {step}
+                <ul className="space-y-2">
+                  {process.items.map((item, idx) => (
+                    <li key={idx} className="flex items-center gap-2 text-gray-600">
+                      <span className="w-1.5 h-1.5 bg-blue-600 rounded-full"></span>
+                      {item}
                     </li>
                   ))}
-                </ol>
+                </ul>
               </motion.div>
             ))}
           </div>
         </div>
 
-        {/* Reports & Analytics */}
+        {/* Reports */}
         <div className="mb-16">
           <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
             Reports & Analytics
           </h2>
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-2 gap-6">
             {reports.map((report, index) => (
               <motion.div
                 key={index}
@@ -232,26 +212,26 @@ export default function InventoryManagementSection() {
           </div>
         </div>
 
-        {/* Best Practices */}
-        <div className="bg-blue-50 p-6 rounded-xl">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Best Practices</h2>
+        {/* Benefits */}
+        <div className="bg-gray-50 p-6 rounded-xl">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">The SPIMS Advantage</h2>
           <div className="grid md:grid-cols-2 gap-6">
             <div>
-              <h3 className="font-semibold text-gray-900 mb-3">Stock Management</h3>
+              <h3 className="font-semibold text-gray-900 mb-3">Traditional Systems</h3>
               <ul className="space-y-2 text-gray-700">
-                <li>• Maintain minimum stock levels</li>
-                <li>• Regular stock verification</li>
-                <li>• FIFO/FEFO implementation</li>
-                <li>• Quality-based segregation</li>
+                <li>• Manual calculations</li>
+                <li>• Paper-based records</li>
+                <li>• Delayed reporting</li>
+                <li>• Error-prone processes</li>
               </ul>
             </div>
             <div>
-              <h3 className="font-semibold text-gray-900 mb-3">Process Optimization</h3>
+              <h3 className="font-semibold text-gray-900 mb-3">With SPIMS</h3>
               <ul className="space-y-2 text-gray-700">
-                <li>• Standardize movement procedures</li>
-                <li>• Document all transactions</li>
-                <li>• Regular process audits</li>
-                <li>• Train staff on procedures</li>
+                <li>• Automated calculations</li>
+                <li>• Digital records</li>
+                <li>• Real-time reporting</li>
+                <li>• Accurate tracking</li>
               </ul>
             </div>
           </div>
@@ -259,4 +239,4 @@ export default function InventoryManagementSection() {
       </motion.div>
     </section>
   );
-}
+} 

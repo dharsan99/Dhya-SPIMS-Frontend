@@ -1,70 +1,310 @@
 import { motion } from "framer-motion";
-
-const orderFeatures = [
-  {
-    title: "Create New Sales Orders",
-    desc: "Quickly add orders linked to buyers and shades, setting delivery deadlines, realization targets, and production instructions.",
-  },
-  {
-    title: "Order Status Tracking",
-    desc: "Monitor real-time progress from Pending → In Progress → Completed automatically based on production updates and dispatches.",
-  },
-  {
-    title: "Realization & Dispatch Management",
-    desc: "Capture realization percentages, production quantities achieved, and generate dispatch notes seamlessly to fulfill orders.",
-  },
-  {
-    title: "Order KPIs & Analytics",
-    desc: "Access live dashboards showing pending orders, expected delivery risks, production delays, and overall order realization trends.",
-  },
-];
+import { FaShoppingCart, FaIndustry, FaBalanceScale, FaBoxes, FaRobot, FaChartLine, FaFileAlt, FaShieldAlt, FaCogs, FaCloud } from "react-icons/fa";
 
 export default function OrderManagementSection() {
+  const features = [
+  {
+      icon: <FaShoppingCart className="w-8 h-8 text-blue-600" />,
+      title: "Intelligent Order Processing",
+      description: "AI-powered order management system",
+      details: [
+        "AI-powered PO parsing (PDF/Image)",
+        "Automated order creation",
+        "Real-time stock visibility",
+        "Multi-shade order support"
+      ]
+    },
+    {
+      icon: <FaIndustry className="w-8 h-8 text-blue-600" />,
+      title: "Realization Management",
+      description: "Advanced production planning",
+      details: [
+        "Realization percentage tracking",
+        "Automated fiber calculations",
+        "Stock sufficiency checks",
+        "Production capacity planning"
+      ]
+  },
+  {
+      icon: <FaRobot className="w-8 h-8 text-blue-600" />,
+      title: "AI-Powered Features",
+      description: "Smart automation and insights",
+      details: [
+        "OCR-based PO parsing",
+        "Production forecasting",
+        "Delay prediction",
+        "Resource optimization"
+      ]
+    },
+    {
+      icon: <FaCloud className="w-8 h-8 text-blue-600" />,
+      title: "SaaS-Ready Platform",
+      description: "Enterprise-grade scalability",
+      details: [
+        "Multi-factory support",
+        "Role-based access",
+        "API integrations",
+        "Centralized monitoring"
+      ]
+    }
+  ];
+
+  const orderWorkflow = [
+    {
+      title: "Order Creation",
+      steps: [
+        "AI-powered PO parsing",
+        "Buyer & shade selection",
+        "Delivery scheduling",
+        "Stock verification"
+      ]
+    },
+    {
+      title: "Production Planning",
+      steps: [
+        "Realization calculation",
+        "Fiber allocation",
+        "Machine assignment",
+        "Capacity planning"
+      ]
+  },
+  {
+      title: "Production Execution",
+      steps: [
+        "Real-time monitoring",
+        "Stock consumption",
+        "Quality control",
+        "Progress tracking"
+      ]
+    },
+    {
+      title: "Order Fulfillment",
+      steps: [
+        "Dispatch planning",
+        "Documentation",
+        "Quality verification",
+        "Delivery tracking"
+      ]
+    }
+  ];
+
+  const aiFeatures = [
+    {
+      title: "PO Parsing",
+      items: [
+        "Multi-format support (PDF/Image)",
+        "99% accuracy rate",
+        "Automatic data extraction",
+        "Validation pipeline"
+      ]
+    },
+    {
+      title: "Production Intelligence",
+      items: [
+        "Delay prediction",
+        "Resource optimization",
+        "Capacity forecasting",
+        "Stock level prediction"
+      ]
+  },
+  {
+      title: "Analytics & Insights",
+      items: [
+        "Real-time dashboards",
+        "Performance metrics",
+        "Trend analysis",
+        "Predictive alerts"
+      ]
+    }
+  ];
+
+  const traceability = [
+    {
+      title: "Digital Audit Trail",
+      items: [
+        "Complete order history",
+        "User activity logs",
+        "Approval workflows",
+        "Change tracking"
+      ]
+    },
+    {
+      title: "Quality Assurance",
+      items: [
+        "Quality checkpoints",
+        "Compliance records",
+        "Documentation",
+        "Traceability reports"
+      ]
+    }
+  ];
+
   return (
-    <section id="order-management" className="px-6 bg-white dark:bg-gray-900 transition-colors duration-300">
+    <section id="order-management" className="px-6 bg-white">
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.7 }}
-        className="max-w-6xl mx-auto flex flex-col justify-center min-h-[calc(100vh-8rem)]"
+        className="max-w-5xl mx-auto py-12"
       >
-        {/* Heading */}
-        <h1 className="text-4xl md:text-5xl font-extrabold text-center text-gray-900 dark:text-white mb-10">
-          Managing Orders Effectively
+        {/* Hero Section */}
+        <div className="text-center mb-16">
+          <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-6">
+            Advanced Order Management System
         </h1>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            Transform your textile manufacturing with AI-powered order management. From order creation to final dispatch, SPIMS delivers complete automation and real-time visibility.
+          </p>
+        </div>
 
-        {/* Introduction */}
-        <p className="text-lg text-center text-gray-700 dark:text-gray-400 leading-relaxed max-w-3xl mx-auto mb-16">
-          With Dhya SPIMS, you gain full control over sales orders, production milestones, realization tracking, and dispatch flows — all in a unified dashboard.
-        </p>
+        {/* Key Features */}
+        <div className="mb-16">
+          <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
+            Key Features
+          </h2>
+          <div className="grid md:grid-cols-2 gap-6">
+            {features.map((feature, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition"
+              >
+                <div className="flex items-start gap-4">
+                  <div className="flex-shrink-0">{feature.icon}</div>
+                  <div>
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">{feature.title}</h3>
+                    <p className="text-gray-600 mb-4">{feature.description}</p>
+                    <ul className="space-y-2">
+                      {feature.details.map((detail, idx) => (
+                        <li key={idx} className="flex items-center gap-2 text-gray-600">
+                          <span className="w-1.5 h-1.5 bg-blue-600 rounded-full"></span>
+                          {detail}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
 
-        {/* Feature Grid */}
-        <div className="grid md:grid-cols-2 gap-8 mb-16">
-          {orderFeatures.map((feature, index) => (
+        {/* Order Workflow */}
+        <div className="mb-16">
+          <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
+            Complete Order Workflow
+          </h2>
+          <div className="grid md:grid-cols-2 gap-6">
+            {orderWorkflow.map((workflow, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                className="bg-gray-50 p-6 rounded-xl"
+              >
+                <h3 className="text-xl font-bold text-gray-900 mb-4">{workflow.title}</h3>
+                <ol className="space-y-3">
+                  {workflow.steps.map((step, idx) => (
+                    <li key={idx} className="flex items-start gap-3 text-gray-600">
+                      <span className="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-semibold">
+                        {idx + 1}
+                      </span>
+                      {step}
+                    </li>
+                  ))}
+                </ol>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+
+        {/* AI Features */}
+        <div className="mb-16">
+          <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
+            AI-Powered Features
+          </h2>
+          <div className="grid md:grid-cols-3 gap-6">
+            {aiFeatures.map((feature, index) => (
             <motion.div
               key={index}
-              whileHover={{ scale: 1.03 }}
-              transition={{ type: "spring", stiffness: 250 }}
-              className="p-6 bg-gray-50 dark:bg-gray-800 rounded-2xl shadow-md hover:shadow-lg border border-gray-100 dark:border-gray-700 transition duration-300"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                className="bg-white p-6 rounded-xl shadow-md"
             >
-              <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-3">
-                {feature.title}
-              </h3>
-              <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                {feature.desc}
-              </p>
+                <h3 className="text-xl font-bold text-gray-900 mb-4">{feature.title}</h3>
+                <ul className="space-y-2">
+                  {feature.items.map((item, idx) => (
+                    <li key={idx} className="flex items-center gap-2 text-gray-600">
+                      <span className="w-1.5 h-1.5 bg-blue-600 rounded-full"></span>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
             </motion.div>
           ))}
+          </div>
         </div>
 
-        {/* Final Note */}
-        <div className="text-center text-xl font-semibold text-blue-600 dark:text-blue-400 mb-12">
-          Manage orders with precision, deliver faster, and boost customer satisfaction.
+        {/* Traceability */}
+        <div className="mb-16">
+          <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
+            Complete Traceability
+          </h2>
+          <div className="grid md:grid-cols-2 gap-6">
+            {traceability.map((item, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                className="bg-blue-50 p-6 rounded-xl"
+              >
+                <h3 className="text-xl font-bold text-gray-900 mb-4">{item.title}</h3>
+                <ul className="space-y-2">
+                  {item.items.map((detail, idx) => (
+                    <li key={idx} className="flex items-center gap-2 text-gray-700">
+                      <span className="w-1.5 h-1.5 bg-blue-600 rounded-full"></span>
+                      {detail}
+                    </li>
+                  ))}
+                </ul>
+              </motion.div>
+            ))}
+          </div>
         </div>
 
-        {/* Prev/Next Navigation */}
-        <div className="mt-8">
+        {/* Benefits */}
+        <div className="bg-gray-50 p-6 rounded-xl">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">The SPIMS Advantage</h2>
+          <div className="grid md:grid-cols-2 gap-6">
+            <div>
+              <h3 className="font-semibold text-gray-900 mb-3">Traditional Systems</h3>
+              <ul className="space-y-2 text-gray-700">
+                <li>• Manual data entry</li>
+                <li>• Spreadsheet chaos</li>
+                <li>• Inventory mismatch</li>
+                <li>• Missed deadlines</li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-semibold text-gray-900 mb-3">With SPIMS</h3>
+              <ul className="space-y-2 text-gray-700">
+                <li>• AI-powered automation</li>
+                <li>• Real-time dashboards</li>
+                <li>• Stock reservation</li>
+                <li>• Predictive alerts</li>
+              </ul>
+            </div>
+          </div>
         </div>
       </motion.div>
     </section>

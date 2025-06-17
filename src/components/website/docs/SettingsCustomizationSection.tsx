@@ -1,78 +1,299 @@
 import { motion } from "framer-motion";
-
-const settingsFeatures = [
-  {
-    title: "Organization Profile",
-    desc: "Manage your company's profile — update your Name, Logo, Contact Information, and Billing Address centrally for consistent visibility.",
-  },
-  {
-    title: "User Roles & Access Control",
-    desc: "Assign Admins, Managers, Operators, and customize granular access to modules like Orders, Inventory, Production, and Reports.",
-  },
-  {
-    title: "Theme & Display Preferences",
-    desc: "Select between Light, Dark, or Auto system themes. Customize layouts and default views for better accessibility and experience.",
-  },
-  {
-    title: "Notifications & Alerts",
-    desc: "Configure alerts for production targets, inventory shortages, or pending orders. Control Email, SMS, and in-app notification settings.",
-  },
-  {
-    title: "Subscription & Billing",
-    desc: "Monitor active plans, renewal dates, billing history, and usage limits. Easily upgrade or manage your subscription within SPIMS.",
-  },
-  {
-    title: "Future Integrations",
-    desc: "Prepare for upcoming integrations with Tally ERP, QuickBooks, IoT Sensors for live machine data syncing, and more.",
-  },
-];
+import { FaCogs, FaUsers, FaShieldAlt, FaChartLine, FaIndustry, FaBell, FaDatabase, FaCloud } from "react-icons/fa";
 
 export default function SettingsCustomizationSection() {
+  const features = [
+    {
+      icon: <FaCogs className="w-8 h-8 text-blue-600" />,
+      title: "System Configuration",
+      description: "Core system settings and preferences",
+      details: [
+        "Company profile setup",
+        "Unit configuration",
+        "System preferences",
+        "Integration settings"
+      ]
+    },
+    {
+      icon: <FaUsers className="w-8 h-8 text-blue-600" />,
+      title: "User Management",
+      description: "Comprehensive user control",
+      details: [
+        "Role-based access control",
+        "User permissions",
+        "Department setup",
+        "Access management"
+      ]
+    },
+    {
+      icon: <FaIndustry className="w-8 h-8 text-blue-600" />,
+      title: "Production Settings",
+      description: "Production workflow configuration",
+      details: [
+        "Machine configuration",
+        "Shift management",
+        "Process parameters",
+        "Quality standards"
+      ]
+    },
+    {
+      icon: <FaCloud className="w-8 h-8 text-blue-600" />,
+      title: "SaaS Configuration",
+      description: "Multi-tenant setup",
+      details: [
+        "Tenant management",
+        "Data isolation",
+        "Resource allocation",
+        "Service limits"
+      ]
+    }
+  ];
+
+  const securitySettings = [
+    {
+      title: "Access Control",
+      items: [
+        "Role-based permissions",
+        "Feature access control",
+        "Data access restrictions",
+        "IP whitelisting"
+      ]
+    },
+    {
+      title: "Security Policies",
+      items: [
+        "Password policies",
+        "Session management",
+        "Two-factor authentication",
+        "Audit logging"
+      ]
+    },
+    {
+      title: "Data Protection",
+      items: [
+        "Data encryption",
+        "Backup policies",
+        "Data retention",
+        "Privacy controls"
+      ]
+    }
+  ];
+
+  const customizationOptions = [
+    {
+      title: "UI Customization",
+      items: [
+        "Theme selection",
+        "Layout preferences",
+        "Dashboard widgets",
+        "Report templates"
+      ]
+    },
+    {
+      title: "Workflow Customization",
+      items: [
+        "Process configuration",
+        "Approval workflows",
+        "Notification rules",
+        "Automation rules"
+      ]
+    },
+    {
+      title: "Integration Settings",
+      items: [
+        "API configuration",
+        "Third-party integrations",
+        "Data synchronization",
+        "Webhook setup"
+      ]
+    }
+  ];
+
+  const notificationSettings = [
+    {
+      title: "Alert Configuration",
+      items: [
+        "Alert thresholds",
+        "Notification channels",
+        "Alert priorities",
+        "Escalation rules"
+      ]
+    },
+    {
+      title: "Report Scheduling",
+      items: [
+        "Report frequency",
+        "Delivery methods",
+        "Recipient groups",
+        "Format preferences"
+      ]
+    }
+  ];
+
   return (
-    <section id="settings-customization" className="px-6 bg-white dark:bg-gray-900 transition-colors duration-300">
+    <section id="settings-customization" className="px-6 bg-white">
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.7 }}
-        className="max-w-6xl mx-auto flex flex-col justify-center min-h-[calc(100vh-8rem)]"
+        className="max-w-5xl mx-auto py-12"
       >
-        {/* Section Heading */}
-        <h1 className="text-4xl md:text-5xl font-extrabold text-center text-gray-900 dark:text-white mb-10">
-          Settings & Customization
-        </h1>
-
-        {/* Intro */}
-        <p className="text-lg text-center text-gray-700 dark:text-gray-400 leading-relaxed max-w-3xl mx-auto mb-16">
-          Personalize every aspect of Dhya SPIMS to match your operational workflows, roles, security policies, and communication preferences — with simple, intuitive settings.
-        </p>
-
-        {/* Features Grid */}
-        <div className="grid md:grid-cols-2 gap-8 mb-16">
-          {settingsFeatures.map((feature, index) => (
-            <motion.div
-              key={index}
-              whileHover={{ scale: 1.03 }}
-              transition={{ type: "spring", stiffness: 250 }}
-              className="p-6 bg-gray-50 dark:bg-gray-800 rounded-2xl shadow-md hover:shadow-xl border border-gray-100 dark:border-gray-700 transition"
-            >
-              <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-3">
-                {feature.title}
-              </h3>
-              <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                {feature.desc}
-              </p>
-            </motion.div>
-          ))}
+        {/* Hero Section */}
+        <div className="text-center mb-16">
+          <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-6">
+            Settings & Customization
+          </h1>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            Comprehensive system configuration and customization platform for spinning mills. Tailor SPIMS to your specific operational needs with flexible settings and powerful customization options.
+          </p>
         </div>
 
-        {/* Final Callout */}
-        <div className="text-center text-xl font-semibold text-blue-600 dark:text-blue-400 mb-12">
-          Customize Dhya SPIMS — create a system that works exactly the way your team works.
+        {/* Key Features */}
+        <div className="mb-16">
+          <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
+            Key Features
+          </h2>
+          <div className="grid md:grid-cols-2 gap-6">
+            {features.map((feature, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition"
+              >
+                <div className="flex items-start gap-4">
+                  <div className="flex-shrink-0">{feature.icon}</div>
+                  <div>
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">{feature.title}</h3>
+                    <p className="text-gray-600 mb-4">{feature.description}</p>
+                    <ul className="space-y-2">
+                      {feature.details.map((detail, idx) => (
+                        <li key={idx} className="flex items-center gap-2 text-gray-600">
+                          <span className="w-1.5 h-1.5 bg-blue-600 rounded-full"></span>
+                          {detail}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
         </div>
 
-        {/* Prev/Next Navigation */}
-        <div className="mt-8">
+        {/* Security Settings */}
+        <div className="mb-16">
+          <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
+            Security Settings
+          </h2>
+          <div className="grid md:grid-cols-3 gap-6">
+            {securitySettings.map((setting, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                className="bg-gray-50 p-6 rounded-xl"
+              >
+                <h3 className="text-xl font-bold text-gray-900 mb-4">{setting.title}</h3>
+                <ul className="space-y-2">
+                  {setting.items.map((item, idx) => (
+                    <li key={idx} className="flex items-center gap-2 text-gray-600">
+                      <span className="w-1.5 h-1.5 bg-blue-600 rounded-full"></span>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+
+        {/* Customization Options */}
+        <div className="mb-16">
+          <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
+            Customization Options
+          </h2>
+          <div className="grid md:grid-cols-3 gap-6">
+            {customizationOptions.map((option, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                className="bg-white p-6 rounded-xl shadow-md"
+              >
+                <h3 className="text-xl font-bold text-gray-900 mb-4">{option.title}</h3>
+                <ul className="space-y-2">
+                  {option.items.map((item, idx) => (
+                    <li key={idx} className="flex items-center gap-2 text-gray-600">
+                      <span className="w-1.5 h-1.5 bg-blue-600 rounded-full"></span>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+
+        {/* Notification Settings */}
+        <div className="mb-16">
+          <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
+            Notification Settings
+          </h2>
+          <div className="grid md:grid-cols-2 gap-6">
+            {notificationSettings.map((setting, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                className="bg-blue-50 p-6 rounded-xl"
+              >
+                <h3 className="text-xl font-bold text-gray-900 mb-4">{setting.title}</h3>
+                <ul className="space-y-2">
+                  {setting.items.map((item, idx) => (
+                    <li key={idx} className="flex items-center gap-2 text-gray-700">
+                      <span className="w-1.5 h-1.5 bg-blue-600 rounded-full"></span>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+
+        {/* Benefits */}
+        <div className="bg-gray-50 p-6 rounded-xl">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">The SPIMS Advantage</h2>
+          <div className="grid md:grid-cols-2 gap-6">
+            <div>
+              <h3 className="font-semibold text-gray-900 mb-3">Traditional Systems</h3>
+              <ul className="space-y-2 text-gray-700">
+                <li>• Limited customization</li>
+                <li>• Basic security</li>
+                <li>• Fixed workflows</li>
+                <li>• Manual configuration</li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-semibold text-gray-900 mb-3">With SPIMS</h3>
+              <ul className="space-y-2 text-gray-700">
+                <li>• Flexible customization</li>
+                <li>• Advanced security</li>
+                <li>• Configurable workflows</li>
+                <li>• Automated setup</li>
+              </ul>
+            </div>
+          </div>
         </div>
       </motion.div>
     </section>

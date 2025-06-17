@@ -1,50 +1,35 @@
 import { create } from 'zustand';
 import toast from 'react-hot-toast';
 
-export type Theme = 'light' | 'dark' | 'auto';
+export type Theme = 'light';
 
 interface ThemeStore {
   theme: Theme;
-  setTheme: (theme: Theme) => void;
+  setTheme: (theme: Theme, showToast?: boolean) => void;
 }
 
 export const useThemeStore = create<ThemeStore>((set) => ({
-  theme: 'auto',
+  theme: 'light',
 
-  setTheme: (theme) => {
+  setTheme: (theme, showToast = true) => {
     const root = document.documentElement;
-    root.classList.remove('light', 'dark');
+    root.classList.remove('dark');
+    root.classList.add('light');
+    localStorage.setItem('theme', 'light');
+    set({ theme: 'light' });
 
-    if (theme === 'auto') {
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      root.classList.add(prefersDark ? 'dark' : 'light');
-    } else {
-      root.classList.add(theme);
-    }
-
-    localStorage.setItem('theme', theme);
-    set({ theme });
-
-    toast.success(`Switched to ${theme === 'auto' ? 'Auto' : theme.charAt(0).toUpperCase() + theme.slice(1)} Theme`, {
+    if (showToast) {
+      toast.success('Light Theme', {
       style: {
         borderRadius: '8px',
         background: '#333',
         color: '#fff',
       },
     });
+    }
   },
 }));
 
-// 🔥 On App Start (Apply stored theme)
-const storedTheme = localStorage.getItem('theme') as Theme;
-if (storedTheme) {
-  const root = document.documentElement;
-  root.classList.remove('light', 'dark');
-
-  if (storedTheme === 'auto') {
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    root.classList.add(prefersDark ? 'dark' : 'light');
-  } else {
-    root.classList.add(storedTheme);
-  }
-}
+// Initialize theme on store creation
+document.documentElement.classList.add('light');
+localStorage.setItem('theme', 'light');
