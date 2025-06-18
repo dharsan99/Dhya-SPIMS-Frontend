@@ -26,17 +26,28 @@ const AttendanceWeeklyTable: React.FC<Props> = ({
   onPageSizeChange,
 }) => {
   console.log('employees', employees)
+  
   const [attendanceMap, setAttendanceMap] = useState<Record<string, Record<string, AttendanceRow>>>({});
   const [loading, setLoading] = useState(true);
 
+
+  const uniqueEmployees = useMemo(() => {
+    const seen = new Set<string>();
+    return employees.filter(emp => {
+      if (seen.has(emp.employee_id)) return false;
+      seen.add(emp.employee_id);
+      return true;
+    });
+  }, [employees]);
+
   const paginatedEmployees = useMemo(() => {
     const startIndex = (page - 1) * pageSize;
-    return employees.slice(startIndex, startIndex + pageSize);
-  }, [employees, page, pageSize]);
+    return uniqueEmployees.slice(startIndex, startIndex + pageSize);
+  }, [uniqueEmployees, page, pageSize]);
 
   const weeklyTotals = useMemo(() => {
     const totals: Record<string, ReturnType<typeof calculateWeeklyTotals>> = {};
-    employees.forEach((emp) => {
+    uniqueEmployees.forEach((emp) => {
       totals[emp.employee_id] = calculateWeeklyTotals(emp, attendanceMap, weekDates);
     });
     return totals;
@@ -45,18 +56,21 @@ const AttendanceWeeklyTable: React.FC<Props> = ({
   useEffect(() => {
     const fetchAllAttendance = async () => {
       setLoading(true);
-
+  
       const results = await Promise.all(
         weekDates.map((date) =>
           fetchAttendanceByDate(date)
-            .then((rows) => ({ date, rows }))
+            .then((response) => ({
+              date,
+              rows: Array.isArray(response.data) ? response.data : [],
+            }))
             .catch((err) => {
               console.error(`❌ Error fetching attendance for ${date}:`, err);
               return { date, rows: [] };
             })
         )
       );
-
+  
       const newMap: Record<string, Record<string, AttendanceRow>> = {};
       results.forEach(({ date, rows }) => {
         newMap[date] = {};
@@ -64,11 +78,11 @@ const AttendanceWeeklyTable: React.FC<Props> = ({
           newMap[date][row.employee_id] = row;
         });
       });
-
+  
       setAttendanceMap(newMap);
       setLoading(false);
     };
-
+  
     fetchAllAttendance();
   }, [weekDates]);
 
@@ -163,7 +177,7 @@ const AttendanceWeeklyTable: React.FC<Props> = ({
 
       <AttendancePagination
         page={page}
-        total={employees.length}
+        total={uniqueEmployees.length}
         pageSize={pageSize}
         onPageChange={onPageChange}
         onPageSizeChange={onPageSizeChange}

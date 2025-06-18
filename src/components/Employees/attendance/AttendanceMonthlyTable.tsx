@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { AttendanceRecord } from '@/types/attendance';
 import { AttendanceRow } from './AttendanceTypes';
 import AttendancePagination from './AttendancePagination';
@@ -24,8 +24,21 @@ const AttendanceMonthlyTable: React.FC<Props> = ({
   const [attendanceMap, setAttendanceMap] = useState<Record<string, Record<string, AttendanceRow>>>({});
   const [loading, setLoading] = useState(true);
 
+
+  const uniqueEmployees = useMemo(() => {
+    const seen = new Set<string>();
+    return employees.filter(emp => {
+      if (seen.has(emp.employee_id)) return false;
+      seen.add(emp.employee_id);
+      return true;
+    });
+  }, [employees]);
+
+  console.log('uniqueEmployees', employees)
+
+  
   const startIdx = (page - 1) * pageSize;
-  const paginatedEmployees = employees.slice(startIdx, startIdx + pageSize);
+  const paginatedEmployees = uniqueEmployees.slice(startIdx, startIdx + pageSize);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -34,11 +47,12 @@ const AttendanceMonthlyTable: React.FC<Props> = ({
 
       for (const date of monthDates) {
         try {
-          const rows = await fetchAttendanceByDate(date);
-          map[date] = {};
-          rows.forEach((row: AttendanceRow) => {
-            map[date][row.employee_id] = row;
-          });
+          const response = await fetchAttendanceByDate(date);
+            const rows = Array.isArray(response.data) ? response.data : [];
+            map[date] = {};
+            rows.forEach((row: AttendanceRow) => {
+              map[date][row.employee_id] = row;
+            });
         } catch (err) {
           map[date] = {};
         }
@@ -50,6 +64,8 @@ const AttendanceMonthlyTable: React.FC<Props> = ({
 
     fetchData();
   }, [monthDates]);
+
+  console.log('attendanceMap', attendanceMap)
 
   const getStatusBadge = (status?: string) => {
     const normalized = status?.toUpperCase();
@@ -106,7 +122,6 @@ const AttendanceMonthlyTable: React.FC<Props> = ({
             </table>
           </div>
 
-          {/* Scrollable Dates Table */}
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 text-sm">
               <thead className="bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-semibold sticky top-0 z-10">
@@ -168,7 +183,7 @@ const AttendanceMonthlyTable: React.FC<Props> = ({
                     }
                   });
 
-                  const hourlyRate = (emp.shift_rate || 0) / 8;
+                  const hourlyRate = Number(emp.employee.shift_rate || 0) / 8;
                   const wages = parseFloat((hourlyRate * totalHours).toFixed(2));
 
                   return (
@@ -192,12 +207,12 @@ const AttendanceMonthlyTable: React.FC<Props> = ({
       </div>
 
       <AttendancePagination
-        page={page}
-        total={employees.length}
-        pageSize={pageSize}
-        onPageChange={onPageChange}
-        onPageSizeChange={onPageSizeChange}
-      />
+          page={page}
+          total={uniqueEmployees.length}  // ✅ Use unique count
+          pageSize={pageSize}
+          onPageChange={onPageChange}
+          onPageSizeChange={onPageSizeChange}
+        />
     </div>
   );
 };

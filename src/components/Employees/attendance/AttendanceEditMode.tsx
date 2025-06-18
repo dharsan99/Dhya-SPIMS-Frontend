@@ -9,9 +9,12 @@ import { MarkAttendancePayload } from '@/types/attendance';
 const AttendanceEditMode: React.FC<
   AttendanceEditModeProps & {
     date: string;
+    rangeMode?: 'day' | 'week' | 'month';
+    rangeStart?: string;
+    rangeEnd?: string;
     onSubmitSuccess?: () => void;
   }
-> = ({ employees, attendance, onTimeChange, onOvertimeChange, pageStart, date, onSubmitSuccess }) => {
+> = ({ employees, attendance, onTimeChange, onOvertimeChange, pageStart, date, rangeMode, rangeStart, rangeEnd, onSubmitSuccess }) => {
   console.log('employees', employees)
   console.log('attendance', attendance)
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -53,8 +56,18 @@ const AttendanceEditMode: React.FC<
         }),
       };
 
+      console.log('Attendance  befor marking.', payload);
+
       await markAttendance(payload);
-      queryClient.invalidateQueries({ queryKey: ['attendance'] });
+      console.log('Attendance marked successfully, invalidating queries...');
+      queryClient.invalidateQueries({ 
+        queryKey: ['attendance-summary', rangeMode, date, rangeStart, rangeEnd],
+        refetchType: 'all'
+      });
+      queryClient.invalidateQueries({ 
+        queryKey: ['attendance', rangeMode, rangeStart, rangeEnd],
+        refetchType: 'all'
+      });
       setIsModalOpen(false);
       onSubmitSuccess?.();
     } catch (err) {
@@ -163,7 +176,8 @@ const AttendanceEditMode: React.FC<
                         
                             await markSingleAttendance(payload);
                             alert(`✅ Attendance updated for ${emp.employee.name}`);
-                            queryClient.invalidateQueries({ queryKey: ['attendance'] });
+                            queryClient.invalidateQueries({ queryKey: ['attendance', rangeMode, rangeStart, rangeEnd] });
+                            queryClient.invalidateQueries({ queryKey: ['attendance-summary', rangeMode, date, rangeStart, rangeEnd] });
                           } catch (error) {
                             console.error('❌ Failed to update single attendance:', error);
                             alert('Failed to update attendance. Please check time fields.');

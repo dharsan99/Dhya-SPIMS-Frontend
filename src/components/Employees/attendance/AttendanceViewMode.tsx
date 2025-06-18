@@ -17,6 +17,8 @@ const AttendanceViewMode: React.FC<AttendanceViewModeProps & { date: string }> =
   loading
 }) => {
 
+  console.log('employees', employees)
+
 
   if (loading) {
     return (
@@ -56,7 +58,6 @@ const AttendanceViewMode: React.FC<AttendanceViewModeProps & { date: string }> =
               const wageRate = Number(emp.employee.shift_rate) ?? 0;
               const wages = (totalHours / 8) * wageRate;
 
-              console.log('emp', emp)
 
               return (
                 <tr

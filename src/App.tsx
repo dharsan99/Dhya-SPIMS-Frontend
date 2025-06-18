@@ -4,6 +4,7 @@ import { Toaster } from 'react-hot-toast';
 import { useThemeStore } from './hooks/useThemeStore'; // ✅
 
 import DashboardLayout from './layout/DashboardLayout';
+import SuperAdminLayout from './components/superadmin/SuperAdminLayout';
 import ProtectedRoute from './routes/ProtectedRoute';
 import WebsiteHeader from './components/website/WebsiteHeader';
 import WebsiteFooter from './components/website/WebsiteFooter';
@@ -34,7 +35,11 @@ import DisclaimerPage from './pages/website/DisclaimerPage';
 import Employees from './pages/Employees';
 import Marketing from './pages/Marketing';
 import ProductionEntryPage from './pages/ProductionEntryPage';
+import SignupPage from './pages/Signup';
 
+// Super Admin Pages
+import SuperAdminDashboard from './pages/superadmin/Dashboard';
+import Tenants from './pages/superadmin/Tenants';
 
 function App() {
   const { setTheme } = useThemeStore();
@@ -66,6 +71,7 @@ function App() {
 
           {/* Login */}
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignupPage />} />
 
           {/* Protected Dashboard */}
           <Route path="/app" element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
@@ -89,6 +95,13 @@ function App() {
             <Route path="*" element={<DelayedNotFound />} />
             <Route path="marketing" element={<Marketing />} /> {/* ✅ Added */}
 
+          </Route>
+
+          {/* Protected Super Admin */}
+          <Route path="/superadmin" element={<ProtectedRoute><SuperAdminLayout /></ProtectedRoute>}>
+            <Route index element={<Navigate to="dashboard" replace />} />
+            <Route path="dashboard" element={<SuperAdminDashboard />} />
+            <Route path="tenants" element={<Tenants />} />
           </Route>
           
 

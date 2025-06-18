@@ -12,7 +12,7 @@ import { ShiftType, shiftTimeMap, AttendanceRow, AttendanceStatus } from './Atte
 import { useQuery } from '@tanstack/react-query';
 import { buildAttendanceMap } from '@/components/Employees/attendance/utils/attendence';
 import { useAttendanceDates } from './hooks/useAttendanceDates';
-import { getAllAttendances, getAttendanceInRange } from '@/api/attendance';
+import { getAllAttendances, getAttendanceInRange, getAttendanceSummary } from '@/api/attendance';
 import { AttendanceRecord } from '@/types/attendance';
 import AttendanceHeaderStats from './AttendanceHeaderStats';
 
@@ -34,21 +34,22 @@ const AttendanceTab = () => {
   const rangeEnd = dates[dates.length - 1];
 
   const { data: attendancesData, isLoading } = useQuery({
-    queryKey: ['attendance', rangeMode, rangeStart, rangeEnd],
+    queryKey: ['attendance', rangeMode, rangeStart, rangeEnd, page, itemsPerPage],
     queryFn: () => {
       if (rangeMode === 'day') {
-        return getAllAttendances(date);
+        return getAllAttendances(date, { page, limit: itemsPerPage });
       } else if (rangeMode === 'week' || rangeMode === 'month') {
-        return getAttendanceInRange(rangeStart, rangeEnd);
+        return getAttendanceInRange(rangeStart, rangeEnd, { page, limit: itemsPerPage });
       }
-      return Promise.resolve([]);
+      return Promise.resolve({ data: [], total: 0, page: 1, limit: 10 });
     },
   });
 
 
 
 
-  const attendances = attendancesData ?? [];
+  const attendances = attendancesData?.data ?? [];
+  console.log('attendancesdata for range', attendancesData)
 
   useEffect(() => {
     if (!attendancesData) return;
@@ -56,7 +57,7 @@ const AttendanceTab = () => {
     const allowedStatuses = ['PRESENT', 'ABSENT', 'LEAVE', 'HALF_DAY'] as const;
   
     const initialAttendance: Record<string, AttendanceRow> = {};
-    attendancesData.forEach((record: AttendanceRecord) => {
+    attendancesData?.data?.forEach((record: AttendanceRecord) => {
       const {
         employee_id,
         in_time,
@@ -68,6 +69,7 @@ const AttendanceTab = () => {
         department,
       } = record;
   
+      console.log('record', record)
       const normalizedStatus = typeof status === 'string'
         ? status.toUpperCase()
         : 'ABSENT';
@@ -90,26 +92,45 @@ const AttendanceTab = () => {
   
     setAttendance(initialAttendance);
   }, [attendancesData]);
+
+  console.log('date', date)
+
+  const { data: summaryData } = useQuery({
+    queryKey: ['attendance-summary', rangeMode, date, rangeStart, rangeEnd],
+    queryFn: () => {
+      if (rangeMode === 'day') {
+        return getAttendanceSummary({ date });
+      } else if (rangeMode === 'week') {
+        return getAttendanceSummary({ startDate: rangeStart, endDate: rangeEnd });
+      } else if (rangeMode === 'month') {
+        const d = new Date(date);
+        return getAttendanceSummary({ month: d.getMonth() + 1, year: d.getFullYear() });
+      }
+      return Promise.resolve(null);
+    },
+    enabled: !!date, // only run if date is available
+  });
+
+  console.log('summaryData', summaryData)
   const departments = useMemo(() => {
-    return [...new Set(attendances.map((a: AttendanceRecord) => a.department).filter(Boolean))] as string[];
+    return [...new Set(attendances.map((a: AttendanceRecord) => a.employee?.department).filter(Boolean))] as string[];
   }, [attendances]);
 
   const filteredAttendances = useMemo(() => {
     return attendances.filter((emp: AttendanceRecord) => {
       const matchesDept = departmentFilter
-        ? emp.department === departmentFilter
+        ? emp.employee?.department === departmentFilter
         : true;
   
       const q = searchQuery.toLowerCase();
       const matchesSearch =
-        emp.name?.toLowerCase().includes(q) ||
+        emp.employee?.name?.toLowerCase().includes(q) ||
         emp.employee_id?.toLowerCase().includes(q);
   
       return matchesDept && matchesSearch;
     });
   }, [attendances, departmentFilter, searchQuery]);
 
-  console.log('filteredAttendances', filteredAttendances)
 
  
 
@@ -118,10 +139,8 @@ const AttendanceTab = () => {
   }, [dates, filteredAttendances, attendance]);
 
   const startIdx = (page - 1) * itemsPerPage;
-  const paginatedAttendances = filteredAttendances.slice(startIdx, startIdx + itemsPerPage);
-  console.log('filteredAttendances', filteredAttendances)
+  const paginatedAttendances = filteredAttendances;
 
-  console.log('paginatedAttendances', paginatedAttendances)
   const handleTimeChange = (
     id: string,
     field: 'in_time' | 'out_time' | 'shift',
@@ -190,11 +209,10 @@ const AttendanceTab = () => {
   return (
     <div className="space-y-4">
      <AttendanceHeaderStats
-        employees={filteredAttendances}
-        attendance={attendance}
-        date={date}
-        department={departmentFilter}
-      />
+          summary={summaryData}
+          loadingSummary={!summaryData}
+          department={departmentFilter}
+        />
       <AttendanceModeTabs
         mode={viewMode}
         onModeChange={setViewMode}
@@ -227,6 +245,9 @@ const AttendanceTab = () => {
             pageStart={startIdx}
             shift={shift}
             date={date}
+            rangeMode={rangeMode}
+            rangeStart={rangeStart}
+            rangeEnd={rangeEnd}
           />
         ) : (
           <AttendanceViewMode
@@ -256,13 +277,16 @@ const AttendanceTab = () => {
         />
       )}
       {rangeMode === 'day' && (
-        <AttendancePagination
-          page={page}
-          total={filteredAttendances.length}
-          pageSize={itemsPerPage}
-          onPageChange={setPage}
-          onPageSizeChange={setItemsPerPage}
-        />
+       <AttendancePagination
+       page={page}
+       total={attendancesData?.total ?? 0}
+       pageSize={itemsPerPage}
+       onPageChange={setPage}
+       onPageSizeChange={(size) => {
+         setItemsPerPage(size);
+         setPage(1); // reset to first page
+       }}
+     />
       )}
     </div>
   );
