@@ -30,7 +30,6 @@ const AttendanceHeaderStats: React.FC<Props> = ({ summary, loadingSummary }) => 
   }
 
   const {
-    total_employees,
     present,
     absent,
     total_overtime,

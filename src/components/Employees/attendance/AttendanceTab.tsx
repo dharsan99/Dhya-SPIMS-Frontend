@@ -259,7 +259,8 @@ const AttendanceTab = () => {
         )
       ) : rangeMode === 'week' ? (
         <AttendanceWeeklyTable
-          employees={filteredAttendances}
+        employees={filteredAttendances.map((a) => a.employee)} // Extract Employee object
+        attendanceData={filteredAttendances} // Pass raw records
           weekDates={weekDates}
           page={page}
           pageSize={itemsPerPage}
@@ -268,13 +269,15 @@ const AttendanceTab = () => {
         />
       ) : (
         <AttendanceMonthlyTable
-          employees={filteredAttendances}
-          monthDates={monthDates}
-          page={page}
-          pageSize={itemsPerPage}
-          onPageChange={setPage}
-          onPageSizeChange={setItemsPerPage}
-        />
+        employees={filteredAttendances.map((a) => a.employee)} // Extract Employee object
+        attendanceData={filteredAttendances} // Pass raw records
+        monthDates={monthDates}
+        page={page}
+        pageSize={itemsPerPage}
+        onPageChange={setPage}
+        onPageSizeChange={setItemsPerPage}
+      />
+      
       )}
       {rangeMode === 'day' && (
        <AttendancePagination

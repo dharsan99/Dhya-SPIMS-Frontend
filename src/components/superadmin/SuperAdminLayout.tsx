@@ -1,7 +1,6 @@
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { FiChevronDown, FiLogOut, FiMenu } from 'react-icons/fi';
 import { useState } from 'react';
-import logoNsc from '../../assets/logo_nsc.jpg';
 import useAuthStore from '../../hooks/auth';
 import SuperAdminSidebar from './SuperAdminSidebar';
 

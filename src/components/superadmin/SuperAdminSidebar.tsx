@@ -8,11 +8,9 @@ import {
   FiShield,
 } from 'react-icons/fi';
 
-import useAuthStore from '../../hooks/auth';
 import logo from '../../assets/dhya_texintelli.png';
 
 const SuperAdminSidebar = ({ onLinkClick }: { onLinkClick?: () => void }) => {
-  const auth = useAuthStore();
   const [collapsed, setCollapsed] = useState(true);
 
   const navLinkStyles = collapsed

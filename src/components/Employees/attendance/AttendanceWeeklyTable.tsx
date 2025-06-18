@@ -1,15 +1,13 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { AttendanceRow } from './AttendanceTypes';
+import React, { useMemo } from 'react';
 import AttendancePagination from './AttendancePagination';
-import { fetchAttendanceByDate } from '../../../api/attendance';
 import { getStatusBadge } from './StatusBadge';
 import { calculateWeeklyTotals } from './utils/attendence';
 import { formatINR } from './utils/attendence';
 import { AttendanceRecord } from '@/types/attendance';
 
-
 interface Props {
-  employees: AttendanceRecord[];
+  employees: any[];
+  attendanceData: any[]; // Changed from AttendanceRecord[] to any[] to handle the actual data structure
   weekDates: string[]; // Dates in 'YYYY-MM-DD' format
   page: number;
   pageSize: number;
@@ -19,26 +17,54 @@ interface Props {
 
 const AttendanceWeeklyTable: React.FC<Props> = ({
   employees,
+  attendanceData,
   weekDates,
   page,
   pageSize,
   onPageChange,
   onPageSizeChange,
 }) => {
-  console.log('employees', employees)
+  console.log('attendanceData', attendanceData);
+  console.log('weekDates', weekDates);
   
-  const [attendanceMap, setAttendanceMap] = useState<Record<string, Record<string, AttendanceRow>>>({});
-  const [loading, setLoading] = useState(true);
+  // Early return if weekDates is not available
+  if (!weekDates || !Array.isArray(weekDates) || weekDates.length === 0) {
+    return (
+      <div className="space-y-4">
+        <div className="w-full p-8 text-center text-gray-500 dark:text-gray-400">
+          Loading week dates...
+        </div>
+      </div>
+    );
+  }
+  
+  const rows = Array.isArray(attendanceData) ? attendanceData : [];
 
-
-  const uniqueEmployees = useMemo(() => {
-    const seen = new Set<string>();
-    return employees.filter(emp => {
-      if (seen.has(emp.employee_id)) return false;
-      seen.add(emp.employee_id);
-      return true;
+  const attendanceMap = useMemo(() => {
+    const map: Record<string, Record<string, any>> = {};
+    
+    // Process each employee's attendance data
+    rows.forEach((row) => {
+      if (!row.attendance) return;
+      
+      // Iterate through the dates in the attendance object
+      Object.entries(row.attendance).forEach(([date, attendanceData]: [string, any]) => {
+        if (!weekDates.includes(date)) return;
+        
+        if (!map[date]) map[date] = {};
+        map[date][row.employee_id] = {
+          ...attendanceData,
+          employee_id: row.employee_id,
+          employee: row.employee
+        };
+      });
     });
-  }, [employees]);
+    
+    return map;
+  }, [rows, weekDates]);
+
+  console.log('attendanceMap', attendanceMap);
+  const uniqueEmployees = attendanceData;
 
   const paginatedEmployees = useMemo(() => {
     const startIndex = (page - 1) * pageSize;
@@ -47,55 +73,20 @@ const AttendanceWeeklyTable: React.FC<Props> = ({
 
   const weeklyTotals = useMemo(() => {
     const totals: Record<string, ReturnType<typeof calculateWeeklyTotals>> = {};
+    
     uniqueEmployees.forEach((emp) => {
-      totals[emp.employee_id] = calculateWeeklyTotals(emp, attendanceMap, weekDates);
+      // The attendance data already comes with the correct structure
+      const employeeWithAttendance = {
+        employee_id: emp.employee_id,
+        employee: { shift_rate: emp.employee?.shift_rate?.toString() || '0' },
+        attendance: emp.attendance || {}
+      };
+      totals[emp.employee_id] = calculateWeeklyTotals(employeeWithAttendance, weekDates);
     });
     return totals;
-  }, [employees, attendanceMap, weekDates]);
+  }, [uniqueEmployees, weekDates]);
 
-  useEffect(() => {
-    const fetchAllAttendance = async () => {
-      setLoading(true);
-  
-      const results = await Promise.all(
-        weekDates.map((date) =>
-          fetchAttendanceByDate(date)
-            .then((response) => ({
-              date,
-              rows: Array.isArray(response.data) ? response.data : [],
-            }))
-            .catch((err) => {
-              console.error(`❌ Error fetching attendance for ${date}:`, err);
-              return { date, rows: [] };
-            })
-        )
-      );
-  
-      const newMap: Record<string, Record<string, AttendanceRow>> = {};
-      results.forEach(({ date, rows }) => {
-        newMap[date] = {};
-        rows.forEach((row: any) => {
-          newMap[date][row.employee_id] = row;
-        });
-      });
-  
-      setAttendanceMap(newMap);
-      setLoading(false);
-    };
-  
-    fetchAllAttendance();
-  }, [weekDates]);
-
-  if (loading) {
-    return (
-      <div className="w-full overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm bg-white dark:bg-gray-900">
-        <div className="text-center py-6 text-gray-500 italic dark:text-gray-400">
-          Loading weekly attendance...
-        </div>
-      </div>
-    );
-  }
-
+  console.log('weeklyTotals', weeklyTotals);
   return (
     <div className="space-y-4">
       <div className="w-full overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm bg-white dark:bg-gray-900">
@@ -105,12 +96,8 @@ const AttendanceWeeklyTable: React.FC<Props> = ({
               <th className="px-4 py-3 text-center">T.No</th>
               <th className="px-4 py-3 text-left">Employee</th>
               {weekDates.map((date) => (
-                <th
-                  key={date}
-                  className="px-4 py-3 text-center whitespace-nowrap"
-                  title={date}
-                >
-                  {date.slice(5)} {/* shows MM-DD */}
+                <th key={date} className="px-4 py-3 text-center whitespace-nowrap" title={date}>
+                  {date.slice(5)}
                 </th>
               ))}
               <th className="px-4 py-3 text-center">Total Hrs</th>
@@ -125,17 +112,11 @@ const AttendanceWeeklyTable: React.FC<Props> = ({
                 const { totalHours, totalDays, totalOvertime, wages } = weeklyTotals[emp.employee_id];
 
                 return (
-                  <tr
-                    key={idx}
-                    className="hover:bg-gray-50 dark:hover:bg-gray-800 transition"
-                  >
+                  <tr key={idx} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition">
                     <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-300">
-                       {emp.employee.token_no || <span className="italic text-gray-400">–</span>}
+                      {emp.employee.token_no || <span className="italic text-gray-400">–</span>}
                     </td>
-                    <td
-                      className="px-4 py-3 text-gray-900 dark:text-white max-w-[200px] truncate"
-                      title={emp.name}
-                    >
+                    <td className="px-4 py-3 text-gray-900 dark:text-white max-w-[200px] truncate" title={emp.employee.name}>
                       {emp.employee.name}
                     </td>
                     {weekDates.map((date) => {
@@ -163,10 +144,7 @@ const AttendanceWeeklyTable: React.FC<Props> = ({
               })
             ) : (
               <tr>
-                <td
-                  colSpan={7 + weekDates.length}
-                  className="text-center py-6 text-gray-500 italic dark:text-gray-400"
-                >
+                <td colSpan={7 + weekDates.length} className="text-center py-6 text-gray-500 italic dark:text-gray-400">
                   No employees found.
                 </td>
               </tr>

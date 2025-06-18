@@ -3,9 +3,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import WebsiteHeader from '../components/website/WebsiteHeader';
 import WebsiteFooter from '../components/website/WebsiteFooter';
+import SubscriptionPlanModal from '@/components/SubscriptionPlanModal';
 
 export default function SignupPage() {
   const [fadeOutPage, setFadeOutPage] = useState(false);
+  const [showPlanModal, setShowPlanModal] = useState(false);
   const [formData, setFormData] = useState({
     orgName: '',
     email: '',
@@ -21,11 +23,18 @@ export default function SignupPage() {
 
   const handleSignup = (e: any) => {
     e.preventDefault();
-    setFadeOutPage(true);
+    
+    // Show subscription plan modal instead of direct navigation
+    setShowPlanModal(true);
+  };
 
-    // Simulate signup logic
+  const handlePlanSelect = (plan: any) => {
+    console.log('Selected plan:', plan);
+    console.log('Signup data:', formData);
+    
+    // Simulate successful signup with plan selection
+    setFadeOutPage(true);
     setTimeout(() => {
-      console.log('Signup data:', formData);
       navigate('/app/dashboard');
     }, 1500);
   };
@@ -135,7 +144,7 @@ export default function SignupPage() {
               type="submit"
               className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-full transition shadow-md"
             >
-              Sign Up
+              Continue to Plan Selection
             </button>
           </form>
 
@@ -152,6 +161,14 @@ export default function SignupPage() {
       </main>
 
       <WebsiteFooter />
+
+      {/* Subscription Plan Modal */}
+      <SubscriptionPlanModal
+        isOpen={showPlanModal}
+        onClose={() => setShowPlanModal(false)}
+        onPlanSelect={handlePlanSelect}
+        formData={formData}
+      />
 
       {/* Spinner on fade out */}
       {fadeOutPage && (

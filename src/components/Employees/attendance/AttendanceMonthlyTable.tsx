@@ -1,11 +1,11 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { AttendanceRecord } from '@/types/attendance';
-import { AttendanceRow } from './AttendanceTypes';
+import React, { useMemo } from 'react';
 import AttendancePagination from './AttendancePagination';
-import { fetchAttendanceByDate } from '../../../api/attendance';
+import { AttendanceRecord } from '@/types/attendance';
+
 
 interface Props {
-  employees: AttendanceRecord[];
+  employees: any[];
+  attendanceData: any[]; // Changed from AttendanceRecord[] to any[] to handle the actual data structure
   monthDates: string[]; // format: YYYY-MM-DD
   page: number;
   pageSize: number;
@@ -15,57 +15,58 @@ interface Props {
 
 const AttendanceMonthlyTable: React.FC<Props> = ({
   employees,
+  attendanceData,
   monthDates,
   page,
   pageSize,
   onPageChange,
   onPageSizeChange,
 }) => {
-  const [attendanceMap, setAttendanceMap] = useState<Record<string, Record<string, AttendanceRow>>>({});
-  const [loading, setLoading] = useState(true);
-
-
-  const uniqueEmployees = useMemo(() => {
-    const seen = new Set<string>();
-    return employees.filter(emp => {
-      if (seen.has(emp.employee_id)) return false;
-      seen.add(emp.employee_id);
-      return true;
-    });
-  }, [employees]);
-
-  console.log('uniqueEmployees', employees)
-
+  console.log('attendanceData', attendanceData);
+  console.log('monthDates', monthDates);
   
+  // Early return if monthDates is not available
+  if (!monthDates || !Array.isArray(monthDates) || monthDates.length === 0) {
+    return (
+      <div className="space-y-4">
+        <div className="w-full p-8 text-center text-gray-500 dark:text-gray-400">
+          Loading month dates...
+        </div>
+      </div>
+    );
+  }
+
+  // Ensure employees are unique by ID
+  const uniqueEmployees = attendanceData;
+
   const startIdx = (page - 1) * pageSize;
   const paginatedEmployees = uniqueEmployees.slice(startIdx, startIdx + pageSize);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      const map: Record<string, Record<string, AttendanceRow>> = {};
+  // Convert attendance data to a map for fast lookup
+  const attendanceMap = useMemo(() => {
+    const map: Record<string, Record<string, any>> = {};
+    
+    // Process each employee's attendance data
+    attendanceData.forEach((row) => {
+      if (!row.attendance) return;
+      
+      // Iterate through the dates in the attendance object
+      Object.entries(row.attendance).forEach(([date, attendanceData]: [string, any]) => {
+        if (!monthDates.includes(date)) return;
+        
+        if (!map[date]) map[date] = {};
+        map[date][row.employee_id] = {
+          ...attendanceData,
+          employee_id: row.employee_id,
+          employee: row.employee
+        };
+      });
+    });
+    
+    return map;
+  }, [attendanceData, monthDates]);
 
-      for (const date of monthDates) {
-        try {
-          const response = await fetchAttendanceByDate(date);
-            const rows = Array.isArray(response.data) ? response.data : [];
-            map[date] = {};
-            rows.forEach((row: AttendanceRow) => {
-              map[date][row.employee_id] = row;
-            });
-        } catch (err) {
-          map[date] = {};
-        }
-      }
-
-      setAttendanceMap(map);
-      setLoading(false);
-    };
-
-    fetchData();
-  }, [monthDates]);
-
-  console.log('attendanceMap', attendanceMap)
+  console.log('attendanceMap', attendanceMap);
 
   const getStatusBadge = (status?: string) => {
     const normalized = status?.toUpperCase();
@@ -80,16 +81,6 @@ const AttendanceMonthlyTable: React.FC<Props> = ({
         return <span className="text-red-500 dark:text-red-400">❌</span>;
     }
   };
-
-  if (loading) {
-    return (
-      <div className="w-full overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm bg-white dark:bg-gray-900">
-        <div className="text-center py-6 text-gray-500 italic dark:text-gray-400">
-          Loading monthly attendance...
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-4">
@@ -106,14 +97,14 @@ const AttendanceMonthlyTable: React.FC<Props> = ({
               </thead>
               <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
                 {paginatedEmployees.map((emp) => (
-                  <tr
-                    key={emp.employee_id}
-                    className="hover:bg-gray-50 dark:hover:bg-gray-800 transition"
-                  >
+                  <tr key={emp.employee_id} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition">
                     <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-300">
                       {emp.employee.token_no || <span className="italic text-gray-400">–</span>}
                     </td>
-                    <td className="px-4 py-3 text-gray-900 dark:text-white max-w-[180px] truncate" title={emp.name}>
+                    <td
+                      className="px-4 py-3 text-gray-900 dark:text-white max-w-[180px] truncate"
+                      title={emp.employee.name}
+                    >
                       {emp.employee.name}
                     </td>
                   </tr>
@@ -122,16 +113,13 @@ const AttendanceMonthlyTable: React.FC<Props> = ({
             </table>
           </div>
 
+          {/* Center: Daily Attendance */}
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 text-sm">
               <thead className="bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-semibold sticky top-0 z-10">
                 <tr>
                   {monthDates.map((date) => (
-                    <th
-                      key={date}
-                      title={date}
-                      className="px-4 py-3 text-center whitespace-nowrap"
-                    >
+                    <th key={date} title={date} className="px-4 py-3 text-center whitespace-nowrap">
                       {date.slice(8)}
                     </th>
                   ))}
@@ -139,10 +127,7 @@ const AttendanceMonthlyTable: React.FC<Props> = ({
               </thead>
               <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
                 {paginatedEmployees.map((emp) => (
-                  <tr
-                    key={emp.employee_id}
-                    className="hover:bg-gray-50 dark:hover:bg-gray-800 transition"
-                  >
+                  <tr key={emp.employee_id} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition">
                     {monthDates.map((date) => {
                       const att = attendanceMap[date]?.[emp.employee_id];
                       return (
@@ -187,10 +172,7 @@ const AttendanceMonthlyTable: React.FC<Props> = ({
                   const wages = parseFloat((hourlyRate * totalHours).toFixed(2));
 
                   return (
-                    <tr
-                      key={emp.employee_id}
-                      className="hover:bg-gray-50 dark:hover:bg-gray-800 transition"
-                    >
+                    <tr key={emp.employee_id} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition">
                       <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-300">{workDays}</td>
                       <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-300">{totalOvertime.toFixed(3)}</td>
                       <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-300">{totalHours.toFixed(3)}</td>
@@ -207,12 +189,12 @@ const AttendanceMonthlyTable: React.FC<Props> = ({
       </div>
 
       <AttendancePagination
-          page={page}
-          total={uniqueEmployees.length}  // ✅ Use unique count
-          pageSize={pageSize}
-          onPageChange={onPageChange}
-          onPageSizeChange={onPageSizeChange}
-        />
+        page={page}
+        total={uniqueEmployees.length}
+        pageSize={pageSize}
+        onPageChange={onPageChange}
+        onPageSizeChange={onPageSizeChange}
+      />
     </div>
   );
 };

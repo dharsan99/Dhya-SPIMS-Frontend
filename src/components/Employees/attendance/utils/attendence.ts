@@ -1,6 +1,6 @@
 import { AttendanceRow } from "@/components/Employees/attendance/AttendanceTypes";
 import { AttendanceRecord } from "@/types/attendance";
-import { format, addDays, addWeeks, startOfWeek, startOfMonth, addMonths as addMonthsFn } from 'date-fns';
+import { format, addDays, addWeeks, startOfWeek, startOfMonth, addMonths } from 'date-fns';
 
 export const buildEmptyRow = (emp: AttendanceRecord): AttendanceRow => ({
     employee_id: emp.employee_id,
@@ -30,7 +30,6 @@ export const buildAttendanceMap = (
   return map;
 };
 
-import { format, startOfWeek, addWeeks, addDays, startOfMonth, addMonths } from 'date-fns';
 
 export const generateWeekRanges = (baseDate: Date) => {
   return Array.from({ length: 13 }, (_, i) => {
@@ -56,29 +55,48 @@ export const generateMonthRanges = (baseDate: Date) => {
 };
 
 export const calculateWeeklyTotals = (
-  emp: AttendanceRecord,
-  attendanceMap: Record<string, Record<string, AttendanceRow>>,
+  emp: {
+    employee_id: string;
+    employee: { shift_rate: string };
+    attendance: Record<string, { status: string; total_hours: number; overtime_hours: number }>;
+  },
   weekDates: string[]
 ) => {
+  // Safety check for weekDates
+  if (!weekDates || !Array.isArray(weekDates) || weekDates.length === 0) {
+    return {
+      totalHours: 0,
+      totalDays: 0,
+      totalOvertime: 0,
+      wages: 0,
+    };
+  }
+
   let totalHours = 0;
   let totalDays = 0;
   let totalOvertime = 0;
 
   weekDates.forEach((date) => {
-    const att = attendanceMap[date]?.[emp.employee_id];
+    const att = emp.attendance?.[date];
     if (att && att.status !== 'ABSENT') {
-      totalHours += att.total_hours;
-      totalOvertime += att.overtime_hours;
+      totalHours += att.total_hours || 0;
+      totalOvertime += att.overtime_hours || 0;
       totalDays += att.status === 'PRESENT' ? 1 : att.status === 'HALF_DAY' ? 0.5 : 0;
     }
   });
 
-  const dailyRate = parseFloat((emp.employee.shift_rate ?? 0).toString());
-  const hourlyRate = dailyRate / 8;
+  const shiftRate = parseFloat(emp.employee?.shift_rate || '0');
+  const hourlyRate = shiftRate / 8;
   const wages = parseFloat((totalHours * hourlyRate).toFixed(2));
 
-  return { totalHours, totalDays, totalOvertime, wages };
+  return {
+    totalHours,
+    totalDays,
+    totalOvertime,
+    wages,
+  };
 };
+
 
 export const formatINR = (value: number) =>
   new Intl.NumberFormat('en-IN', {
