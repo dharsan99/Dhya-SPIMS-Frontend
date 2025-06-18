@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { FaChartLine, FaChartBar, FaChartPie, FaChartArea, FaRobot, FaFileAlt, FaDownload, FaFilter } from "react-icons/fa";
+import { FaChartBar, FaChartLine, FaChartPie, FaFileExport } from "react-icons/fa";
 
 export default function ReportsAnalyticsSection() {
   const features = [
@@ -26,7 +26,7 @@ export default function ReportsAnalyticsSection() {
       ]
     },
     {
-      icon: <FaRobot className="w-8 h-8 text-blue-600" />,
+      icon: <FaFileExport className="w-8 h-8 text-blue-600" />,
       title: "AI-Powered Insights",
       description: "Smart analytics and predictions",
       details: [
@@ -273,7 +273,7 @@ export default function ReportsAnalyticsSection() {
 
         {/* Benefits */}
         <div className="bg-gray-50 p-6 rounded-xl">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">The SPIMS Advantage</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">The TexIntelli Advantage</h2>
           <div className="grid md:grid-cols-2 gap-6">
             <div>
               <h3 className="font-semibold text-gray-900 mb-3">Traditional Systems</h3>
@@ -285,7 +285,7 @@ export default function ReportsAnalyticsSection() {
               </ul>
             </div>
             <div>
-              <h3 className="font-semibold text-gray-900 mb-3">With SPIMS</h3>
+              <h3 className="font-semibold text-gray-900 mb-3">With TexIntelli</h3>
               <ul className="space-y-2 text-gray-700">
                 <li>• Real-time analytics</li>
                 <li>• AI-powered insights</li>

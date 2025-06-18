@@ -11,7 +11,7 @@ interface ThemeStore {
 export const useThemeStore = create<ThemeStore>((set) => ({
   theme: 'light',
 
-  setTheme: (theme, showToast = true) => {
+  setTheme: (_theme, showToast = false) => {
     const root = document.documentElement;
     root.classList.remove('dark');
     root.classList.add('light');
@@ -20,16 +20,16 @@ export const useThemeStore = create<ThemeStore>((set) => ({
 
     if (showToast) {
       toast.success('Light Theme', {
-      style: {
-        borderRadius: '8px',
-        background: '#333',
-        color: '#fff',
-      },
-    });
+        style: {
+          borderRadius: '8px',
+          background: '#333',
+          color: '#fff',
+        },
+      });
     }
   },
 }));
 
-// Initialize theme on store creation
+// Initialize theme on store creation without showing toast
 document.documentElement.classList.add('light');
 localStorage.setItem('theme', 'light');

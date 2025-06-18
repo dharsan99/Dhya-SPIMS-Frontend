@@ -50,9 +50,9 @@ const Sidebar = ({ onLinkClick }: { onLinkClick?: () => void }) => {
     <aside className="w-64 fixed top-0 left-0 h-screen flex flex-col bg-white dark:bg-gray-900 border-r dark:border-gray-700 px-4 py-6 shadow-md transition-colors duration-300 overflow-y-auto z-50">
       {/* Logo */}
       <div className="mb-10 text-center">
-        <h1 className="text-2xl font-extrabold text-blue-600 dark:text-blue-400 tracking-wide">
-          SPIMS
-        </h1>
+        <span className="text-xl font-bold text-gray-900 dark:text-white">
+          TexIntelli
+        </span>
       </div>
 
       {/* Navigation */}

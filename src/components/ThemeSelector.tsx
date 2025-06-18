@@ -2,7 +2,7 @@
 import { useThemeStore } from "../hooks/useThemeStore";
 
 const ThemeSelector = () => {
-  const { theme } = useThemeStore();
+  useThemeStore();
 
   return (
     <div className="p-2 rounded border bg-white text-sm">

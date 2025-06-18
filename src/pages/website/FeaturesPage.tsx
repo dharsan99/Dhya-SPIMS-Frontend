@@ -8,8 +8,8 @@ import TechnicalFeaturesSection from "../../components/website/features/Technica
 
 export default function FeaturesPage() {
   usePageTitle({
-    title: "Features | Dhya SPIMS",
-    description: "Discover the powerful features of SPIMS - Smart Production & Inventory Management System for textile manufacturers.",
+    title: "Features | TexIntelli",
+    description: "Discover the powerful features of TexIntelli - Smart Production & Inventory Management System for textile manufacturers.",
   });
 
   return (
@@ -30,7 +30,7 @@ export default function FeaturesPage() {
             transition={{ delay: 0.1 }}
             className="text-xl text-gray-600 max-w-3xl mx-auto"
           >
-            SPIMS combines advanced technology with industry-specific features to streamline your production and inventory management.
+            TexIntelli combines advanced technology with industry-specific features to streamline your production and inventory management.
           </motion.p>
         </div>
       </section>

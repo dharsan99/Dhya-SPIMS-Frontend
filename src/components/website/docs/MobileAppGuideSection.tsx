@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
-import { FaMobileAlt, FaBell, FaChartLine, FaQrcode, FaCloud, FaShieldAlt, FaSync, FaUserShield } from "react-icons/fa";
+import { FaMobileAlt, FaBell, FaQrcode, FaSync } from "react-icons/fa";
 import MobileAppNotificationModal from "./MobileAppNotificationModal";
 
 export default function MobileAppGuideSection() {
@@ -149,7 +149,7 @@ export default function MobileAppGuideSection() {
             Mobile App (Coming Soon)
         </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Take SPIMS on the go with our upcoming mobile application. Manage your spinning mill operations from anywhere with real-time access to critical data and features.
+            Take TexIntelli on the go with our upcoming mobile application. Manage your spinning mill operations from anywhere with real-time access to critical data and features.
           </p>
         </div>
 
@@ -279,7 +279,7 @@ export default function MobileAppGuideSection() {
         <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-8 rounded-xl text-center">
           <h2 className="text-2xl font-bold mb-4">Coming Soon</h2>
           <p className="text-lg mb-6">
-            The SPIMS mobile app is currently in development. Stay tuned for updates and be among the first to experience mobile management of your spinning mill operations.
+            The TexIntelli mobile app is currently in development. Stay tuned for updates and be among the first to experience mobile management of your spinning mill operations.
           </p>
           <div className="flex justify-center">
             <button 

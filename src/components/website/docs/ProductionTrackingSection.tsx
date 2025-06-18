@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { FaIndustry, FaChartLine, FaClipboardCheck, FaRobot, FaTachometerAlt, FaExclamationTriangle, FaChartBar, FaCogs } from "react-icons/fa";
+import { FaIndustry, FaChartLine, FaRobot, FaTachometerAlt } from "react-icons/fa";
 
 export default function ProductionTrackingSection() {
   const features = [
@@ -273,7 +273,7 @@ export default function ProductionTrackingSection() {
 
         {/* Benefits */}
         <div className="bg-gray-50 p-6 rounded-xl">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">The SPIMS Advantage</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">The TexIntelli Advantage</h2>
           <div className="grid md:grid-cols-2 gap-6">
             <div>
               <h3 className="font-semibold text-gray-900 mb-3">Traditional Systems</h3>
@@ -285,7 +285,7 @@ export default function ProductionTrackingSection() {
               </ul>
             </div>
             <div>
-              <h3 className="font-semibold text-gray-900 mb-3">With SPIMS</h3>
+              <h3 className="font-semibold text-gray-900 mb-3">With TexIntelli</h3>
               <ul className="space-y-2 text-gray-700">
                 <li>• Real-time monitoring</li>
                 <li>• Predictive analytics</li>

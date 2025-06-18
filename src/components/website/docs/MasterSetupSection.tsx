@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { FaBox, FaIndustry, FaUsers, FaCogs, FaChartLine, FaShieldAlt } from "react-icons/fa";
+import { FaBox, FaIndustry, FaUsers, FaCogs } from "react-icons/fa";
 
 export default function MasterSetupSection() {
   const masterDataTypes = [

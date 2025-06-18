@@ -5,7 +5,6 @@ import './index.css';
 import App from './App';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { useThemeStore } from './hooks/useThemeStore';
 
 import AOS from 'aos';
 import 'aos/dist/aos.css';

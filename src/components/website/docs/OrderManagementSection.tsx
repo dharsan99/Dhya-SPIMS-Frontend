@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { FaShoppingCart, FaIndustry, FaBalanceScale, FaBoxes, FaRobot, FaChartLine, FaFileAlt, FaShieldAlt, FaCogs, FaCloud } from "react-icons/fa";
+import { FaShoppingCart, FaIndustry, FaRobot, FaCloud } from "react-icons/fa";
 
 export default function OrderManagementSection() {
   const features = [
@@ -154,7 +154,7 @@ export default function OrderManagementSection() {
             Advanced Order Management System
         </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Transform your textile manufacturing with AI-powered order management. From order creation to final dispatch, SPIMS delivers complete automation and real-time visibility.
+            Transform your textile manufacturing with AI-powered order management. From order creation to final dispatch, TexIntelli delivers complete automation and real-time visibility.
           </p>
         </div>
 
@@ -284,7 +284,7 @@ export default function OrderManagementSection() {
 
         {/* Benefits */}
         <div className="bg-gray-50 p-6 rounded-xl">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">The SPIMS Advantage</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">The TexIntelli Advantage</h2>
           <div className="grid md:grid-cols-2 gap-6">
             <div>
               <h3 className="font-semibold text-gray-900 mb-3">Traditional Systems</h3>
@@ -296,7 +296,7 @@ export default function OrderManagementSection() {
               </ul>
             </div>
             <div>
-              <h3 className="font-semibold text-gray-900 mb-3">With SPIMS</h3>
+              <h3 className="font-semibold text-gray-900 mb-3">With TexIntelli</h3>
               <ul className="space-y-2 text-gray-700">
                 <li>• AI-powered automation</li>
                 <li>• Real-time dashboards</li>

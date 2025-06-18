@@ -1,32 +1,27 @@
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Pagination, Navigation, Autoplay } from 'swiper/modules';
-import { FaQuoteLeft } from 'react-icons/fa';
-import { useRef, useEffect } from 'react';
-import 'swiper/css';
-import 'swiper/css/pagination';
-import 'swiper/css/navigation';
+import { useState, useRef, useEffect } from "react";
+import { FaQuoteLeft, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
 const testimonials = [
   {
-    quote: "SPIMS has transformed how we manage our spinning operations. The real-time tracking and analytics have significantly improved our efficiency.",
+    quote: "TexIntelli has transformed how we manage our spinning operations. The real-time tracking and analytics have significantly improved our efficiency.",
     author: "Rajesh Kumar",
     position: "Production Manager",
-    company: "Textile Solutions Ltd"
+    company: "ABC Spinning Mills"
   },
   {
-    quote: "The inventory management system is exceptional. We've reduced stock discrepancies by 95% since implementing SPIMS.",
+    quote: "The inventory management system is exceptional. We've reduced stock discrepancies by 95% since implementing TexIntelli.",
     author: "Priya Sharma",
-    position: "Inventory Controller",
-    company: "Modern Spinning Mills"
-  },
-  {
-    quote: "The production tracking features have given us unprecedented visibility into our operations. Highly recommended!",
-    author: "Vikram Singh",
     position: "Operations Director",
-    company: "Quality Yarns Inc"
+    company: "XYZ Textiles"
   },
   {
-    quote: "SPIMS has streamlined our entire production process. The order management system is particularly impressive.",
+    quote: "TexIntelli has streamlined our entire production process. The order management system is particularly impressive.",
+    author: "Mohammed Ali",
+    position: "CEO",
+    company: "Global Yarns Ltd"
+  },
+  {
+    quote: "TexIntelli has transformed how we manage our spinning operations. The real-time tracking and analytics have significantly improved our efficiency.",
     author: "Anita Patel",
     position: "Plant Manager",
     company: "Elite Spinning Co"
@@ -34,104 +29,79 @@ const testimonials = [
 ];
 
 const TestimonialSection = () => {
-  const swiperRef = useRef(null);
+  const [index, setIndex] = useState(0);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Auto-advance every 4 seconds
+  const resetTimeout = () => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+  };
 
   useEffect(() => {
-    if (swiperRef.current) {
-      const swiper = swiperRef.current.swiper;
-      swiper.on('slideChange', () => {
-        swiper.navigation.enable();
-        swiper.navigation.update();
-      });
-    }
-  }, []);
+    resetTimeout();
+    timeoutRef.current = setTimeout(
+      () => setIndex((prev) => (prev + 1) % testimonials.length),
+      4000
+    );
+    return () => resetTimeout();
+  }, [index]);
+
+  const goTo = (i: number) => setIndex(i);
+  const prev = () => setIndex((prev) => (prev - 1 + testimonials.length) % testimonials.length);
+  const next = () => setIndex((prev) => (prev + 1) % testimonials.length);
 
   return (
     <section className="py-20 bg-gradient-to-b from-white to-blue-50">
-      <div className="max-w-7xl mx-auto px-4">
-        {/* Section Header */}
-        <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">
-            What Our Clients Say
-          </h2>
+      <div className="max-w-3xl mx-auto px-4">
+        <div className="text-center mb-12">
+          <h2 className="text-4xl font-bold text-gray-900 mb-4">What Our Clients Say</h2>
           <p className="text-gray-600 max-w-2xl mx-auto">
             Trusted by leading spinning mills across India for comprehensive production and inventory management.
           </p>
         </div>
-
-        {/* Testimonials Slider */}
-        <div className="relative px-8 md:px-12">
-          <Swiper
-            ref={swiperRef}
-            modules={[Pagination, Navigation, Autoplay]}
-            spaceBetween={20}
-            slidesPerView={1}
-            loop={true}
-            loopedSlides={4}
-            watchSlidesProgress={true}
-            autoplay={{
-              delay: 3000,
-              disableOnInteraction: false,
-              pauseOnMouseEnter: true,
-              waitForTransition: true,
-            }}
-            speed={800}
-            grabCursor={true}
-            pagination={{
-              clickable: true,
-              dynamicBullets: true,
-            }}
-            navigation={{
-              prevEl: '.swiper-button-prev',
-              nextEl: '.swiper-button-next',
-              disabledClass: 'swiper-button-disabled',
-            }}
-            breakpoints={{
-              640: {
-                slidesPerView: 1,
-                spaceBetween: 20,
-              },
-              768: {
-                slidesPerView: 2,
-                spaceBetween: 24,
-              },
-              1024: {
-                slidesPerView: 3,
-                spaceBetween: 30,
-              },
-            }}
-            className="pb-16"
-            onSlideChange={(swiper) => {
-              swiper.navigation.enable();
-              swiper.navigation.update();
-            }}
-          >
-            {testimonials.map((testimonial, index) => (
-              <SwiperSlide key={index}>
-                <div className="bg-white p-6 md:p-8 rounded-xl shadow-md hover:shadow-lg transition-all h-[320px] flex flex-col">
-                  <FaQuoteLeft className="text-blue-600 text-3xl mb-6 flex-shrink-0" />
-                  <p className="text-gray-600 mb-6 leading-relaxed flex-grow">
-                    {testimonial.quote}
-                  </p>
-                  <div className="mt-auto pt-4 border-t border-gray-100">
-                    <h4 className="font-semibold text-gray-900">
-                      {testimonial.author}
-                    </h4>
-                    <p className="text-sm text-gray-600">
-                      {testimonial.position}
-                    </p>
-                    <p className="text-sm text-blue-600">
-                      {testimonial.company}
-                    </p>
+        <div className="relative overflow-hidden">
+          <div className="flex transition-transform duration-700 ease-in-out"
+            style={{ transform: `translateX(-${index * 100}%)` }}>
+            {testimonials.map((t, i) => (
+              <div key={i} className="min-w-full px-6">
+                <div className="bg-white p-8 rounded-xl shadow-md h-[320px] flex flex-col items-center">
+                  <FaQuoteLeft className="text-blue-600 text-3xl mb-6" />
+                  <p className="text-gray-600 mb-6 leading-relaxed flex-grow text-center">{t.quote}</p>
+                  <div className="mt-auto pt-4 border-t border-gray-100 text-center">
+                    <h4 className="font-semibold text-gray-900">{t.author}</h4>
+                    <p className="text-sm text-gray-600">{t.position}</p>
+                    <p className="text-sm text-blue-600">{t.company}</p>
                   </div>
                 </div>
-              </SwiperSlide>
+              </div>
             ))}
-          </Swiper>
-
-          {/* Custom Navigation Buttons */}
-          <div className="swiper-button-prev !w-10 !h-10 !bg-white !rounded-full !shadow-md after:!text-blue-600 after:!text-lg hover:!bg-blue-50 transition-colors !opacity-100 !-left-2 md:!-left-4"></div>
-          <div className="swiper-button-next !w-10 !h-10 !bg-white !rounded-full !shadow-md after:!text-blue-600 after:!text-lg hover:!bg-blue-50 transition-colors !opacity-100 !-right-2 md:!-right-4"></div>
+          </div>
+          {/* Navigation */}
+          <button
+            className="absolute top-1/2 left-2 transform -translate-y-1/2 bg-white rounded-full shadow p-2 text-blue-600 hover:bg-blue-50"
+            onClick={prev}
+            aria-label="Previous"
+          >
+            <FaChevronLeft />
+          </button>
+          <button
+            className="absolute top-1/2 right-2 transform -translate-y-1/2 bg-white rounded-full shadow p-2 text-blue-600 hover:bg-blue-50"
+            onClick={next}
+            aria-label="Next"
+          >
+            <FaChevronRight />
+          </button>
+          {/* Dots */}
+          <div className="flex justify-center mt-6 gap-2">
+            {testimonials.map((_, i) => (
+              <button
+                key={i}
+                className={`w-3 h-3 rounded-full ${i === index ? "bg-blue-600" : "bg-gray-300"}`}
+                onClick={() => goTo(i)}
+                aria-label={`Go to testimonial ${i + 1}`}
+              />
+            ))}
+          </div>
         </div>
       </div>
     </section>

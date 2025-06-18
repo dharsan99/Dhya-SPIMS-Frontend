@@ -80,7 +80,7 @@ export default function IntroductionSection() {
         {/* Hero Section */}
         <div className="text-center mb-16">
           <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-6">
-            Introduction to Dhya SPIMS
+            Introduction to TexIntelli
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             A comprehensive solution designed to transform spinning mill operations through intelligent production and inventory management.
@@ -105,7 +105,7 @@ export default function IntroductionSection() {
           <div className="bg-blue-50 p-6 rounded-xl">
             <h2 className="text-2xl font-bold text-blue-700 mb-4">Our Solution</h2>
             <p className="text-gray-700 leading-relaxed">
-              Dhya SPIMS addresses these challenges by providing:
+              TexIntelli addresses these challenges by providing:
             </p>
             <ul className="mt-4 space-y-2 text-gray-700">
               <li>• Centralized process management</li>

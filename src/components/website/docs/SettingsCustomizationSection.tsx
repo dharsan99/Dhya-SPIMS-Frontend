@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { FaCogs, FaUsers, FaShieldAlt, FaChartLine, FaIndustry, FaBell, FaDatabase, FaCloud } from "react-icons/fa";
+import { FaCogs, FaSlidersH, FaPalette } from "react-icons/fa";
 
 export default function SettingsCustomizationSection() {
   const features = [
@@ -15,7 +15,7 @@ export default function SettingsCustomizationSection() {
       ]
     },
     {
-      icon: <FaUsers className="w-8 h-8 text-blue-600" />,
+      icon: <FaSlidersH className="w-8 h-8 text-blue-600" />,
       title: "User Management",
       description: "Comprehensive user control",
       details: [
@@ -26,7 +26,7 @@ export default function SettingsCustomizationSection() {
       ]
     },
     {
-      icon: <FaIndustry className="w-8 h-8 text-blue-600" />,
+      icon: <FaPalette className="w-8 h-8 text-blue-600" />,
       title: "Production Settings",
       description: "Production workflow configuration",
       details: [
@@ -34,17 +34,6 @@ export default function SettingsCustomizationSection() {
         "Shift management",
         "Process parameters",
         "Quality standards"
-      ]
-    },
-    {
-      icon: <FaCloud className="w-8 h-8 text-blue-600" />,
-      title: "SaaS Configuration",
-      description: "Multi-tenant setup",
-      details: [
-        "Tenant management",
-        "Data isolation",
-        "Resource allocation",
-        "Service limits"
       ]
     }
   ];
@@ -145,7 +134,7 @@ export default function SettingsCustomizationSection() {
             Settings & Customization
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Comprehensive system configuration and customization platform for spinning mills. Tailor SPIMS to your specific operational needs with flexible settings and powerful customization options.
+            Comprehensive system configuration and customization platform for spinning mills. Tailor TexIntelli to your specific operational needs with flexible settings and powerful customization options.
           </p>
         </div>
 
@@ -273,7 +262,7 @@ export default function SettingsCustomizationSection() {
 
         {/* Benefits */}
         <div className="bg-gray-50 p-6 rounded-xl">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">The SPIMS Advantage</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">The TexIntelli Advantage</h2>
           <div className="grid md:grid-cols-2 gap-6">
             <div>
               <h3 className="font-semibold text-gray-900 mb-3">Traditional Systems</h3>
@@ -285,7 +274,7 @@ export default function SettingsCustomizationSection() {
               </ul>
             </div>
             <div>
-              <h3 className="font-semibold text-gray-900 mb-3">With SPIMS</h3>
+              <h3 className="font-semibold text-gray-900 mb-3">With TexIntelli</h3>
               <ul className="space-y-2 text-gray-700">
                 <li>• Flexible customization</li>
                 <li>• Advanced security</li>

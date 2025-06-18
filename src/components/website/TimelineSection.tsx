@@ -13,20 +13,20 @@ interface Milestone {
 const milestones: Milestone[] = [
   {
     year: "2019",
-    title: "SPIMS Foundation",
+    title: "TexIntelli Foundation",
     description: "Founded with a vision to revolutionize textile manufacturing through digital transformation.",
     impact: "Started with a mission to digitize operational workflows for traditional industries."
   },
   {
     year: "2021",
     title: "First SaaS Launch",
-    description: "Released the first version of SPIMS with core production tracking and inventory management features.",
+    description: "Released the first version of TexIntelli with core production tracking and inventory management features.",
     impact: "Enabled real-time production monitoring and automated inventory tracking."
   },
   {
     year: "2022",
     title: "Industry Expansion",
-    description: "Expanded SPIMS capabilities to serve diverse textile manufacturing sectors.",
+    description: "Expanded TexIntelli capabilities to serve diverse textile manufacturing sectors.",
     impact: "Successfully deployed across spinning mills, yarn manufacturers, and dyeing units."
   },
   {

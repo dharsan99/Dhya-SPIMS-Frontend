@@ -49,7 +49,7 @@ const FeatureSection = () => {
             Comprehensive Spinning Mill Management
           </h2>
           <p className="text-gray-600 max-w-2xl mx-auto" data-aos="fade-up" data-aos-delay="100">
-            Streamline your spinning operations, boost productivity, and scale faster with Dhya SPIMS — your smart production partner.
+            Streamline your spinning operations, boost productivity, and scale faster with TexIntelli — your smart production partner.
           </p>
         </div>
 

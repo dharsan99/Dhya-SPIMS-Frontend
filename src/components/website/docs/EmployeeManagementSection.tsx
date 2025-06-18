@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { FaUsers, FaUserTie, FaUserClock, FaUserShield, FaChartBar, FaIdCard, FaCalendarAlt, FaTasks } from "react-icons/fa";
+import { FaUsers, FaUserClock, FaUserShield, FaTasks } from "react-icons/fa";
 
 export default function EmployeeManagementSection() {
   const features = [
@@ -115,7 +115,7 @@ export default function EmployeeManagementSection() {
             Employee Management
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Streamline your workforce management with SPIMS. From employee profiles to performance tracking, manage your entire workforce efficiently.
+            Streamline your workforce management with TexIntelli. From employee profiles to performance tracking, manage your entire workforce efficiently.
           </p>
         </div>
 
@@ -214,7 +214,7 @@ export default function EmployeeManagementSection() {
 
         {/* Benefits */}
         <div className="bg-gray-50 p-6 rounded-xl">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">The SPIMS Advantage</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">The TexIntelli Advantage</h2>
           <div className="grid md:grid-cols-2 gap-6">
             <div>
               <h3 className="font-semibold text-gray-900 mb-3">Traditional Systems</h3>
@@ -226,7 +226,7 @@ export default function EmployeeManagementSection() {
               </ul>
             </div>
             <div>
-              <h3 className="font-semibold text-gray-900 mb-3">With SPIMS</h3>
+              <h3 className="font-semibold text-gray-900 mb-3">With TexIntelli</h3>
               <ul className="space-y-2 text-gray-700">
                 <li>• Automated workflows</li>
                 <li>• Digital documentation</li>

@@ -19,8 +19,8 @@ import FinancialManagementSection from "../../components/website/docs/FinancialM
 
 export default function DocumentationPage() {
   usePageTitle({
-    title: "Documentation | Dhya SPIMS",
-    description: "Learn everything about Dhya SPIMS to streamline your production and inventory management.",
+    title: "Documentation | TexIntelli",
+    description: "Learn everything about TexIntelli to streamline your production and inventory management.",
   });
 
   const [activeIndex, setActiveIndex] = useState(0);

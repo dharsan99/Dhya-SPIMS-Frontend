@@ -5,8 +5,8 @@ import { useState } from "react";
 
 export default function TermsPage() {
   usePageTitle({
-    title: "Terms of Service | Dhya SPIMS",
-    description: "Read our terms of service to understand your rights and responsibilities when using Dhya SPIMS."
+    title: "Terms of Service | TexIntelli",
+    description: "Read our terms of service to understand your rights and responsibilities when using TexIntelli."
   });
 
   const [expandedSections, setExpandedSections] = useState<number[]>([]);
@@ -23,7 +23,7 @@ export default function TermsPage() {
     {
       icon: <FaShieldAlt className="w-8 h-8 text-blue-600" />,
       title: "1. Acceptance of Terms",
-      content: "By accessing or using Dhya SPIMS, you agree to be bound by these Terms of Service and all applicable laws and regulations. If you do not agree with any of these terms, you are prohibited from using or accessing this site.",
+      content: "By accessing or using TexIntelli, you agree to be bound by these Terms of Service and all applicable laws and regulations. If you do not agree with any of these terms, you are prohibited from using or accessing this site.",
       subsections: [
         {
           title: "Account Registration",
@@ -31,18 +31,18 @@ export default function TermsPage() {
         },
         {
           title: "Age Requirement",
-          content: "You must be at least 18 years old to use Dhya SPIMS. By using our services, you represent and warrant that you meet this requirement."
+          content: "You must be at least 18 years old to use TexIntelli. By using our services, you represent and warrant that you meet this requirement."
         }
       ]
     },
     {
       icon: <FaUserShield className="w-8 h-8 text-blue-600" />,
       title: "2. Use of Service",
-      content: "Dhya SPIMS provides digital tools to streamline production, inventory management, and reporting in textile and spinning industries.",
+      content: "TexIntelli provides digital tools to streamline production, inventory management, and reporting in textile and spinning industries.",
       subsections: [
         {
           title: "Authorized Use",
-          content: "You may use Dhya SPIMS only for lawful purposes and in accordance with these Terms. You agree not to use the service for any illegal or unauthorized purpose."
+          content: "You may use TexIntelli only for lawful purposes and in accordance with these Terms. You agree not to use the service for any illegal or unauthorized purpose."
         },
         {
           title: "User Responsibilities",
@@ -53,7 +53,7 @@ export default function TermsPage() {
     {
       icon: <FaMoneyBillWave className="w-8 h-8 text-blue-600" />,
       title: "3. Subscription & Payment",
-      content: "Certain features of Dhya SPIMS may require paid subscriptions. By subscribing, you agree to pay all applicable fees and charges.",
+      content: "Certain features of TexIntelli may require paid subscriptions. By subscribing, you agree to pay all applicable fees and charges.",
       subsections: [
         {
           title: "Billing Terms",
@@ -83,7 +83,7 @@ export default function TermsPage() {
     {
       icon: <FaChartLine className="w-8 h-8 text-blue-600" />,
       title: "5. Service Features",
-      content: "Dhya SPIMS offers various features for production tracking, inventory management, and analytics.",
+      content: "TexIntelli offers various features for production tracking, inventory management, and analytics.",
       subsections: [
         {
           title: "Feature Availability",
@@ -98,7 +98,7 @@ export default function TermsPage() {
     {
       icon: <FaTools className="w-8 h-8 text-blue-600" />,
       title: "6. Service Modifications",
-      content: "We reserve the right to modify, suspend, or discontinue any aspect of Dhya SPIMS at any time.",
+      content: "We reserve the right to modify, suspend, or discontinue any aspect of TexIntelli at any time.",
       subsections: [
         {
           title: "Scheduled Maintenance",
@@ -172,7 +172,7 @@ export default function TermsPage() {
               Terms & Conditions
             </h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Welcome to Dhya SPIMS. By accessing or using our platform, you agree to be bound by these terms and conditions. 
+              Welcome to TexIntelli. By accessing or using our platform, you agree to be bound by these terms and conditions. 
               Please read them carefully before using our services.
             </p>
           </motion.div>

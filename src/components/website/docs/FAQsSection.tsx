@@ -23,24 +23,24 @@ export default function FAQsSection() {
     // General Questions
     {
       category: "general",
-      question: "What is SPIMS?",
-      answer: "SPIMS (Smart Production & Inventory Management System) is a comprehensive SaaS solution designed specifically for spinning mills. It streamlines operations, manages inventory, tracks production, and provides real-time insights for better decision-making."
+      question: "What is TexIntelli?",
+      answer: "TexIntelli (Smart Production & Inventory Management System) is a comprehensive SaaS solution designed specifically for spinning mills. It streamlines operations, manages inventory, tracks production, and provides real-time insights for better decision-making."
     },
     {
       category: "general",
-      question: "How does SPIMS benefit my spinning mill?",
-      answer: "SPIMS helps spinning mills by automating order management, optimizing production planning, tracking inventory in real-time, providing data-driven insights, and ensuring quality control. It reduces manual errors, improves efficiency, and helps in making informed business decisions."
+      question: "How does TexIntelli benefit my spinning mill?",
+      answer: "TexIntelli helps spinning mills by automating order management, optimizing production planning, tracking inventory in real-time, providing data-driven insights, and ensuring quality control. It reduces manual errors, improves efficiency, and helps in making informed business decisions."
     },
     {
       category: "general",
-      question: "Is SPIMS suitable for my mill size?",
-      answer: "Yes, SPIMS is designed to scale with your business. Whether you're a small, medium, or large spinning mill, the system can be customized to meet your specific needs and grow with your operations."
+      question: "Is TexIntelli suitable for my mill size?",
+      answer: "Yes, TexIntelli is designed to scale with your business. Whether you're a small, medium, or large spinning mill, the system can be customized to meet your specific needs and grow with your operations."
     },
 
     // Features Questions
     {
       category: "features",
-      question: "What are the key features of SPIMS?",
+      question: "What are the key features of TexIntelli?",
       answer: "Key features include AI-powered order management, real-time production tracking, inventory management, quality control, advanced analytics, mobile app access, and comprehensive reporting. The system also offers customization options to match your specific operational needs."
     },
     {
@@ -51,36 +51,36 @@ export default function FAQsSection() {
     {
       category: "features",
       question: "Can I track production in real-time?",
-      answer: "Yes, SPIMS provides real-time production tracking with detailed insights into machine performance, production rates, quality metrics, and efficiency indicators. You can monitor production status from anywhere using the web interface or mobile app."
+      answer: "Yes, TexIntelli provides real-time production tracking with detailed insights into machine performance, production rates, quality metrics, and efficiency indicators. You can monitor production status from anywhere using the web interface or mobile app."
     },
 
     // Technical Questions
     {
       category: "technical",
       question: "How is data security handled?",
-      answer: "SPIMS implements enterprise-grade security measures including data encryption, role-based access control, regular backups, and secure cloud storage. We comply with industry standards and best practices for data protection."
+      answer: "TexIntelli implements enterprise-grade security measures including data encryption, role-based access control, regular backups, and secure cloud storage. We comply with industry standards and best practices for data protection."
     },
     {
       category: "technical",
       question: "What are the system requirements?",
-      answer: "SPIMS is a cloud-based solution that works on any modern web browser. For optimal performance, we recommend using the latest versions of Chrome, Firefox, or Safari. The system is also accessible through our mobile app."
+      answer: "TexIntelli is a cloud-based solution that works on any modern web browser. For optimal performance, we recommend using the latest versions of Chrome, Firefox, or Safari. The system is also accessible through our mobile app."
     },
     {
       category: "technical",
       question: "How is the system updated?",
-      answer: "SPIMS is automatically updated with new features and improvements. Updates are deployed seamlessly without disrupting your operations. You'll be notified of major updates and new features in advance."
+      answer: "TexIntelli is automatically updated with new features and improvements. Updates are deployed seamlessly without disrupting your operations. You'll be notified of major updates and new features in advance."
     },
 
     // Pricing Questions
     {
       category: "pricing",
       question: "What pricing plans are available?",
-      answer: "SPIMS offers flexible pricing plans based on your mill size and requirements. We provide different tiers with varying features and support levels. Contact our sales team for detailed pricing information and to find the best plan for your needs."
+      answer: "TexIntelli offers flexible pricing plans based on your mill size and requirements. We provide different tiers with varying features and support levels. Contact our sales team for detailed pricing information and to find the best plan for your needs."
     },
     {
       category: "pricing",
       question: "Is there a free trial available?",
-      answer: "Yes, we offer a free trial period to help you evaluate SPIMS. During the trial, you'll have access to all features and can test the system with your actual data. Our team will provide full support to ensure you get the most out of the trial."
+      answer: "Yes, we offer a free trial period to help you evaluate TexIntelli. During the trial, you'll have access to all features and can test the system with your actual data. Our team will provide full support to ensure you get the most out of the trial."
     },
     {
       category: "pricing",
@@ -114,7 +114,7 @@ export default function FAQsSection() {
           Frequently Asked Questions
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Find answers to common questions about SPIMS and how it can help streamline your spinning mill operations.
+            Find answers to common questions about TexIntelli and how it can help streamline your spinning mill operations.
           </p>
         </div>
 

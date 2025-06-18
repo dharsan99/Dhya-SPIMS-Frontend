@@ -31,7 +31,7 @@ const LandingPage = () => {
               Transform Your Spinning Mill Operations
             </h2>
             <p className="text-lg md:text-xl text-blue-100 mb-10">
-              Dhya SPIMS helps you streamline fibers, shades, production tracking, and more with a smart, integrated platform designed for modern spinning mills.
+              TexIntelli helps you streamline fibers, shades, production tracking, and more with a smart, integrated platform designed for modern spinning mills.
             </p>
 
             <div className="flex justify-center gap-6 flex-wrap">
@@ -45,7 +45,7 @@ const LandingPage = () => {
 
               {/* Book a Meeting Button */}
               <a
-                href="https://calendly.com/dharsan-dhya/spims-meeting" 
+                href="https://calendly.com/dharsan-dhya/TexIntelli-meeting" 
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-block border-2 border-white text-white hover:bg-blue-500 font-semibold px-8 py-3 rounded-full transition transform hover:-translate-y-1"

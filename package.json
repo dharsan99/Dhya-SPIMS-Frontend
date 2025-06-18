@@ -1,5 +1,5 @@
 {
-  "name": "spims-frontend",
+  "name": "texintelli-frontend",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -58,6 +58,7 @@
     "react-router-dom": "^6.30.0",
     "react-select": "^5.10.1",
     "recharts": "^2.15.3",
+    "swiper": "^9.4.1",
     "tesseract.js": "^6.0.1",
     "three": "^0.176.0",
     "uuid": "^11.1.0",

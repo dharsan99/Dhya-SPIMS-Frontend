@@ -62,7 +62,7 @@ const HeroSection = () => {
             </a>
 
             <a
-              href="https://calendly.com/dharsan-dhya/spims-meeting"
+              href="https://calendly.com/dharsan-dhya/TexIntelli-meeting"
               target="_blank"
               rel="noopener noreferrer"
               className="px-8 py-3 border-2 border-blue-600 text-blue-600 hover:bg-blue-50 rounded-full font-semibold text-base transition-all duration-300 transform hover:-translate-y-1"

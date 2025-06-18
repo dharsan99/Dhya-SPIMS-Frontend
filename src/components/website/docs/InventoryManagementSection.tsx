@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { FaBoxes, FaExchangeAlt, FaChartLine, FaSearch, FaExclamationTriangle, FaHistory } from "react-icons/fa";
+import { FaBoxes, FaWarehouse, FaClipboardList, FaBarcode } from "react-icons/fa";
 
 export default function InventoryManagementSection() {
   const features = [
@@ -15,7 +15,7 @@ export default function InventoryManagementSection() {
       ]
     },
     {
-      icon: <FaExchangeAlt className="w-8 h-8 text-blue-600" />,
+      icon: <FaWarehouse className="w-8 h-8 text-blue-600" />,
       title: "Material Movement",
       description: "Track all material movements and transfers",
       details: [
@@ -26,7 +26,7 @@ export default function InventoryManagementSection() {
       ]
     },
     {
-      icon: <FaChartLine className="w-8 h-8 text-blue-600" />,
+      icon: <FaClipboardList className="w-8 h-8 text-blue-600" />,
       title: "Stock Analysis",
       description: "Analyze inventory patterns and trends",
       details: [
@@ -37,7 +37,7 @@ export default function InventoryManagementSection() {
       ]
     },
     {
-      icon: <FaSearch className="w-8 h-8 text-blue-600" />,
+      icon: <FaBarcode className="w-8 h-8 text-blue-600" />,
       title: "Stock Verification",
       description: "Conduct physical stock verification",
       details: [

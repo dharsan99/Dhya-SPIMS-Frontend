@@ -1,50 +1,39 @@
 import { motion } from "framer-motion";
-import { FaMoneyBillWave, FaChartLine, FaFileInvoiceDollar, FaBalanceScale, FaCalculator, FaChartPie, FaExchangeAlt, FaFileAlt } from "react-icons/fa";
+import { FaMoneyBillWave, FaReceipt, FaPiggyBank } from "react-icons/fa";
 
 export default function FinancialManagementSection() {
   const features = [
     {
       icon: <FaMoneyBillWave className="w-8 h-8 text-blue-600" />,
-      title: "Financial Tracking",
-      description: "Comprehensive financial management",
+      title: "Financial Overview",
+      description: "Real-time financial insights",
       details: [
         "Revenue tracking",
         "Expense management",
         "Profit analysis",
-        "Cost control"
+        "Cash flow monitoring"
       ]
     },
     {
-      icon: <FaFileInvoiceDollar className="w-8 h-8 text-blue-600" />,
+      icon: <FaReceipt className="w-8 h-8 text-blue-600" />,
       title: "Invoice Management",
-      description: "Streamlined invoicing process",
+      description: "Streamlined billing process",
       details: [
         "Invoice generation",
         "Payment tracking",
-        "Credit management",
+        "Due date monitoring",
         "Payment reminders"
       ]
     },
     {
-      icon: <FaCalculator className="w-8 h-8 text-blue-600" />,
-      title: "Cost Analysis",
-      description: "Detailed cost tracking",
+      icon: <FaPiggyBank className="w-8 h-8 text-blue-600" />,
+      title: "Cost Control",
+      description: "Optimize your expenses",
       details: [
-        "Production costs",
-        "Material costs",
-        "Labor costs",
-        "Overhead analysis"
-      ]
-    },
-    {
-      icon: <FaChartPie className="w-8 h-8 text-blue-600" />,
-      title: "Financial Reports",
-      description: "Comprehensive reporting",
-      details: [
-        "Profit & loss",
-        "Balance sheets",
-        "Cash flow",
-        "Financial ratios"
+        "Cost analysis",
+        "Budget tracking",
+        "Expense categorization",
+        "Cost optimization"
       ]
     }
   ];
@@ -115,7 +104,7 @@ export default function FinancialManagementSection() {
             Financial Management
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Take control of your financial operations with SPIMS. From invoicing to financial reporting, manage your spinning mill's finances efficiently.
+            Take control of your financial operations with TexIntelli. From invoicing to financial reporting, manage your spinning mill's finances efficiently.
           </p>
         </div>
 
@@ -214,7 +203,7 @@ export default function FinancialManagementSection() {
 
         {/* Benefits */}
         <div className="bg-gray-50 p-6 rounded-xl">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">The SPIMS Advantage</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">The TexIntelli Advantage</h2>
           <div className="grid md:grid-cols-2 gap-6">
             <div>
               <h3 className="font-semibold text-gray-900 mb-3">Traditional Systems</h3>
@@ -226,7 +215,7 @@ export default function FinancialManagementSection() {
               </ul>
             </div>
             <div>
-              <h3 className="font-semibold text-gray-900 mb-3">With SPIMS</h3>
+              <h3 className="font-semibold text-gray-900 mb-3">With TexIntelli</h3>
               <ul className="space-y-2 text-gray-700">
                 <li>• Automated calculations</li>
                 <li>• Digital records</li>

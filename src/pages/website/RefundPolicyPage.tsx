@@ -3,14 +3,7 @@ import { usePageTitle } from "../../hooks/usePageTitle";
 import { useState } from "react";
 import { 
   FaShieldAlt, 
-  FaUserShield, 
-  FaDatabase, 
-  FaChartLine, 
   FaMoneyBillWave, 
-  FaTools, 
-  FaExclamationTriangle, 
-  FaGavel, 
-  FaEnvelope,
   FaChevronDown,
   FaUndo,
   FaCalendarAlt,
@@ -22,8 +15,8 @@ import {
 
 export default function RefundPolicyPage() {
   usePageTitle({
-    title: "Refund & Cancellation Policy | Dhya SPIMS",
-    description: "Learn about our refund and cancellation policies for Dhya SPIMS subscriptions and services."
+    title: "Refund & Cancellation Policy | TexIntelli",
+    description: "Learn about our refund and cancellation policies for TexIntelli subscriptions and services."
   });
 
   const [expandedSections, setExpandedSections] = useState<number[]>([]);
@@ -40,11 +33,11 @@ export default function RefundPolicyPage() {
     {
       icon: <FaShieldAlt className="w-8 h-8 text-blue-600" />,
       title: "1. Overview",
-      content: "This Refund and Cancellation Policy outlines the terms and conditions for refunds and cancellations of Dhya SPIMS subscriptions and services. By using our services, you agree to these terms.",
+      content: "This Refund and Cancellation Policy outlines the terms and conditions for refunds and cancellations of TexIntelli subscriptions and services. By using our services, you agree to these terms.",
       subsections: [
         {
           title: "Policy Scope",
-          content: "This policy applies to all subscriptions, services, and purchases made through Dhya SPIMS."
+          content: "This policy applies to all subscriptions, services, and purchases made through TexIntelli."
         },
         {
           title: "Updates",
@@ -174,7 +167,7 @@ export default function RefundPolicyPage() {
             Refund & Cancellation Policy
           </h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Clear and transparent policies for refunds and cancellations of Dhya SPIMS subscriptions and services.
+              Clear and transparent policies for refunds and cancellations of TexIntelli subscriptions and services.
             </p>
           </motion.div>
           </div>

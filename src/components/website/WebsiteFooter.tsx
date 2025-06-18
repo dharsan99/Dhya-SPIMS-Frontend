@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 import { FiMail, FiMapPin } from "react-icons/fi";
-import { scrollToTop } from '@/utils/scrollToTop';
 
 const WebsiteFooter = () => {
   const currentYear = new Date().getFullYear();
@@ -15,8 +14,8 @@ const WebsiteFooter = () => {
             <span className="text-2xl font-extrabold text-blue-600">
               Dhya
             </span>
-            <span className="text-lg font-semibold text-gray-800 tracking-wide">
-              SPIMS
+            <span className="text-lg font-semibold text-gray-800">
+              TexIntelli
             </span>
           </Link>
           <p className="leading-relaxed max-w-xs text-gray-600">

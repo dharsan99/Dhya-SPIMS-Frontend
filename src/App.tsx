@@ -61,8 +61,8 @@ function App() {
   const { setTheme } = useThemeStore();
 
   useEffect(() => {
-    // Always set light theme on app initialization
-    setTheme('light');
+    // Always set light theme on app initialization without showing toast
+    setTheme('light', false);
   }, [setTheme]);
 
   return (

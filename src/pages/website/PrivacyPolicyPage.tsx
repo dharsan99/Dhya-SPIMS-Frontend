@@ -3,13 +3,7 @@ import { usePageTitle } from "../../hooks/usePageTitle";
 import { useState } from "react";
 import { 
   FaShieldAlt, 
-  FaUserShield, 
   FaDatabase, 
-  FaChartLine, 
-  FaMoneyBillWave, 
-  FaTools, 
-  FaExclamationTriangle, 
-  FaGavel, 
   FaEnvelope,
   FaChevronDown,
   FaLock,
@@ -21,8 +15,8 @@ import {
 
 export default function PrivacyPolicyPage() {
   usePageTitle({
-    title: "Privacy Policy | Dhya SPIMS",
-    description: "Learn how we collect, use, and protect your personal information at Dhya SPIMS."
+    title: "Privacy Policy | TexIntelli",
+    description: "Learn how we collect, use, and protect your personal information at TexIntelli."
   });
 
   const [expandedSections, setExpandedSections] = useState<number[]>([]);
@@ -39,11 +33,11 @@ export default function PrivacyPolicyPage() {
     {
       icon: <FaShieldAlt className="w-8 h-8 text-blue-600" />,
       title: "1. Introduction",
-      content: "At Dhya SPIMS, we take your privacy seriously. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our Smart Production & Inventory Management System.",
+      content: "At TexIntelli, we take your privacy seriously. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our Smart Production & Inventory Management System.",
       subsections: [
         {
           title: "Scope",
-          content: "This policy applies to all users of Dhya SPIMS, including visitors, customers, and employees. By using our services, you agree to the collection and use of information in accordance with this policy."
+          content: "This policy applies to all users of TexIntelli, including visitors, customers, and employees. By using our services, you agree to the collection and use of information in accordance with this policy."
         },
         {
           title: "Updates",
@@ -182,7 +176,7 @@ export default function PrivacyPolicyPage() {
           </h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               Your privacy is important to us. This policy outlines how we collect, use, and protect your information 
-              when you use Dhya SPIMS.
+              when you use TexIntelli.
           </p>
           </motion.div>
         </div>

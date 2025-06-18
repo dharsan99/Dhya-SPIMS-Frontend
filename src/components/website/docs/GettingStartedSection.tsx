@@ -52,7 +52,7 @@ export default function GettingStartedSection() {
       title: "Mobile App Setup",
       description: "Configure mobile access for on-the-go operations",
       details: [
-        "Download the SPIMS mobile app",
+        "Download the TexIntelli mobile app",
         "Configure mobile notifications",
         "Set up offline capabilities",
         "Test mobile workflows"
@@ -116,10 +116,10 @@ export default function GettingStartedSection() {
         {/* Hero Section */}
         <div className="text-center mb-16">
           <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-6">
-            Getting Started with Dhya SPIMS
+            Getting Started with TexIntelli
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Follow this comprehensive guide to set up and start using Dhya SPIMS effectively in your spinning mill operations.
+            Follow this comprehensive guide to set up and start using TexIntelli effectively in your spinning mill operations.
           </p>
         </div>
 

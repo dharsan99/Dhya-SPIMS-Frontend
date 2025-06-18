@@ -11,17 +11,12 @@ export default function MobileAppNotificationModal({ isOpen, onClose }: MobileAp
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
-  const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-    setIsSubmitting(true);
 
     // Basic email validation
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setError('Please enter a valid email address');
-      setIsSubmitting(false);
       return;
     }
 
@@ -31,7 +26,7 @@ export default function MobileAppNotificationModal({ isOpen, onClose }: MobileAp
       setIsSuccess(true);
       setEmail('');
     } catch (err) {
-      setError('Failed to subscribe. Please try again.');
+      // Handle error
     } finally {
       setIsSubmitting(false);
     }
@@ -78,9 +73,6 @@ export default function MobileAppNotificationModal({ isOpen, onClose }: MobileAp
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
                       disabled={isSubmitting}
                     />
-                    {error && (
-                      <p className="mt-1 text-sm text-red-600">{error}</p>
-                    )}
                   </div>
 
                   <button

@@ -22,8 +22,8 @@ const WebsiteHeader = () => {
           <span className="text-2xl font-extrabold text-blue-600">
             Dhya
           </span>
-          <span className="text-lg font-semibold text-gray-800 tracking-wide">
-            SPIMS
+          <span className="text-xl font-bold text-gray-900">
+            TexIntelli
           </span>
         </Link>
 
