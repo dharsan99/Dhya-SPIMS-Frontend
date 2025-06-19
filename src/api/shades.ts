@@ -2,10 +2,11 @@ import {
   ShadeCreateInput,
   ShadeWithBlendDescription,
   FibreComposition,
+  Shade,
 } from '../types/shade';
 import api from './axios';
 
-const endpoint = '/shades';
+const endpoint = '/api/shades';
 
 /**
  * 🔁 Helper: Transform raw shade from API to typed ShadeWithBlendDescription
@@ -24,6 +25,7 @@ function transformShade(shade: any): ShadeWithBlendDescription {
       ? Number(shade.available_stock_kg)
       : undefined,
     blend_composition,
+    raw_cotton_compositions: shade.raw_cotton_compositions || [],
     blend_code: blend_composition.map((b) => b.fibre?.fibre_code).join(' + ') || '',
     blend_description: blend_composition
       .map(
@@ -32,18 +34,15 @@ function transformShade(shade: any): ShadeWithBlendDescription {
       .join(', ') || '',
   };
 
-  console.log('🔄 Transformed Shade:', transformed);
   return transformed;
 }
 
 /**
  * ✅ Get all shades with fibre composition
  */
-export const getAllShades = async (): Promise<ShadeWithBlendDescription[]> => {
-  console.log('📥 Fetching all shades...');
+export const getAllShades = async (): Promise<Shade[]> => {
   const response = await api.get(endpoint);
-  console.log('📦 Raw response:', response.data);
-  return response.data.map(transformShade);
+  return response.data;
 };
 
 /**
@@ -52,23 +51,16 @@ export const getAllShades = async (): Promise<ShadeWithBlendDescription[]> => {
 export const getShadeById = async (
   id: string
 ): Promise<ShadeWithBlendDescription> => {
-  console.log(`🔍 Fetching shade by ID: ${id}`);
   const response = await api.get(`${endpoint}/${id}`);
-  console.log('📦 Raw shade:', response.data);
   return transformShade(response.data);
 };
 
 /**
  * ✅ Create a new shade (maps blend_composition to fibre_composition)
  */
-export const createShade = (data: ShadeCreateInput) => {
-  const { blend_composition, ...rest } = data;
-  const payload = {
-    ...rest,
-    fibre_composition: blend_composition,
-  };
-  console.log('🛠️ Creating new shade with payload:', payload);
-  return api.post(endpoint, payload);
+export const createShade = async (data: Partial<Shade>): Promise<Shade> => {
+  const response = await api.post(endpoint, data);
+  return response.data;
 };
 
 /**
@@ -80,7 +72,6 @@ export const updateShade = (id: string, data: Partial<ShadeCreateInput>) => {
     ...rest,
     fibre_composition: blend_composition,
   };
-  console.log(`📝 Updating shade ${id} with payload:`, payload);
   return api.put(`${endpoint}/${id}`, payload);
 };
 
@@ -88,6 +79,5 @@ export const updateShade = (id: string, data: Partial<ShadeCreateInput>) => {
  * ✅ Delete a shade by ID
  */
 export const deleteShade = (id: string) => {
-  console.log(`🗑️ Deleting shade with ID: ${id}`);
   return api.delete(`${endpoint}/${id}`);
 };

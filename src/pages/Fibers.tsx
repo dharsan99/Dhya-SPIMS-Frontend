@@ -18,7 +18,6 @@ import FibreSuppliersPanel from '../components/Fibers/FibreSuppliersPanel';
 import FibreTransfersPanel from '../components/Fibers/FibreTransfersPanel';
 import FibersToolbar from '../components/Fibers/FibersToolbar';
 import FibersTable from '../components/Fibers/FibersTable';
-import { CreateFibreTransfer, FibreTransfer } from '../types/fibreTransfer';
 import FiberStocksPanel from '@/components/Fibers/FibreStocksPanel';
 import useAuthStore from '@/hooks/auth';
 
@@ -101,8 +100,7 @@ const Fibers = () => {
     currentPage * rowsPerPage
   );
 
-  const handleTransferSave = (data: CreateFibreTransfer | FibreTransfer) => {
-    console.log('Transfer saved:', data);
+  const handleTransferSave = () => {
     toast.success('Transfer saved (not implemented)');
   };
 

@@ -16,15 +16,12 @@ instance.interceptors.request.use(
 
     if (token) {
       config.headers.set('Authorization', `Bearer ${token}`);
-      console.log('🔐 Auth token added to request');
     } else {
-      console.warn('⚠️ No token found in Zustand auth store');
     }
 
     return config;
   },
   (error: unknown) => {
-    console.error('❌ Axios request interceptor error:', error);
     return Promise.reject(error);
   }
 );
@@ -35,11 +32,9 @@ instance.interceptors.response.use(
     const status = error.response?.status;
 
     if (status === 401) {
-      console.warn('🔐 Unauthorized - logging out');
       useAuthStore.getState().logout();
       window.location.href = '/login';
     } else if (status >= 500) {
-      console.error('🚨 Server error:', error.response?.data || error.message);
     }
 
     return Promise.reject(error);

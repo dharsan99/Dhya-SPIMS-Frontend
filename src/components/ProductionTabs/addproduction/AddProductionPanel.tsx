@@ -24,9 +24,6 @@ const AddProductionPanel: React.FC<AddProductionPanelProps> = ({
 
   const handleFormSubmit = async (formData: any) => {
     try {
-      console.log('🧑 Auth User:', user);
-      console.log('📝 Form Data:', formData);
-
       if (!user?.id || !user?.tenant_id) {
         toast.error('Missing user or tenant info');
         return;
@@ -38,14 +35,10 @@ const AddProductionPanel: React.FC<AddProductionPanelProps> = ({
         tenant_id: user.tenant_id,
       };
 
-      console.log('📤 Final Payload:', payload);
-
       await createProduction(payload);
-      console.log('✅ Production created successfully!');
       toast.success('✅ Production record saved successfully!');
       onClose();
     } catch (err: any) {
-      console.error('❌ Error saving production:', err);
       toast.error('❌ Failed to save production');
     }
   };

@@ -17,7 +17,7 @@ const ProductionFormPanel = () => {
     isError,
   } = useQuery<Order[]>({
     queryKey: ['orders'],
-    queryFn: getAllOrders,
+    queryFn: () => getAllOrders({}),
   });
 
   if (isError) {

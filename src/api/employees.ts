@@ -1,3 +1,4 @@
+// pullable request
 import api from './axios';
 import { Employee } from '../types/employee';
 
@@ -11,9 +12,6 @@ export const getAllEmployees = async (): Promise<Employee[]> => {
   return res.data;
 };
 
-/**
- * ✅ Get a single employee by ID
- */
 export const getEmployeeById = async (id: string): Promise<Employee> => {
   const res = await api.get(`${endpoint}/${id}`);
   return res.data;

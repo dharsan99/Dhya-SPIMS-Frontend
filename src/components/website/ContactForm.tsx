@@ -21,7 +21,6 @@ const ContactForm = () => {
     }
 
     // 🔥 You can integrate your email API or backend API here later
-    console.log("Submitted Contact Form:", form);
     toast.success("✅ Message sent successfully!");
 
     // Reset form
@@ -36,6 +35,7 @@ const ContactForm = () => {
             Contact Us
           </h2>
           <p className="text-gray-600">
+
             Got a question or project idea? We'd love to hear from you!
           </p>
         </div>

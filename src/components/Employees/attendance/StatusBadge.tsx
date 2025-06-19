@@ -2,6 +2,7 @@ import { CheckCircle, AlertTriangle, XCircle } from 'lucide-react';
 
 export const getStatusBadge = (status?: string) => {
   const normalized = status?.toUpperCase?.();
+  
 
   switch (normalized) {
     case 'PRESENT':

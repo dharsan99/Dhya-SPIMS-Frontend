@@ -1,6 +1,7 @@
-import { Employee } from '../../../types/employee';
 
-export type ShiftType = 'SHIFT_1' | 'SHIFT_2' | 'SHIFT_3';
+import { AttendanceRecord } from '@/types/attendance';
+
+export type ShiftType = 'MORNING' | 'EVENING' | 'NIGHT';
 // Add this near the top, after ShiftType
 export type AttendanceStatus = 'PRESENT' | 'ABSENT' | 'HALF_DAY';
 
@@ -9,10 +10,10 @@ export type ShiftDropdownOption = ShiftType | 'ABSENT';
 export type RangeMode = 'day' | 'week' | 'month';
 // AttendanceTypes.ts
 export const shiftTimeMap: Record<ShiftType, { in_time: string; out_time: string }> = {
-    SHIFT_1: { in_time: '06:00', out_time: '14:00' },
-    SHIFT_2: { in_time: '14:00', out_time: '22:00' },
-    SHIFT_3: { in_time: '22:00', out_time: '06:00' },
-  };
+  MORNING: { in_time: '06:00', out_time: '14:00' },
+  EVENING: { in_time: '14:00', out_time: '22:00' },
+  NIGHT: { in_time: '22:00', out_time: '06:00' },
+};
 export interface AttendanceFiltersProps {
   date: string;
   department: string;
@@ -25,7 +26,7 @@ export interface AttendanceFiltersProps {
   onRangeChange: (range: 'day' | 'week' | 'month') => void;
   shift: string; // or ShiftType if it's a custom type
   onShiftChange: (shift: string) => void; // or (shift: ShiftType) => void
-  employees: Employee[];
+  employees: AttendanceRecord[];
   attendanceMap: Record<string, Record<string, AttendanceRow>>;
   dates: string[];
 }
@@ -45,7 +46,7 @@ export interface AttendanceRow {
 
 // Props for edit mode table
 export interface AttendanceEditModeProps {
-    employees: Employee[];
+    employees: AttendanceRecord[];
     attendance: Record<string, AttendanceRow>;
     onTimeChange: (id: string, field: 'in_time' | 'out_time' | 'shift', value: string | undefined) => void;
     onOvertimeChange: (id: string, value: number) => void;
@@ -56,16 +57,12 @@ export interface AttendanceEditModeProps {
 // Props for view mode table
 // AttendanceTypes.ts
 export interface AttendanceViewModeProps {
-    employees: {
-      id: string;
-      name: string;
-      token_no?: string;
-      shift_rate: number;
-    }[];
+    employees: AttendanceRecord[]
     pageStart: number;
+    loading: boolean;
   }
 
 export interface AttendanceHeaderStatsProps {
-  employees: Employee[];
+  employees: AttendanceRecord[];
   attendance: Record<string, AttendanceRow>;
 }

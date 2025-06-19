@@ -13,4 +13,10 @@ export default defineConfig({
       // '@': path.resolve(path.dirname(new URL(import.meta.url).pathname), 'src'), // ✅ alias to match "@/..." imports
     },
   },
+  server: {
+    headers: {
+      'Cross-Origin-Opener-Policy': 'same-origin',
+      'Cross-Origin-Embedder-Policy': 'require-corp',
+    },
+  },
 })

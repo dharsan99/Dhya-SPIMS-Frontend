@@ -5,6 +5,7 @@ import { useThemeStore } from './hooks/useThemeStore';
 import ScrollToTop from './components/ScrollToTop';
 
 import DashboardLayout from './layout/DashboardLayout';
+import SuperAdminLayout from './components/superadmin/SuperAdminLayout';
 import ProtectedRoute from './routes/ProtectedRoute';
 import WebsiteHeader from './components/website/WebsiteHeader';
 import WebsiteFooter from './components/website/WebsiteFooter';
@@ -34,8 +35,14 @@ import RefundPolicyPage from './pages/website/RefundPolicyPage';
 import DisclaimerPage from './pages/website/DisclaimerPage';
 import Employees from './pages/Employees';
 import Marketing from './pages/Marketing';
-import FeaturesPage from './pages/website/FeaturesPage';
 
+import FeaturesPage from './pages/website/FeaturesPage';
+import ProductionEntryPage from './pages/ProductionEntryPage';
+import SignupPage from './pages/Signup';
+
+// Super Admin Pages
+import SuperAdminDashboard from './pages/superadmin/Dashboard';
+import Tenants from './pages/superadmin/Tenants';
 // Layout Components
 const WebsiteLayout = () => (
   <>
@@ -56,6 +63,8 @@ const DelayedNotFound = () => {
   if (!show404) return null;
   return <NotFoundPage />;
 };
+
+
 
 function App() {
   const { setTheme } = useThemeStore();
@@ -87,13 +96,18 @@ function App() {
 
           {/* Login */}
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignupPage />} />
 
           {/* Protected Dashboard */}
           <Route path="/app" element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
             <Route index element={<Navigate to="dashboard" replace />} />
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="orders" element={<Orders />} />
-            <Route path="production" element={<ProductionDashboard />} />
+            <Route path="production">
+              <Route index element={<ProductionDashboard />} />
+              <Route path="new" element={<ProductionEntryPage />} />
+              <Route path=":date" element={<ProductionEntryPage />} />
+            </Route>
             <Route path="brands" element={<Brands />} />
             <Route path="blends" element={<Blends />} />
             <Route path="shades" element={<Shades />} />
@@ -106,6 +120,15 @@ function App() {
             <Route path="marketing" element={<Marketing />} />
             <Route path="*" element={<DelayedNotFound />} />
           </Route>
+
+
+          {/* Protected Super Admin */}
+          <Route path="/superadmin" element={<ProtectedRoute><SuperAdminLayout /></ProtectedRoute>}>
+            <Route index element={<Navigate to="dashboard" replace />} />
+            <Route path="dashboard" element={<SuperAdminDashboard />} />
+            <Route path="tenants" element={<Tenants />} />
+          </Route>
+          
 
           {/* Catch-all */}
           <Route path="*" element={<DelayedNotFound />} />

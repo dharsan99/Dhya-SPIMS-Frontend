@@ -14,9 +14,12 @@ export default function LoginPage() {
 
   const handleLoginClick = () => setShowLoginForm(true);
   const handleSignupClick = () => {
+
     window.open('https://calendly.com/dharsan-dhya/TexIntelli-meeting', '_blank');
   };  const handleDashboardAccess = () => navigate('/app/dashboard');
 
+
+  const handleDashboardAccess = () => navigate('/app/dashboard');
   return (
     <motion.div
       initial={{ opacity: 0 }}

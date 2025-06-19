@@ -9,7 +9,6 @@ const OrgSettings = () => {
   const [address, setAddress] = useState('Coimbatore, Tamil Nadu, India');
 
   const handleSave = () => {
-    console.log('Saving org settings:', { orgName, contactEmail, website, address });
     setIsEditing(false);
     alert('Organization settings updated successfully');
   };

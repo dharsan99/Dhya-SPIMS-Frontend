@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Order } from '../../types/order';
+import { ShadeWithBlendDescription } from '../../types/shade';
 import Pagination from '../Pagination';
 
 interface OrdersTableProps {
@@ -16,10 +17,26 @@ const OrdersTable: React.FC<OrdersTableProps> = ({ orders, onEdit, onDelete }) =
     setPage(1);
   }, [orders]);
 
+  // Debug log for orders with shades
+  useEffect(() => {
+    console.log('Orders with shades:', orders.map(order => ({
+      orderNumber: order.order_number,
+      shade: order.shade,
+      rawCotton: order.shade?.raw_cotton_compositions
+    })));
+  }, [orders]);
+
   const paginatedOrders = useMemo(() => {
     const start = (page - 1) * rowsPerPage;
     return orders.slice(start, start + rowsPerPage);
   }, [orders, page, rowsPerPage]);
+
+  // Helper for minimal date format
+  const minimalDate = (dateStr?: string) => {
+    if (!dateStr) return '-';
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
+  };
 
   const statusBadge = (status: string) => {
     const base = 'px-2 py-1 rounded text-xs font-semibold';
@@ -30,9 +47,29 @@ const OrdersTable: React.FC<OrdersTableProps> = ({ orders, onEdit, onDelete }) =
         return <span className={`${base} bg-blue-100 text-blue-700 dark:bg-blue-700/20 dark:text-blue-300`}>In Progress</span>;
       case 'completed':
         return <span className={`${base} bg-green-100 text-green-700 dark:bg-green-700/20 dark:text-green-300`}>Completed</span>;
+      case 'dispatched':
+        return <span className={`${base} bg-indigo-100 text-indigo-700 dark:bg-indigo-700/20 dark:text-indigo-300`}>Dispatched</span>;
       default:
         return <span className={`${base} bg-gray-200 text-gray-700 dark:bg-gray-600/30 dark:text-gray-300`}>{status}</span>;
     }
+  };
+
+  // Helper to get shade display text
+  const getShadeDisplay = (shade: ShadeWithBlendDescription | null) => {
+    if (!shade) return <i className="text-gray-400">—</i>;
+    
+    console.log('Processing shade:', {
+      shadeCode: shade.shade_code,
+      rawCotton: shade.raw_cotton_compositions,
+      hasRawCotton: (shade.raw_cotton_compositions?.length ?? 0) > 0
+    });
+    
+    const hasRawCotton = (shade.raw_cotton_compositions?.length ?? 0) > 0;
+    const rawCottonText = hasRawCotton && shade.raw_cotton_compositions?.[0]?.percentage
+      ? ` + RAW (${shade.raw_cotton_compositions[0].percentage}%)`
+      : '';
+    
+    return `${shade.shade_code}${rawCottonText}`;
   };
 
   return (
@@ -60,11 +97,11 @@ const OrdersTable: React.FC<OrdersTableProps> = ({ orders, onEdit, onDelete }) =
                     {order.order_number}
                   </td>
                   <td className="px-4 py-2">{order.buyer?.name || <i className="text-gray-400">—</i>}</td>
-                  <td className="px-4 py-2">{order.shade?.shade_code || <i className="text-gray-400">—</i>}</td>
+                  <td className="px-4 py-2">{getShadeDisplay(order.shade)}</td>
                   <td className="px-4 py-2 text-right">{Number(order.quantity_kg).toFixed(2)}</td>
                   <td className="px-4 py-2 text-center">{order.count ?? <i className="text-gray-400">—</i>}</td>
-                  <td className="px-4 py-2">{new Date(order.created_at).toLocaleDateString('en-GB')}</td>
-                  <td className="px-4 py-2">{new Date(order.delivery_date).toLocaleDateString('en-GB')}</td>
+                  <td className="px-4 py-2">{minimalDate(order.created_at)}</td>
+                  <td className="px-4 py-2">{minimalDate(order.delivery_date)}</td>
                   <td className="px-4 py-2">{statusBadge(order.status)}</td>
                   <td className="px-4 py-2 text-center">
                     <div className="flex justify-center gap-2">

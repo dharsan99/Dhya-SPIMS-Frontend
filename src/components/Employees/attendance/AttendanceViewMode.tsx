@@ -1,43 +1,24 @@
-import React, { useEffect, useState } from 'react';
-import { AttendanceViewModeProps } from './AttendanceTypes';
-import { fetchAttendanceByDate } from '../../../api/attendance';
+import React from 'react';
+
 import { formatINR } from './utils/attendence';
 import { getAttendenceStatusBadge } from './StatusBadge';
+import { AttendanceViewModeProps } from './AttendanceTypes';
 
 // 🔹 Shift label and time map
 const shiftMap = {
-  SHIFT_1: { label: 'Shift 1', time: '6 AM - 2 PM' },
-  SHIFT_2: { label: 'Shift 2', time: '2 PM - 10 PM' },
-  SHIFT_3: { label: 'Shift 3', time: '10 PM - 6 AM' },
+  MORNING: { label: 'Morning', time: '6 AM - 2 PM' },
+  EVENING: { label: 'Evening', time: '2 PM - 10 PM' },
+  NIGHT: { label: 'Night', time: '10 PM - 6 AM' },
   ABSENT: { label: 'Absent', time: '--:--' },
 };
 
 const AttendanceViewMode: React.FC<AttendanceViewModeProps & { date: string }> = ({
   employees,
-  pageStart,
-  date,
+  loading
 }) => {
-  const [attendance, setAttendance] = useState<Record<string, any>>({});
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const records = await fetchAttendanceByDate(date);
-        const map: Record<string, any> = {};
-        records.forEach((rec: any) => {
-          map[rec.employee_id] = rec;
-        });
-        setAttendance(map);
-      } catch (err) {
-        console.error('❌ Failed to fetch attendance:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
+  console.log('employees', employees)
 
-    fetchData();
-  }, [date]);
 
   if (loading) {
     return (
@@ -68,29 +49,29 @@ const AttendanceViewMode: React.FC<AttendanceViewModeProps & { date: string }> =
         <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
           {employees.length > 0 ? (
             employees.map((emp, idx) => {
-              const att = attendance[emp.id];
-              const isPresent = att?.status === 'PRESENT';
-              const overtime = att?.overtime_hours || 0;
-              const rawShiftKey = isPresent ? att?.shift ?? 'SHIFT_1' : 'ABSENT';
+              const isPresent = emp?.status === 'PRESENT';
+              const overtime = emp?.overtime_hours || 0;
+              const rawShiftKey = isPresent ? emp?.shift?.toUpperCase() ?? 'MORNING' : 'ABSENT';
               const shift = shiftMap[rawShiftKey as keyof typeof shiftMap] ?? shiftMap['ABSENT'];
               const totalHours = isPresent ? 8 + overtime : 0;
               const workDays = isPresent ? 1 : 0;
-              const wageRate = emp.shift_rate ?? 0;
+              const wageRate = Number(emp.employee.shift_rate) ?? 0;
               const wages = (totalHours / 8) * wageRate;
+
 
               return (
                 <tr
-                  key={emp.id}
+                  key={idx}
                   className="hover:bg-gray-50 dark:hover:bg-gray-800 transition"
                 >
                   <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-300">
-                    {emp.token_no || pageStart + idx + 1}
+                    {emp.employee.token_no || <span className="italic text-gray-400">–</span>}
                   </td>
                   <td
                     className="px-4 py-3 text-gray-900 dark:text-white max-w-[200px] truncate"
-                    title={emp.name}
+                    title={emp.employee?.name}
                   >
-                    {emp.name}
+                    {emp.employee?.name}
                   </td>
                   <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-300">
                     {shift?.label}
@@ -99,7 +80,7 @@ const AttendanceViewMode: React.FC<AttendanceViewModeProps & { date: string }> =
                     {shift.time}
                   </td>
                   <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-300">
-                    {overtime}
+                    {overtime.toFixed(3)}
                   </td>
                   <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-300">
                     {totalHours}
@@ -111,7 +92,7 @@ const AttendanceViewMode: React.FC<AttendanceViewModeProps & { date: string }> =
                     {formatINR(wages)}
                   </td>
                   <td className="px-4 py-3 text-center">
-                    {getAttendenceStatusBadge(att?.status)}
+                    {getAttendenceStatusBadge(emp?.status)}
                   </td>
                 </tr>
               );

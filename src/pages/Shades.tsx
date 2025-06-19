@@ -1,8 +1,9 @@
+// Imports remain unchanged
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
 import { getAllShades, createShade, updateShade, deleteShade } from '../api/shades';
 import { getAllFibers } from '../api/fibers';
-import { Shade, ShadeCreateInput, ShadeWithBlendDescription } from '../types/shade';
+import { ShadeCreateInput, ShadeWithBlendDescription } from '../types/shade';
 import { Fiber } from '../types/fiber';
 import ShadeModal from '../components/ShadeModal';
 import toast from 'react-hot-toast';
@@ -18,8 +19,8 @@ const Shades = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [shadeToEdit, setShadeToEdit] = useState<ShadeWithBlendDescription | null>(null);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const hasPermission = useAuthStore((state) => state.hasPermission);
 
+  const hasPermission = useAuthStore((state) => state.hasPermission);
   const canAddShade = hasPermission('Shades', 'Add Shade');
   const canEditShade = hasPermission('Shades', 'Update Shade');
   const canDeleteShade = hasPermission('Shades', 'Delete Shade');
@@ -27,7 +28,12 @@ const Shades = () => {
   const { data: shadesRaw } = useQuery({ queryKey: ['shades'], queryFn: getAllShades });
   const { data: fibres = [] } = useQuery<Fiber[]>({ queryKey: ['fibres'], queryFn: getAllFibers });
 
-  const shades: ShadeWithBlendDescription[] = Array.isArray(shadesRaw) ? shadesRaw : [];
+  const shades: ShadeWithBlendDescription[] = Array.isArray(shadesRaw)
+    ? shadesRaw.map((shade: any) => ({
+        ...shade,
+        raw_cotton_compositions: shade.raw_cotton_compositions || [],
+      }))
+    : [];
 
   const createMutation = useMutation({
     mutationFn: (data: ShadeCreateInput) => createShade(data),
@@ -47,7 +53,7 @@ const Shades = () => {
         percentage: shade.percentage ?? '100%',
         available_stock_kg: shade.available_stock_kg,
         blend_composition: shade.blend_composition,
-        raw_cotton_composition: shade.raw_cotton_composition,
+        raw_cotton_compositions: shade.raw_cotton_compositions,
       }),
     onSuccess: () => {
       toast.success('✏️ Shade updated!');
@@ -59,42 +65,48 @@ const Shades = () => {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id: string) => deleteShade(id),
-    onSuccess: () => {
-      toast.success('🗑️ Shade deleted!');
-      queryClient.invalidateQueries({ queryKey: ['shades'] });
+    mutationFn: (id: string) => deleteShade(id).then(res => res.data),
+    onSuccess: (response: any) => {
+      if (response?.success) {
+        toast.success(`🗑️ Shade ${response.data.shade_code} deleted!`);
+        queryClient.invalidateQueries({ queryKey: ['shades'] });
+      } else if (response?.code === 'SHADE_IN_USE') {
+        const linkedOrders = response.details?.linked_orders || [];
+        const orderList = linkedOrders.map((o: any) => o.order_number).join(', ');
+        toast.error(`❌ Cannot delete shade: used in ${linkedOrders.length} order(s): ${orderList}`);
+      } else if (response?.code === 'SHADE_NOT_FOUND') {
+        toast.error('❌ Shade not found.');
+      } else {
+        toast.error(`❌ Failed to delete shade: ${response?.error || 'Unknown error'}`);
+      }
     },
-    onError: () => toast.error('❌ Failed to delete shade'),
+    onError: (error: any) => {
+      const response = error?.response?.data;
+      if (response?.code === 'SHADE_IN_USE') {
+        const linkedOrders = response.details?.linked_orders || [];
+        const orderList = linkedOrders.map((o: any) => o.order_number).join(', ');
+        toast.error(`❌ Cannot delete shade: used in ${linkedOrders.length} order(s): ${orderList}`);
+      } else if (response?.code === 'SHADE_NOT_FOUND') {
+        toast.error('❌ Shade not found.');
+      } else {
+        toast.error(`❌ Failed to delete shade: ${response?.error || error.message || 'Unknown error'}`);
+      }
+    },
   });
 
-  const handleCreate = (shade: Omit<Shade, 'id'> & {
-    blend_composition: { fibre_id: string; percentage: number }[];
-    raw_cotton_composition?: { percentage: number } | { percentage: number }[];
-  }) => {
-    const payload: ShadeCreateInput = {
-      shade_code: shade.shade_code,
-      shade_name: shade.shade_name,
+  const handleCreate = (shade: ShadeCreateInput) => {
+    createMutation.mutate({
+      ...shade,
       percentage: shade.percentage ?? '100%',
-      blend_composition: shade.blend_composition,
-      raw_cotton_composition: Array.isArray(shade.raw_cotton_composition)
-        ? shade.raw_cotton_composition
-        : shade.raw_cotton_composition
-        ? [shade.raw_cotton_composition]
-        : [],
-    };
-    createMutation.mutate(payload);
+      raw_cotton_compositions: shade.raw_cotton_compositions || [],
+    });
   };
 
   const handleUpdate = (updated: ShadeCreateInput & { id: string }) => {
-    const payload = {
+    updateMutation.mutate({
       ...updated,
-      raw_cotton_composition: Array.isArray(updated.raw_cotton_composition)
-        ? updated.raw_cotton_composition
-        : updated.raw_cotton_composition
-        ? [updated.raw_cotton_composition]
-        : [],
-    };
-    updateMutation.mutate(payload);
+      raw_cotton_compositions: updated.raw_cotton_compositions || [],
+    });
   };
 
   const filteredShades = useMemo(() => {
@@ -122,7 +134,6 @@ const Shades = () => {
 
   return (
     <div className="p-6">
-      {/* Top Bar */}
       <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
         <h2 className="text-xl font-bold text-blue-600 dark:text-blue-400">Shades</h2>
         <div className="flex gap-3 items-center">
@@ -136,7 +147,7 @@ const Shades = () => {
               setCurrentPage(1);
             }}
           />
-         {canAddShade && (
+          {canAddShade && (
             <button
               onClick={() => {
                 setIsModalOpen(true);
@@ -150,7 +161,6 @@ const Shades = () => {
         </div>
       </div>
 
-      {/* Table */}
       <div className="overflow-x-auto">
         <table className="min-w-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded shadow text-sm">
           <thead className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300">
@@ -175,12 +185,18 @@ const Shades = () => {
                       </span>
                     </div>
                   ))}
-                  {(shade.raw_cotton_composition || []).map((rc, idx) => (
-                    <div key={`raw-${idx}`}>
+                  {(shade.raw_cotton_compositions || []).map((rc, idx) => (
+                    <div key={`raw-${idx}`} className="mt-1">
                       <span className="font-medium">RAW COTTON</span>{' '}
                       <span className="text-gray-500 dark:text-gray-400">
-                        ({rc.lot_number ?? 'default'} - {rc.percentage.toFixed(1)}%)
+                        ({Number(rc.percentage).toFixed(1)}%)
                       </span>
+                      {rc.lot_number && (
+                        <span className="text-gray-500 dark:text-gray-400 ml-2">Lot: {rc.lot_number}</span>
+                      )}
+                      {rc.grade && (
+                        <span className="text-gray-500 dark:text-gray-400 ml-2">Grade: {rc.grade}</span>
+                      )}
                     </div>
                   ))}
                 </td>
@@ -209,7 +225,6 @@ const Shades = () => {
                     </button>
                   )}
                 </td>
-
               </tr>
             ))}
             {paginated.length === 0 && (
@@ -223,7 +238,6 @@ const Shades = () => {
         </table>
       </div>
 
-      {/* Pagination */}
       <Pagination
         page={currentPage}
         setPage={setCurrentPage}
@@ -233,7 +247,6 @@ const Shades = () => {
         options={[5, 10, 20]}
       />
 
-      {/* Modal */}
       <ShadeModal
         isOpen={isModalOpen}
         onClose={() => {
@@ -245,10 +258,8 @@ const Shades = () => {
           handleUpdate({
             ...shade,
             id: shade.id,
-            raw_cotton_composition: shade.raw_cotton_composition
-              ? Array.isArray(shade.raw_cotton_composition)
-                ? shade.raw_cotton_composition
-                : [shade.raw_cotton_composition]
+            raw_cotton_compositions: Array.isArray(shade.raw_cotton_compositions)
+              ? shade.raw_cotton_compositions
               : [],
           })
         }
