@@ -1,126 +1,96 @@
 import { motion } from "framer-motion";
-import { FaCogs, FaSlidersH, FaPalette } from "react-icons/fa";
+import { FaMoneyBillWave, FaReceipt, FaPiggyBank } from "react-icons/fa";
 
-export default function SettingsCustomizationSection() {
+export default function FinancialManagementSection() {
   const features = [
     {
-      icon: <FaCogs className="w-8 h-8 text-blue-600" />,
-      title: "System Configuration",
-      description: "Core system settings and preferences",
+      icon: <FaMoneyBillWave className="w-8 h-8 text-blue-600" />,
+      title: "Financial Overview",
+      description: "Real-time financial insights",
       details: [
-        "Company profile setup",
-        "Unit configuration",
-        "System preferences",
-        "Integration settings"
+        "Revenue tracking",
+        "Expense management",
+        "Profit analysis",
+        "Cash flow monitoring"
       ]
     },
     {
-      icon: <FaSlidersH className="w-8 h-8 text-blue-600" />,
-      title: "User Management",
-      description: "Comprehensive user control",
+      icon: <FaReceipt className="w-8 h-8 text-blue-600" />,
+      title: "Invoice Management",
+      description: "Streamlined billing process",
       details: [
-        "Role-based access control",
-        "User permissions",
-        "Department setup",
-        "Access management"
+        "Invoice generation",
+        "Payment tracking",
+        "Due date monitoring",
+        "Payment reminders"
       ]
     },
     {
-      icon: <FaPalette className="w-8 h-8 text-blue-600" />,
-      title: "Production Settings",
-      description: "Production workflow configuration",
+      icon: <FaPiggyBank className="w-8 h-8 text-blue-600" />,
+      title: "Cost Control",
+      description: "Optimize your expenses",
       details: [
-        "Machine configuration",
-        "Shift management",
-        "Process parameters",
-        "Quality standards"
+        "Cost analysis",
+        "Budget tracking",
+        "Expense categorization",
+        "Cost optimization"
       ]
     }
   ];
 
-  const securitySettings = [
+  const processes = [
     {
-      title: "Access Control",
+      title: "Accounts Receivable",
       items: [
-        "Role-based permissions",
-        "Feature access control",
-        "Data access restrictions",
-        "IP whitelisting"
+        "Customer invoicing",
+        "Payment tracking",
+        "Credit management",
+        "Collection follow-up"
       ]
     },
     {
-      title: "Security Policies",
+      title: "Accounts Payable",
       items: [
-        "Password policies",
-        "Session management",
-        "Two-factor authentication",
-        "Audit logging"
+        "Vendor payments",
+        "Payment scheduling",
+        "Expense tracking",
+        "Payment approval"
       ]
     },
     {
-      title: "Data Protection",
+      title: "Financial Planning",
       items: [
-        "Data encryption",
-        "Backup policies",
-        "Data retention",
-        "Privacy controls"
+        "Budget planning",
+        "Cost forecasting",
+        "Financial projections",
+        "Resource allocation"
       ]
     }
   ];
 
-  const customizationOptions = [
+  const reports = [
     {
-      title: "UI Customization",
+      title: "Financial Reports",
       items: [
-        "Theme selection",
-        "Layout preferences",
-        "Dashboard widgets",
-        "Report templates"
+        "Profit & loss statements",
+        "Balance sheets",
+        "Cash flow statements",
+        "Financial ratios"
       ]
     },
     {
-      title: "Workflow Customization",
+      title: "Analytics",
       items: [
-        "Process configuration",
-        "Approval workflows",
-        "Notification rules",
-        "Automation rules"
-      ]
-    },
-    {
-      title: "Integration Settings",
-      items: [
-        "API configuration",
-        "Third-party integrations",
-        "Data synchronization",
-        "Webhook setup"
-      ]
-    }
-  ];
-
-  const notificationSettings = [
-    {
-      title: "Alert Configuration",
-      items: [
-        "Alert thresholds",
-        "Notification channels",
-        "Alert priorities",
-        "Escalation rules"
-      ]
-    },
-    {
-      title: "Report Scheduling",
-      items: [
-        "Report frequency",
-        "Delivery methods",
-        "Recipient groups",
-        "Format preferences"
+        "Revenue analysis",
+        "Cost analysis",
+        "Profitability metrics",
+        "Trend analysis"
       ]
     }
   ];
 
   return (
-    <section id="settings-customization" className="px-6 bg-white">
+    <section id="financial-management" className="px-6 bg-white">
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -131,10 +101,10 @@ export default function SettingsCustomizationSection() {
         {/* Hero Section */}
         <div className="text-center mb-16">
           <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-6">
-            Settings & Customization
+            Financial Management
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Comprehensive system configuration and customization platform for spinning mills. Tailor TexIntelli to your specific operational needs with flexible settings and powerful customization options.
+            Take control of your financial operations with TexIntelli. From invoicing to financial reporting, manage your spinning mill's finances efficiently.
           </p>
         </div>
 
@@ -173,13 +143,13 @@ export default function SettingsCustomizationSection() {
           </div>
         </div>
 
-        {/* Security Settings */}
+        {/* Processes */}
         <div className="mb-16">
           <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
-            Security Settings
+            Financial Processes
           </h2>
           <div className="grid md:grid-cols-3 gap-6">
-            {securitySettings.map((setting, index) => (
+            {processes.map((process, index) => (
               <motion.div
                 key={index}
                 initial={{ opacity: 0, y: 20 }}
@@ -188,9 +158,9 @@ export default function SettingsCustomizationSection() {
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 className="bg-gray-50 p-6 rounded-xl"
               >
-                <h3 className="text-xl font-bold text-gray-900 mb-4">{setting.title}</h3>
+                <h3 className="text-xl font-bold text-gray-900 mb-4">{process.title}</h3>
                 <ul className="space-y-2">
-                  {setting.items.map((item, idx) => (
+                  {process.items.map((item, idx) => (
                     <li key={idx} className="flex items-center gap-2 text-gray-600">
                       <span className="w-1.5 h-1.5 bg-blue-600 rounded-full"></span>
                       {item}
@@ -202,13 +172,13 @@ export default function SettingsCustomizationSection() {
           </div>
         </div>
 
-        {/* Customization Options */}
+        {/* Reports */}
         <div className="mb-16">
           <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
-            Customization Options
+            Reports & Analytics
           </h2>
-          <div className="grid md:grid-cols-3 gap-6">
-            {customizationOptions.map((option, index) => (
+          <div className="grid md:grid-cols-2 gap-6">
+            {reports.map((report, index) => (
               <motion.div
                 key={index}
                 initial={{ opacity: 0, y: 20 }}
@@ -217,39 +187,10 @@ export default function SettingsCustomizationSection() {
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 className="bg-white p-6 rounded-xl shadow-md"
               >
-                <h3 className="text-xl font-bold text-gray-900 mb-4">{option.title}</h3>
+                <h3 className="text-xl font-bold text-gray-900 mb-4">{report.title}</h3>
                 <ul className="space-y-2">
-                  {option.items.map((item, idx) => (
+                  {report.items.map((item, idx) => (
                     <li key={idx} className="flex items-center gap-2 text-gray-600">
-                      <span className="w-1.5 h-1.5 bg-blue-600 rounded-full"></span>
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-
-        {/* Notification Settings */}
-        <div className="mb-16">
-          <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
-            Notification Settings
-          </h2>
-          <div className="grid md:grid-cols-2 gap-6">
-            {notificationSettings.map((setting, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="bg-blue-50 p-6 rounded-xl"
-              >
-                <h3 className="text-xl font-bold text-gray-900 mb-4">{setting.title}</h3>
-                <ul className="space-y-2">
-                  {setting.items.map((item, idx) => (
-                    <li key={idx} className="flex items-center gap-2 text-gray-700">
                       <span className="w-1.5 h-1.5 bg-blue-600 rounded-full"></span>
                       {item}
                     </li>
@@ -267,19 +208,19 @@ export default function SettingsCustomizationSection() {
             <div>
               <h3 className="font-semibold text-gray-900 mb-3">Traditional Systems</h3>
               <ul className="space-y-2 text-gray-700">
-                <li>• Limited customization</li>
-                <li>• Basic security</li>
-                <li>• Fixed workflows</li>
-                <li>• Manual configuration</li>
+                <li>• Manual calculations</li>
+                <li>• Paper-based records</li>
+                <li>• Delayed reporting</li>
+                <li>• Error-prone processes</li>
               </ul>
             </div>
             <div>
               <h3 className="font-semibold text-gray-900 mb-3">With TexIntelli</h3>
               <ul className="space-y-2 text-gray-700">
-                <li>• Flexible customization</li>
-                <li>• Advanced security</li>
-                <li>• Configurable workflows</li>
-                <li>• Automated setup</li>
+                <li>• Automated calculations</li>
+                <li>• Digital records</li>
+                <li>• Real-time reporting</li>
+                <li>• Accurate tracking</li>
               </ul>
             </div>
           </div>
@@ -287,4 +228,4 @@ export default function SettingsCustomizationSection() {
       </motion.div>
     </section>
   );
-}
+} 

@@ -57,6 +57,7 @@ const Sidebar = ({ onLinkClick }: { onLinkClick?: () => void }) => {
   const isOrderUser = email === 'orders@nscspinning.com';
 
   return (
+
     <aside
       className={`h-full flex flex-col bg-white dark:bg-gray-900 border-r dark:border-gray-700 shadow-md transition-all duration-300 overflow-y-auto pt-20 ${collapsed ? 'w-20' : 'w-64'}` }
       aria-label="Sidebar Navigation"
@@ -80,6 +81,7 @@ const Sidebar = ({ onLinkClick }: { onLinkClick?: () => void }) => {
         >
           {collapsed ? <FiChevronRight className="w-6 h-6" /> : <FiChevronLeft className="w-6 h-6" />}
         </button>
+
       </div>
 
       {/* Navigation */}

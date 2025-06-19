@@ -14,11 +14,13 @@ import ReportsAnalyticsSection from "../../components/website/docs/ReportsAnalyt
 import SettingsCustomizationSection from "../../components/website/docs/SettingsCustomizationSection";
 import MobileAppGuideSection from "../../components/website/docs/MobileAppGuideSection";
 import FAQsSection from "../../components/website/docs/FAQsSection";
+import EmployeeManagementSection from "../../components/website/docs/EmployeeManagementSection";
+import FinancialManagementSection from "../../components/website/docs/FinancialManagementSection";
 
 export default function DocumentationPage() {
   usePageTitle({
-    title: "Documentation | Dhya SPIMS",
-    description: "Learn everything about Dhya SPIMS to streamline your production and inventory management.",
+    title: "Documentation | TexIntelli",
+    description: "Learn everything about TexIntelli to streamline your production and inventory management.",
   });
 
   const [activeIndex, setActiveIndex] = useState(0);
@@ -41,12 +43,14 @@ export default function DocumentationPage() {
       case "settings-customization": return <SettingsCustomizationSection />;
       case "mobile-app-guide": return <MobileAppGuideSection />;
       case "faq": return <FAQsSection />;
+      case "employee-management": return <EmployeeManagementSection />;
+      case "financial-management": return <FinancialManagementSection />;
       default: return null;
     }
   };
 
   return (
-    <div className="flex h-auto min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300">
+    <div className="flex h-auto min-h-screen bg-white">
 
       {/* 🔵 Top Progress Bar */}
       <div
@@ -55,17 +59,17 @@ export default function DocumentationPage() {
       />
 
       {/* 🧭 Sidebar */}
-      <aside className="hidden md:flex flex-col w-64 bg-gray-100 dark:bg-gray-800 p-6 border-r border-gray-200 dark:border-gray-700 sticky top-0 h-screen">
-        <h2 className="text-xl font-bold mb-6 text-gray-900 dark:text-white">Documentation</h2>
+      <aside className="hidden md:flex flex-col w-64 bg-gray-50 p-6 border-r border-gray-200 sticky top-0 h-screen">
+        <h2 className="text-xl font-bold mb-6 text-gray-900">Documentation</h2>
         <nav className="flex flex-col gap-4">
           {sections.map((section, idx) => (
             <button
               key={section.id}
               onClick={() => setActiveIndex(idx)}
-              className={`text-left transition hover:text-blue-600 dark:hover:text-blue-400 ${
+              className={`text-left transition hover:text-blue-600 ${
                 activeIndex === idx
-                  ? "text-blue-600 dark:text-blue-400 font-semibold"
-                  : "text-gray-600 dark:text-gray-300"
+                  ? "text-blue-600 font-semibold"
+                  : "text-gray-600"
               }`}
             >
               {section.label}
@@ -84,8 +88,8 @@ export default function DocumentationPage() {
 
       {/* 📱 Mobile Sidebar */}
       {menuOpen && (
-        <div className="fixed inset-0 bg-white dark:bg-gray-900 p-8 z-40 flex flex-col gap-6">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Docs</h2>
+        <div className="fixed inset-0 bg-white p-8 z-40 flex flex-col gap-6">
+          <h2 className="text-2xl font-bold text-gray-900">Docs</h2>
           {sections.map((section, idx) => (
             <button
               key={section.id}
@@ -93,7 +97,7 @@ export default function DocumentationPage() {
                 setActiveIndex(idx);
                 setMenuOpen(false);
               }}
-              className="text-left text-gray-700 dark:text-gray-300 text-lg"
+              className="text-left text-gray-700 text-lg"
             >
               {section.label}
             </button>
@@ -112,14 +116,14 @@ export default function DocumentationPage() {
           {renderCurrentSection()}
 
           {/* ⬅️➡️ Prev/Next Buttons */}
-          <div className="mt-12 flex justify-between pt-6 border-t border-gray-200 dark:border-gray-700">
+          <div className="mt-12 flex justify-between pt-6 border-t border-gray-200">
             <button
               onClick={() => setActiveIndex((prev) => Math.max(prev - 1, 0))}
               disabled={activeIndex === 0}
               className={`px-6 py-2 rounded-full font-semibold ${
                 activeIndex === 0
-                  ? "bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed"
-                  : "bg-gray-300 dark:bg-gray-600 text-gray-900 dark:text-white hover:bg-gray-400 dark:hover:bg-gray-500"
+                  ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                  : "bg-gray-300 text-gray-900 hover:bg-gray-400"
               }`}
             >
               Previous
@@ -130,7 +134,7 @@ export default function DocumentationPage() {
               disabled={activeIndex === sections.length - 1}
               className={`px-6 py-2 rounded-full font-semibold ${
                 activeIndex === sections.length - 1
-                  ? "bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed"
+                  ? "bg-gray-200 text-gray-500 cursor-not-allowed"
                   : "bg-blue-600 hover:bg-blue-700 text-white"
               }`}
             >

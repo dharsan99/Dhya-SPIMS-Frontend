@@ -1,141 +1,266 @@
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { usePageTitle } from "../../hooks/usePageTitle";
+import { useState } from "react";
+import { 
+  FaShieldAlt, 
+  FaDatabase, 
+  FaEnvelope,
+  FaChevronDown,
+  FaLock,
+  FaUserCog,
+  FaCookieBite,
+  FaEye,
+  FaHandshake
+} from "react-icons/fa";
 
 export default function PrivacyPolicyPage() {
   usePageTitle({
-    title: "Privacy Policy | Dhya SPIMS",
-    description: "Understand how Dhya SPIMS collects, uses, and protects your information."
+    title: "Privacy Policy | TexIntelli",
+    description: "Learn how we collect, use, and protect your personal information at TexIntelli."
   });
 
+  const [expandedSections, setExpandedSections] = useState<number[]>([]);
+
+  const toggleSection = (index: number) => {
+    setExpandedSections(prev => 
+      prev.includes(index) 
+        ? prev.filter(i => i !== index)
+        : [...prev, index]
+    );
+  };
+
+  const sections = [
+    {
+      icon: <FaShieldAlt className="w-8 h-8 text-blue-600" />,
+      title: "1. Introduction",
+      content: "At TexIntelli, we take your privacy seriously. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our Smart Production & Inventory Management System.",
+      subsections: [
+        {
+          title: "Scope",
+          content: "This policy applies to all users of TexIntelli, including visitors, customers, and employees. By using our services, you agree to the collection and use of information in accordance with this policy."
+        },
+        {
+          title: "Updates",
+          content: "We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page and updating the 'Last Updated' date."
+        }
+      ]
+    },
+    {
+      icon: <FaDatabase className="w-8 h-8 text-blue-600" />,
+      title: "2. Information We Collect",
+      content: "We collect several types of information for various purposes to provide and improve our service to you.",
+      subsections: [
+        {
+          title: "Personal Information",
+          content: "This includes but is not limited to: name, email address, phone number, company details, and billing information."
+        },
+        {
+          title: "Usage Data",
+          content: "We collect information about how you use our service, including access times, pages viewed, and features used."
+        },
+        {
+          title: "Production Data",
+          content: "Information related to your production processes, inventory levels, and operational metrics."
+        }
+      ]
+    },
+    {
+      icon: <FaUserCog className="w-8 h-8 text-blue-600" />,
+      title: "3. How We Use Your Information",
+      content: "We use the collected information for various purposes to provide and improve our service.",
+      subsections: [
+        {
+          title: "Service Provision",
+          content: "To provide and maintain our service, notify you about changes, and provide customer support."
+        },
+        {
+          title: "Improvement",
+          content: "To improve our service, develop new features, and enhance user experience."
+        },
+        {
+          title: "Communication",
+          content: "To communicate with you about updates, security alerts, and support messages."
+        }
+      ]
+    },
+    {
+      icon: <FaLock className="w-8 h-8 text-blue-600" />,
+      title: "4. Data Security",
+      content: "We implement appropriate security measures to protect your personal information.",
+      subsections: [
+        {
+          title: "Security Measures",
+          content: "We use industry-standard encryption, secure servers, and regular security audits to protect your data."
+        },
+        {
+          title: "Data Access",
+          content: "Access to your data is restricted to authorized personnel only, and all access is logged and monitored."
+        }
+      ]
+    },
+    {
+      icon: <FaCookieBite className="w-8 h-8 text-blue-600" />,
+      title: "5. Cookies and Tracking",
+      content: "We use cookies and similar tracking technologies to track activity on our service.",
+      subsections: [
+        {
+          title: "Cookie Types",
+          content: "We use essential cookies for site functionality and analytics cookies to improve our service."
+        },
+        {
+          title: "Cookie Control",
+          content: "You can control cookie settings through your browser preferences. However, disabling cookies may affect service functionality."
+        }
+      ]
+    },
+    {
+      icon: <FaEye className="w-8 h-8 text-blue-600" />,
+      title: "6. Data Sharing and Disclosure",
+      content: "We may share your information with third parties in certain circumstances.",
+      subsections: [
+        {
+          title: "Service Providers",
+          content: "We may share data with third-party service providers who assist in operating our service."
+        },
+        {
+          title: "Legal Requirements",
+          content: "We may disclose your information if required by law or to protect our rights and safety."
+        }
+      ]
+    },
+    {
+      icon: <FaHandshake className="w-8 h-8 text-blue-600" />,
+      title: "7. Your Rights",
+      content: "You have certain rights regarding your personal information.",
+      subsections: [
+        {
+          title: "Access and Control",
+          content: "You can access, update, or delete your personal information through your account settings."
+        },
+        {
+          title: "Data Export",
+          content: "You can request a copy of your data in a structured, commonly used format."
+        }
+      ]
+    },
+    {
+      icon: <FaEnvelope className="w-8 h-8 text-blue-600" />,
+      title: "8. Contact Us",
+      content: "If you have any questions about this Privacy Policy, please contact us:",
+      subsections: [
+        {
+          title: "Support",
+          content: "Email: support@dhya.in"
+        },
+        {
+          title: "Privacy Officer",
+          content: "Email: privacy@dhya.in"
+        }
+      ]
+    }
+  ];
+
   return (
-    <section className="max-w-6xl mx-auto py-16 px-6">
+    <div className="min-h-screen bg-gray-50">
+      {/* Hero Section */}
+      <section className="relative py-20 bg-gradient-to-b from-blue-50 to-white">
+        <div className="max-w-7xl mx-auto px-6">
       <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.6 }}
-        className="space-y-12 text-gray-700 dark:text-gray-300"
-      >
-        {/* Title Block */}
-        <div className="text-center mb-10">
-          <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-white mb-4">
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="text-center"
+          >
+            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
             Privacy Policy
           </h1>
-          <p className="text-lg text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
-            Learn how Dhya Innovations Private Limited collects, uses, protects, and shares your personal information when you use Dhya SPIMS.
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Your privacy is important to us. This policy outlines how we collect, use, and protect your information 
+              when you use TexIntelli.
+          </p>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Policy Sections */}
+      <section className="py-16">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="space-y-4">
+            {sections.map((section, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                className="bg-white rounded-xl shadow-md overflow-hidden"
+              >
+                {/* Section Header */}
+                <button
+                  onClick={() => toggleSection(index)}
+                  className="w-full p-8 flex items-center justify-between hover:bg-gray-50 transition-colors"
+                >
+                  <div className="flex items-center gap-6">
+                    <div className="flex-shrink-0">
+                      {section.icon}
+          </div>
+                    <h2 className="text-2xl font-bold text-gray-900">
+                      {section.title}
+            </h2>
+          </div>
+                  <motion.div
+                    animate={{ rotate: expandedSections.includes(index) ? 180 : 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <FaChevronDown className="w-5 h-5 text-gray-500" />
+                  </motion.div>
+                </button>
+
+                {/* Section Content */}
+                <AnimatePresence>
+                  {expandedSections.includes(index) && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="overflow-hidden"
+                    >
+                      <div className="p-8 pt-0">
+                        <p className="text-gray-600 mb-6">
+                          {section.content}
+                        </p>
+                        {section.subsections && (
+                          <div className="space-y-4">
+                            {section.subsections.map((subsection, subIndex) => (
+                              <div key={subIndex} className="bg-gray-50 rounded-lg p-4">
+                                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                                  {subsection.title}
+                                </h3>
+                                <p className="text-gray-600">
+                                  {subsection.content}
+            </p>
+          </div>
+                            ))}
+                          </div>
+                        )}
+          </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+            ))}
+          </div>
+          </div>
+      </section>
+
+      {/* Last Updated */}
+      <section className="py-8 bg-white">
+        <div className="max-w-7xl mx-auto px-6 text-center">
+          <p className="text-gray-600">
+            Last updated: {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
           </p>
         </div>
-
-        {/* Section Blocks */}
-        <div className="space-y-10">
-
-          {/* 1. Information We Collect */}
-          <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-xl shadow-sm hover:shadow-md transition">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
-              1. Information We Collect
-            </h2>
-            <p className="mb-4 leading-relaxed">
-              We collect information necessary to provide and improve our services:
-            </p>
-            <ul className="list-disc list-inside space-y-2 ml-4">
-              <li>Personal Information: Name, Email Address, Phone Number, Company Details</li>
-              <li>Login Credentials: Username, Encrypted Password</li>
-              <li>Operational Data: Production entries, Inventory records, Order details</li>
-              <li>Usage Data: Device information, IP address, Browser type, Activity logs</li>
-            </ul>
-          </div>
-
-          {/* 2. How We Use Your Information */}
-          <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-xl shadow-sm hover:shadow-md transition">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
-              2. How We Use Your Information
-            </h2>
-            <ul className="list-disc list-inside space-y-2 ml-4">
-              <li>Provide, maintain, and improve Dhya SPIMS functionalities</li>
-              <li>Communicate important updates and alerts</li>
-              <li>Respond to support requests and inquiries</li>
-              <li>Analyze usage patterns to enhance user experience</li>
-              <li>Protect the platform against fraud and ensure regulatory compliance</li>
-            </ul>
-          </div>
-
-          {/* 3. Data Sharing and Disclosure */}
-          <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-xl shadow-sm hover:shadow-md transition">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
-              3. Data Sharing and Disclosure
-            </h2>
-            <p className="mb-4 leading-relaxed">
-              We do not sell or rent personal information to third parties. 
-              We may share information with:
-            </p>
-            <ul className="list-disc list-inside space-y-2 ml-4">
-              <li>Trusted service providers (Hosting, Analytics, Communication)</li>
-              <li>Regulatory authorities when legally obligated</li>
-              <li>During business mergers, acquisitions, or restructurings (with prior notice)</li>
-            </ul>
-          </div>
-
-          {/* 4. Data Security */}
-          <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-xl shadow-sm hover:shadow-md transition">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
-              4. Data Security
-            </h2>
-            <p className="leading-relaxed">
-              We implement strict security protocols, including encryption, access controls, and secure servers. 
-              However, no method of transmission over the internet is entirely secure. 
-              You share data at your own risk.
-            </p>
-          </div>
-
-          {/* 5. Cookies and Tracking */}
-          <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-xl shadow-sm hover:shadow-md transition">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
-              5. Cookies and Tracking
-            </h2>
-            <p className="leading-relaxed">
-              Dhya SPIMS uses cookies and similar technologies to improve user experience.
-              You can adjust cookie preferences via your browser settings at any time.
-            </p>
-          </div>
-
-          {/* 6. Your Rights */}
-          <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-xl shadow-sm hover:shadow-md transition">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
-              6. Your Rights
-            </h2>
-            <ul className="list-disc list-inside space-y-2 ml-4">
-              <li>Access, update, or delete your personal data</li>
-              <li>Request a copy of the information we hold about you</li>
-              <li>Withdraw consent for marketing communications</li>
-            </ul>
-          </div>
-
-          {/* 7. Changes to This Policy */}
-          <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-xl shadow-sm hover:shadow-md transition">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
-              7. Changes to This Policy
-            </h2>
-            <p className="leading-relaxed">
-              We may update this Privacy Policy periodically. Significant changes will be notified via platform alerts or email.
-              Continued use of Dhya SPIMS after changes indicates acceptance of the updated policy.
-            </p>
-          </div>
-
-          {/* 8. Contact Information */}
-          <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-xl shadow-sm hover:shadow-md transition">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
-              8. Contact Information
-            </h2>
-            <p className="leading-relaxed">
-              If you have any questions about this Privacy Policy, please contact:
-            </p>
-            <ul className="mt-4 space-y-2 text-blue-600 dark:text-blue-400">
-              <li>Email: <a href="mailto:support@dhya.in" className="hover:underline">support@dhya.in</a></li>
-            </ul>
-          </div>
-
-        </div>
-
-      </motion.div>
     </section>
+    </div>
   );
 }

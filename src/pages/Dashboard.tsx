@@ -94,8 +94,8 @@ const Dashboard: React.FC = () => {
   if (auth.user?.email === 'orders@nscspinning.com') {
     return (
       <div className="p-6 flex flex-col items-center justify-center min-h-screen bg-white dark:bg-gray-900 text-gray-800 dark:text-white">
-        <h1 className="text-3xl font-bold mb-6 text-blue-600 dark:text-blue-400">
-          Welcome to SPIMS
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+          Welcome to TexIntelli
         </h1>
         <p className="mb-8 text-lg text-center max-w-md">
           You are logged in as an <strong>Order Staff</strong>. Click below to manage orders.

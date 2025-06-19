@@ -10,6 +10,8 @@ export const sections = [
     { id: "inventory-management", label: "Inventory Management" },
     { id: "order-management", label: "Order Management" },
     { id: "production-tracking", label: "Production Tracking" },
+    { id: "employee-management", label: "Employee Management" },
+    { id: "financial-management", label: "Financial Management" },
     { id: "reports-analytics", label: "Reports & Analytics" },
     { id: "settings-customization", label: "Settings & Customization" },
     { id: "mobile-app-guide", label: "Mobile App Guide" },
