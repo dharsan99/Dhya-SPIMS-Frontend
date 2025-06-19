@@ -1,3 +1,4 @@
+// pullable request
 // src/types/attendance.ts
 
 export interface Attendance {
@@ -51,6 +52,25 @@ total_hours: number;
 overtime_hours: number;
 status: AttendanceStatus;
 shift: ShiftType;
+}
+
+export interface NestedAttendanceRecord {
+  employee_id: string;
+  employee: {
+    token_no: string;
+    name: string;
+    shift_rate: string;
+  };
+  attendance: Record<
+    string,
+    {
+      status: string;
+      in_time: string;
+      out_time: string;
+      total_hours: number;
+      overtime_hours: number;
+    }
+  >;
 }
 
 export interface AttendanceRecord {

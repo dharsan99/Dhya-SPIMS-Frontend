@@ -1,3 +1,4 @@
+// pullable request
 import { useEffect, useMemo, useState } from 'react';
 
 import format from 'date-fns/format';
@@ -15,6 +16,8 @@ import { useAttendanceDates } from './hooks/useAttendanceDates';
 import { getAllAttendances, getAttendanceInRange, getAttendanceSummary } from '@/api/attendance';
 import { AttendanceRecord } from '@/types/attendance';
 import AttendanceHeaderStats from './AttendanceHeaderStats';
+
+
 
 
 const AttendanceTab = () => {
@@ -46,10 +49,12 @@ const AttendanceTab = () => {
   });
 
 
+  console.log('attendancesdata for range', attendancesData)
+
+
 
 
   const attendances = attendancesData?.data ?? [];
-  console.log('attendancesdata for range', attendancesData)
 
   useEffect(() => {
     if (!attendancesData) return;
@@ -259,23 +264,29 @@ const AttendanceTab = () => {
         )
       ) : rangeMode === 'week' ? (
         <AttendanceWeeklyTable
-        employees={filteredAttendances.map((a) => a.employee)} // Extract Employee object
-        attendanceData={filteredAttendances} // Pass raw records
+        attendanceData={filteredAttendances} 
           weekDates={weekDates}
           page={page}
           pageSize={itemsPerPage}
+          total={attendancesData?.total ?? 0} 
           onPageChange={setPage}
-          onPageSizeChange={setItemsPerPage}
+          onPageSizeChange={(size) => {
+            setItemsPerPage(size);
+            setPage(1); // reset to first page
+          }}
         />
       ) : (
         <AttendanceMonthlyTable
-        employees={filteredAttendances.map((a) => a.employee)} // Extract Employee object
-        attendanceData={filteredAttendances} // Pass raw records
+        attendanceData={filteredAttendances}
         monthDates={monthDates}
         page={page}
         pageSize={itemsPerPage}
+        total={attendancesData?.total ?? 0} // <- Pass total count
         onPageChange={setPage}
-        onPageSizeChange={setItemsPerPage}
+        onPageSizeChange={(size) => {
+          setItemsPerPage(size);
+          setPage(1); // reset to first page
+        }}
       />
       
       )}

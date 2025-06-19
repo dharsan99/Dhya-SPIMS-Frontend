@@ -1,14 +1,14 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  darkMode: 'class', // ✅ Enable dark mode via class
+  darkMode: 'class',
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
       backgroundSize: {
-        '200%': '200% 200%', // ✅ gradient bg movement
+        '200%': '200% 200%',
       },
       backgroundImage: {
-        'noise': "url('/noise.png')", // 📁 Add a small transparent noise texture image
+        'noise': "url('/noise.png')",
       },
       animation: {
         'gradient-x': 'gradient-x 10s ease infinite',
@@ -30,6 +30,13 @@ export default {
           '50%': { opacity: 0.8 },
         },
       },
+    },
+    screens: {
+      sm: '576px',
+      md: '768px',
+      lg: '992px',
+      xl: '1200px',
+      xxl: '1400px',
     },
   },
   plugins: [],

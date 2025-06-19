@@ -1,23 +1,24 @@
+// pullable request
 import React, { useMemo } from 'react';
 import AttendancePagination from './AttendancePagination';
-import { AttendanceRecord } from '@/types/attendance';
+import { getStatusBadge } from './StatusBadge';
 
 
-interface Props {
-  employees: any[];
-  attendanceData: any[]; // Changed from AttendanceRecord[] to any[] to handle the actual data structure
-  monthDates: string[]; // format: YYYY-MM-DD
+interface Props {  
+  attendanceData: any[];
+  monthDates: string[];
   page: number;
   pageSize: number;
+  total: number; // <- New prop
   onPageChange: (page: number) => void;
   onPageSizeChange: (size: number) => void;
 }
 
 const AttendanceMonthlyTable: React.FC<Props> = ({
-  employees,
   attendanceData,
   monthDates,
   page,
+  total,
   pageSize,
   onPageChange,
   onPageSizeChange,
@@ -37,10 +38,7 @@ const AttendanceMonthlyTable: React.FC<Props> = ({
   }
 
   // Ensure employees are unique by ID
-  const uniqueEmployees = attendanceData;
 
-  const startIdx = (page - 1) * pageSize;
-  const paginatedEmployees = uniqueEmployees.slice(startIdx, startIdx + pageSize);
 
   // Convert attendance data to a map for fast lookup
   const attendanceMap = useMemo(() => {
@@ -68,19 +66,7 @@ const AttendanceMonthlyTable: React.FC<Props> = ({
 
   console.log('attendanceMap', attendanceMap);
 
-  const getStatusBadge = (status?: string) => {
-    const normalized = status?.toUpperCase();
-    switch (normalized) {
-      case 'PRESENT':
-        return <span className="text-green-600 dark:text-green-400">✅</span>;
-      case 'HALF_DAY':
-        return <span className="text-yellow-500 dark:text-yellow-400">½</span>;
-      case 'LEAVE':
-        return <span className="text-blue-500 dark:text-blue-400">📘</span>;
-      default:
-        return <span className="text-red-500 dark:text-red-400">❌</span>;
-    }
-  };
+
 
   return (
     <div className="space-y-4">
@@ -96,7 +82,7 @@ const AttendanceMonthlyTable: React.FC<Props> = ({
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-                {paginatedEmployees.map((emp) => (
+                {attendanceData.map((emp) => (
                   <tr key={emp.employee_id} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition">
                     <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-300">
                       {emp.employee.token_no || <span className="italic text-gray-400">–</span>}
@@ -126,7 +112,7 @@ const AttendanceMonthlyTable: React.FC<Props> = ({
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-                {paginatedEmployees.map((emp) => (
+                {attendanceData.map((emp) => (
                   <tr key={emp.employee_id} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition">
                     {monthDates.map((date) => {
                       const att = attendanceMap[date]?.[emp.employee_id];
@@ -154,7 +140,7 @@ const AttendanceMonthlyTable: React.FC<Props> = ({
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-                {paginatedEmployees.map((emp) => {
+                {attendanceData.map((emp) => {
                   let workDays = 0;
                   let totalHours = 0;
                   let totalOvertime = 0;
@@ -189,12 +175,12 @@ const AttendanceMonthlyTable: React.FC<Props> = ({
       </div>
 
       <AttendancePagination
-        page={page}
-        total={uniqueEmployees.length}
-        pageSize={pageSize}
-        onPageChange={onPageChange}
-        onPageSizeChange={onPageSizeChange}
-      />
+          page={page}
+          total={total} // ← Use the correct total from props
+          pageSize={pageSize}
+          onPageChange={onPageChange}
+          onPageSizeChange={onPageSizeChange}
+        />
     </div>
   );
 };

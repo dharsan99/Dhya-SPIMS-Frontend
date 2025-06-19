@@ -1,25 +1,25 @@
+// pullable request
 import React, { useMemo } from 'react';
 import AttendancePagination from './AttendancePagination';
 import { getStatusBadge } from './StatusBadge';
 import { calculateWeeklyTotals } from './utils/attendence';
 import { formatINR } from './utils/attendence';
-import { AttendanceRecord } from '@/types/attendance';
 
 interface Props {
-  employees: any[];
   attendanceData: any[]; // Changed from AttendanceRecord[] to any[] to handle the actual data structure
   weekDates: string[]; // Dates in 'YYYY-MM-DD' format
   page: number;
   pageSize: number;
+  total: number; 
   onPageChange: (newPage: number) => void;
   onPageSizeChange: (newSize: number) => void;
 }
 
 const AttendanceWeeklyTable: React.FC<Props> = ({
-  employees,
   attendanceData,
   weekDates,
   page,
+  total,
   pageSize,
   onPageChange,
   onPageSizeChange,
@@ -63,18 +63,11 @@ const AttendanceWeeklyTable: React.FC<Props> = ({
     return map;
   }, [rows, weekDates]);
 
-  console.log('attendanceMap', attendanceMap);
-  const uniqueEmployees = attendanceData;
-
-  const paginatedEmployees = useMemo(() => {
-    const startIndex = (page - 1) * pageSize;
-    return uniqueEmployees.slice(startIndex, startIndex + pageSize);
-  }, [uniqueEmployees, page, pageSize]);
 
   const weeklyTotals = useMemo(() => {
     const totals: Record<string, ReturnType<typeof calculateWeeklyTotals>> = {};
     
-    uniqueEmployees.forEach((emp) => {
+    attendanceData.forEach((emp) => {
       // The attendance data already comes with the correct structure
       const employeeWithAttendance = {
         employee_id: emp.employee_id,
@@ -84,7 +77,7 @@ const AttendanceWeeklyTable: React.FC<Props> = ({
       totals[emp.employee_id] = calculateWeeklyTotals(employeeWithAttendance, weekDates);
     });
     return totals;
-  }, [uniqueEmployees, weekDates]);
+  }, [attendanceData, weekDates]);
 
   console.log('weeklyTotals', weeklyTotals);
   return (
@@ -107,8 +100,8 @@ const AttendanceWeeklyTable: React.FC<Props> = ({
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-            {paginatedEmployees.length > 0 ? (
-              paginatedEmployees.map((emp, idx) => {
+            {attendanceData.length > 0 ? (
+              attendanceData.map((emp, idx) => {
                 const { totalHours, totalDays, totalOvertime, wages } = weeklyTotals[emp.employee_id];
 
                 return (
@@ -155,7 +148,7 @@ const AttendanceWeeklyTable: React.FC<Props> = ({
 
       <AttendancePagination
         page={page}
-        total={uniqueEmployees.length}
+        total={total} 
         pageSize={pageSize}
         onPageChange={onPageChange}
         onPageSizeChange={onPageSizeChange}

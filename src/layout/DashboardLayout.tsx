@@ -64,7 +64,7 @@ const DashboardLayout = () => {
 
       {/* Sidebar */}
       <div 
-        className={`fixed md:static inset-y-0 left-0 z-400000 transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 transition-transform duration-300 ease-in-out`}
+        className={`fixed md:static inset-y-0 left-0 z-40 transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 transition-transform duration-300 ease-in-out`}
         style={{ width: 'auto' }}
       >
         <Sidebar onLinkClick={() => setSidebarOpen(false)} />
