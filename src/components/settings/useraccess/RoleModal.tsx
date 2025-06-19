@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import Modal from '../../Modal';
+import { useQuery } from '@tanstack/react-query';
+import { getRolePermissions } from '@/api/roles';
 
 interface RoleModalProps {
   isOpen: boolean;
@@ -8,74 +10,43 @@ interface RoleModalProps {
   roleToEdit?: { id: string; name: string; permissions: Record<string, string[]> } | null;
 }
 
-const FEATURES = [
-  {
-    name: 'Orders',
-    subPermissions: ['Add Order', 'Update Order', 'Delete Order', 'View Order'],
-  },
-  {
-    name: 'Shades',
-    subPermissions: ['Add Shade', 'Update Shade', 'Delete Shade', 'View Shade'],
-  },
-  {
-    name: 'Fibres',
-    subPermissions: ['Add Fibre', 'Update Fibre', 'Delete Fibre'],
-  },
-  {
-    name: 'Production',
-    subPermissions: ['Add Production', 'Update Production', 'Delete Production'],
-  },
-  {
-    name: 'Buyers',
-    subPermissions: ['Add Buyer', 'Update Buyer', 'Delete Buyer'],
-  },
 
-  {
-    name: 'Employees',
-    subPermissions: ['Add Employee', 'Update Employee', 'Delete Employee'],
-  },
-  {
-    name: 'Attendence',
-    subPermissions: ['Add Attendence', 'Update Attendence', 'Delete Attendence'],
-  },
-  {
-    name: 'Suppliers',
-    subPermissions: ['Add Supplier', 'Update Supplier', 'Delete Supplier'],
-  },
-  {
-    name: 'Settings',
-    subPermissions: ['View Settings', 'Add Settings', 'Update Settings', 'Delete Settings'],
-  },
-];
 
 const RoleModal = ({ isOpen, onClose, onSave, roleToEdit }: RoleModalProps) => {
   const [name, setName] = useState('');
   const [permissions, setPermissions] = useState<Record<string, string[]>>({});
   const [expandedFeatures, setExpandedFeatures] = useState<Record<string, boolean>>({});
 
+
+  const { data: allFeatures } = useQuery({
+    queryKey: ['rolePermissions'],
+    queryFn: getRolePermissions,
+  });
+
   useEffect(() => {
-  if (roleToEdit) {
-    setName(roleToEdit.name);
-    const grouped: Record<string, string[]> = {};
-    const expanded: Record<string, boolean> = {};
+    if (roleToEdit && allFeatures) {
+      setName(roleToEdit.name);
+      const grouped: Record<string, string[]> = {};
+      const expanded: Record<string, boolean> = {};
 
-    FEATURES.forEach(({ name, subPermissions }) => {
-      const selected = roleToEdit.permissions[name] || [];
-      const matched = subPermissions.filter(p => selected.includes(p));
-      if (matched.length > 0) {
-        grouped[name] = matched;
-        expanded[name] = true; // Auto-expand if there are selected permissions
-      }
-    });
+      Object.entries(allFeatures).forEach(([feature, subPermissions]) => {
+        const selected = roleToEdit.permissions[feature] || [];
+        const matched = subPermissions.filter(p => selected.includes(p));
+        if (matched.length > 0) {
+          grouped[feature] = matched;
+          expanded[feature] = true;
+        }
+      });
 
-    setPermissions(grouped);
-    setExpandedFeatures(expanded);
-  } else {
-    setName('');
-    setPermissions({});
-    setExpandedFeatures({});
-  }
-}, [roleToEdit, isOpen]);
+      setPermissions(grouped);
+      setExpandedFeatures(expanded);
+    } else if (!roleToEdit) {
+      setName('');
+      setPermissions({});
+      setExpandedFeatures({});
+    }
+  }, [roleToEdit, isOpen, allFeatures]);
+
 
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -151,7 +122,8 @@ const RoleModal = ({ isOpen, onClose, onSave, roleToEdit }: RoleModalProps) => {
             Permissions
           </label>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {FEATURES.map(({ name: featureName, subPermissions }) => {
+          {allFeatures &&
+            Object.entries(allFeatures).map(([featureName, subPermissions]) => {
               const expanded = expandedFeatures[featureName] || false;
               return (
                 <div key={featureName} className="border rounded p-3 bg-gray-50 dark:bg-gray-800">

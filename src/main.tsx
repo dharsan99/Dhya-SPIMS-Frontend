@@ -9,6 +9,7 @@ import { useThemeStore } from './hooks/useThemeStore';
 
 import AOS from 'aos';
 import 'aos/dist/aos.css';
+import TenantContextProvider from './context/TenantContextProvider';
 
 // ✅ Create Query Client
 const queryClient = new QueryClient();
@@ -29,8 +30,10 @@ AOS.init({
 // ✅ ReactDOM Hydration
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
+    <TenantContextProvider>
     <QueryClientProvider client={queryClient}>
       <App />
     </QueryClientProvider>
+    </TenantContextProvider>
   </React.StrictMode>
 );

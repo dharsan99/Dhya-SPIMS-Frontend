@@ -77,6 +77,47 @@ export default function LoginModal({ setFadeOutPage }: LoginModalProps) {
       return;
     }
 
+    // Check for super-admin credentials
+    if (email === 'superadmin@dhya.in' && password === '12345') {
+      // Create super-admin user object
+      const superAdminUser = {
+        token: 'super-admin-token',
+        user: {
+          id: 'super-admin-1',
+          tenant_id: 'super-admin-tenant',
+          name: 'Super Admin',
+          email: 'superadmin@dhya.in',
+          role: 'super-admin',
+          permissions: ['all']
+        }
+      };
+
+      setAuth(superAdminUser.token, superAdminUser.user);
+
+      // 🎉 Confetti blast for super admin
+      confetti({
+        particleCount: 150,
+        spread: 80,
+        startVelocity: 50,
+        gravity: 0.7,
+        origin: { y: 0.5 },
+        colors: ['#EF4444', '#DC2626', '#B91C1C', '#991B1B'],
+        scalar: 1,
+        ticks: 300,
+        zIndex: 9999,
+      });
+
+      toast.success('Welcome, Super Admin!');
+
+      setFadeOut(true);
+      setFadeOutPage(true);
+
+      setTimeout(() => {
+        navigate('/superadmin/dashboard');
+      }, 1200);
+      return;
+    }
+
     mutation.mutate({ email, password });
   };
 
