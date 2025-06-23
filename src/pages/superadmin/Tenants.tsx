@@ -86,12 +86,12 @@ const Tenants: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col md:flex-row items-center justify-center md:justify-between gap-4 md:gap-0">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white text-center md:text-left">
             Tenants Management
           </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">
+          <p className="text-gray-600 dark:text-gray-400 mt-2 text-center md:text-left">
             Manage all registered tenants and their subscriptions
           </p>
         </div>

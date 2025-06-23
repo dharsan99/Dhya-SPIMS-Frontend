@@ -50,6 +50,13 @@ export const markAttendance = async (payload: any) => {
   return res.data;
 };
 
+export const markAttendanceBulk = (payload: any) => {
+  return api.post('/attendance/mark-bulk', payload);
+};
+
+
+
+
 export const markSingleAttendance = async (payload: Omit<SingleAttendancePayload, 'employee_id'> & { employee_id: string }) => {
   const { employee_id, ...rest } = payload;
 

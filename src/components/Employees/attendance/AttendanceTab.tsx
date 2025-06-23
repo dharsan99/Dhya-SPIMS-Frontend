@@ -49,7 +49,7 @@ const AttendanceTab = () => {
   });
 
 
-  console.log('attendancesdata for range', attendancesData)
+  console.log('attendancesdata', attendancesData)
 
 
 
@@ -98,7 +98,13 @@ const AttendanceTab = () => {
     setAttendance(initialAttendance);
   }, [attendancesData]);
 
-  console.log('date', date)
+  useEffect(() => {
+    if (rangeMode !== 'day' && viewMode === 'edit') {
+      setViewMode('view');
+    }
+  }, [rangeMode, viewMode]);
+
+  console.log('attendance', attendance)
 
   const { data: summaryData } = useQuery({
     queryKey: ['attendance-summary', rangeMode, date, rangeStart, rangeEnd],
@@ -219,11 +225,11 @@ const AttendanceTab = () => {
           department={departmentFilter}
         />
       <AttendanceModeTabs
-        mode={viewMode}
-        onModeChange={setViewMode}
-        range={rangeMode}
-        onRangeChange={setRangeMode}
-      />
+  mode={viewMode}
+  onModeChange={setViewMode}
+  range={rangeMode}
+  onRangeChange={setRangeMode}
+/>
       <AttendanceFilters
         date={normalizedDate}
         onDateChange={setDate}

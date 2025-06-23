@@ -60,9 +60,10 @@ export interface NestedAttendanceRecord {
     token_no: string;
     name: string;
     shift_rate: string;
+    department: string; // ← Added this line
   };
   attendance: Record<
-    string,
+    string, // date string e.g., '2025-06-20'
     {
       status: string;
       in_time: string;

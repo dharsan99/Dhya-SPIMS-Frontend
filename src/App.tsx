@@ -40,6 +40,9 @@ import SignupPage from './pages/Signup';
 // Super Admin Pages
 import SuperAdminDashboard from './pages/superadmin/Dashboard';
 import Tenants from './pages/superadmin/Tenants';
+import Plans from './pages/superadmin/Plans';
+import Billing from './pages/superadmin/Billing';
+import ParsingUsage from './pages/superadmin/ParsingUsage';
 
 function App() {
   const { setTheme } = useThemeStore();
@@ -102,10 +105,12 @@ function App() {
             <Route index element={<Navigate to="dashboard" replace />} />
             <Route path="dashboard" element={<SuperAdminDashboard />} />
             <Route path="tenants" element={<Tenants />} />
+            <Route path="plans" element={<Plans />} />
+            <Route path="billing" element={<Billing />} />
+            <Route path="parsing-usage" element={<ParsingUsage />} />
           </Route>
           
-
-          {/* Catch-all */}
+          {/* Catch-all - moved to end */}
           <Route path="*" element={<DelayedNotFound />} />
         </Routes>
 

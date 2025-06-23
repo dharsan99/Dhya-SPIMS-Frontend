@@ -5,6 +5,7 @@ import { getStatusBadge } from './StatusBadge';
 import { calculateWeeklyTotals } from './utils/attendence';
 import { formatINR } from './utils/attendence';
 
+
 interface Props {
   attendanceData: any[]; // Changed from AttendanceRecord[] to any[] to handle the actual data structure
   weekDates: string[]; // Dates in 'YYYY-MM-DD' format
@@ -24,8 +25,7 @@ const AttendanceWeeklyTable: React.FC<Props> = ({
   onPageChange,
   onPageSizeChange,
 }) => {
-  console.log('attendanceData', attendanceData);
-  console.log('weekDates', weekDates);
+  
   
   // Early return if weekDates is not available
   if (!weekDates || !Array.isArray(weekDates) || weekDates.length === 0) {

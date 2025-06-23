@@ -6,6 +6,9 @@ import {
   FiChevronLeft,
   FiChevronRight,
   FiShield,
+  FiDollarSign,
+  FiCreditCard,
+  FiBarChart,
 } from 'react-icons/fi';
 
 import logo from '../../assets/dhya_texintelli.png';
@@ -41,7 +44,7 @@ const SuperAdminSidebar = ({ onLinkClick }: { onLinkClick?: () => void }) => {
 
   return (
     <aside
-      className={`h-full flex flex-col bg-white dark:bg-gray-900 border-r dark:border-gray-700 shadow-md transition-all duration-300 overflow-y-auto ${collapsed ? 'w-20' : 'w-64'}`}
+      className={`h-full flex flex-col bg-white dark:bg-gray-900 border-r dark:border-gray-700 shadow-md transition-all duration-300 overflow-y-auto pt-30 md:pt-0 ${collapsed ? 'w-20' : 'w-64'}`}
       aria-label="Super Admin Sidebar Navigation"
     >
       {/* Header Section */}
@@ -57,7 +60,7 @@ const SuperAdminSidebar = ({ onLinkClick }: { onLinkClick?: () => void }) => {
           )}
         </div>
         <button
-          className="hidden md:block p-2 focus:outline-none"
+          className="p-2 focus:outline-none"
           onClick={() => setCollapsed(!collapsed)}
           aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
@@ -81,6 +84,9 @@ const SuperAdminSidebar = ({ onLinkClick }: { onLinkClick?: () => void }) => {
           <div className="flex flex-col gap-1">
             {createNavLink('/superadmin/dashboard', 'Dashboard', FiGrid)}
             {createNavLink('/superadmin/tenants', 'Tenants', FiUsers)}
+            {createNavLink('/superadmin/plans', 'Plans', FiDollarSign)}
+            {createNavLink('/superadmin/billing', 'Billing', FiCreditCard)}
+            {createNavLink('/superadmin/parsing-usage', 'Parsing Usage', FiBarChart)}
           </div>
         </div>
       </nav>

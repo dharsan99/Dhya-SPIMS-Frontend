@@ -23,6 +23,10 @@ const shiftOptions = (['MORNING', 'EVENING', 'NIGHT', 'ABSENT'] as ShiftDropdown
   label: shift,
 }));
 
+const buildLocalTimeString = (date: string, time: string): string => {
+  return `${date}T${time}:00`; // No timezone shift
+}
+
 const AddAttendanceModal: React.FC<AddAttendanceModalProps> = ({
   onClose,
   defaultDate,
@@ -90,7 +94,6 @@ const AddAttendanceModal: React.FC<AddAttendanceModalProps> = ({
     const isAbsent = status === 'ABSENT';
   
     if (isAbsent) {
-      // Minimal payload for absent employees
       const payload = {
         employee_id: employeeId,
         date,
@@ -100,26 +103,36 @@ const AddAttendanceModal: React.FC<AddAttendanceModalProps> = ({
       return;
     }
   
-    // Build Date objects for time manipulation
-    const baseOutTime = new Date(`${date}T${outTime}`);
-    const adjustedOutTime = new Date(baseOutTime);
-    adjustedOutTime.setHours(adjustedOutTime.getHours() + overtimeHours);
+    // Create local time strings (no UTC shift)
+    const rawInTime = buildLocalTimeString(date, inTime);
+    const rawOutTime = buildLocalTimeString(date, outTime);
   
-    // Format adjusted out time as HH:MM
-    const formattedOutTime = adjustedOutTime.toISOString().slice(11, 16);
+    let inDateTime = new Date(rawInTime);
+    let outDateTime = new Date(rawOutTime);
+  
+    // If it's NIGHT and outTime is less than inTime, roll to next day
+    if (shift === 'NIGHT' && outTime < inTime) {
+      outDateTime.setDate(outDateTime.getDate() + 1);
+    }
+  
+    // Add overtime
+    outDateTime.setHours(outDateTime.getHours() + overtimeHours);
   
     const payload = {
       employee_id: employeeId,
       date,
       shift: shift || '',
-      in_time: `${date}T${inTime}`,
-      out_time: `${date}T${formattedOutTime}`,
+      in_time: inDateTime.toISOString(),
+      out_time: outDateTime.toISOString(),
       overtime_hours: overtimeHours,
       status,
     };
+
+    console.log('payload', payload)
   
     mutate(payload);
   };
+  
   
   
   

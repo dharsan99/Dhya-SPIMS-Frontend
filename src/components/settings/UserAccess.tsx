@@ -17,6 +17,7 @@ import {
   createUser,
   updateUser,
   deleteUser,
+  getUserById,
 } from '../../api/users';
 
 import { Role, User } from '../../types/user';
@@ -45,8 +46,6 @@ const UserAccess = () => {
     enabled: !!tenantId, // only run query if tenantId exists
   });
 
-
-
   // ✅ Use useQuery to fetch users
   const {
     data: users = [],
@@ -66,17 +65,38 @@ const UserAccess = () => {
   // ✅ Role Operations
   const handleSaveRole = async (data: { id?: string; name: string; permissions: Record<string, string[]> }) => {
     try {
-       const description = `This is description of ${data.name}`;
+      const description = `This is description of ${data.name}`;
       if (data.id) {
-        await updateRole(data.id, { name: data.name, permissions: data.permissions, description: data.name, });
+        await updateRole(data.id, {
+          name: data.name,
+          permissions: data.permissions,
+          description: data.name,
+        });
         toast.success('Role updated successfully');
+  
+        console.log('auth.user', auth.user?.id);
+        if (auth.user?.id) {
+          console.log('🔍 Fetching updated user info...');
+          const res = await getUserById(auth.user.id);
+          console.log('✅ Updated user:', res.data);
+        
+          auth.setAuth(auth.token!, res.data);
+        }
+  
       } else {
-        await createRole({ name: data.name, permissions: data.permissions, tenant_id: tenantId, description});
+        await createRole({
+          name: data.name,
+          permissions: data.permissions,
+          tenant_id: tenantId,
+          description,
+        });
         toast.success('Role created successfully');
       }
+  
       setIsRoleModalOpen(false);
       setSelectedRole(null);
       refetchRoles();
+  
     } catch (err) {
       console.error('Error saving role:', err);
       toast.error('Failed to save role');
@@ -163,14 +183,16 @@ const UserAccess = () => {
       <section className="bg-white dark:bg-gray-900 p-6 rounded">
         <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">User Management</h2>
         <UserTable
-          users={users.map((u: any) => ({
-            ...u,
-            role: roles.find((r: any) => r.id === u.role_id),
-          }))}
-          roles={roles}
-          onSave={handleSaveUser}
-          onDelete={handleDeleteUser}
-        />
+              users={users
+                .filter((u: any) => u.is_active) // 👈 only active users
+                .map((u: any) => ({
+                  ...u,
+                  role: roles.find((r: any) => r.id === u.role_id),
+                }))}
+              roles={roles}
+              onSave={handleSaveUser}
+              onDelete={handleDeleteUser}
+            />
       </section>
 
       {/* 🔧 Role Modal */}

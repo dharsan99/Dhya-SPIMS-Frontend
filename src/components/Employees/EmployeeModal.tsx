@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Employee } from '../../types/employee';
+import { showError, showSuccess } from './attendance/utils/toastutils';
 
 interface EmployeeModalProps {
   isOpen: boolean;
@@ -51,10 +52,50 @@ const EmployeeModal: React.FC<EmployeeModalProps> = ({ isOpen, onClose, onSave, 
     }));
   };
 
+  const validateForm = (data: Omit<Employee, 'id'>) => {
+    const cleanedAadhar = data.aadhar_no.replace(/\D/g, ''); // remove all non-digit characters
+  
+    if (cleanedAadhar.length !== 12) {
+      return 'Aadhar number must be exactly 12 digits.';
+    }
+  
+    if (!/^[a-zA-Z0-9]+$/.test(data.token_no)) {
+      return 'Token number must be alphanumeric.';
+    }
+  
+    if (data.shift_rate <= 0) {
+      return 'Shift rate must be a positive number.';
+    }
+
+    if (!/^\d+$/.test(data.bank_acc_1)) {
+      return 'Bank Account 1 must contain only digits.';
+    }
+  
+    if (data.bank_acc_1.length < 9 || data.bank_acc_1.length > 18) {
+      return 'Bank Account 1 must be between 9 and 18 digits.';
+    }
+  
+    if (data.bank_acc_2) {
+      if (!/^\d+$/.test(data.bank_acc_2)) {
+        return 'Bank Account 2 must contain only digits.';
+      }
+      if (data.bank_acc_2.length < 9 || data.bank_acc_2.length > 18) {
+        return 'Bank Account 2 must be between 9 and 18 digits.';
+      }
+    }
+  
+    return null;
+  };
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const error = validateForm(formData);
+    if (error) {
+      showError(error);
+      return;
+    }
     onSave(formData, initialData?.id);
     onClose();
+    showSuccess(initialData ? 'Employee updated successfully.' : 'Employee created successfully.');
   };
 
   if (!isOpen) return null;
@@ -65,6 +106,8 @@ const EmployeeModal: React.FC<EmployeeModalProps> = ({ isOpen, onClose, onSave, 
         <h2 className="text-xl font-bold mb-6 text-gray-800 dark:text-white">
           {initialData ? 'Edit Employee Record' : 'Add New Employee'}
         </h2>
+
+        <div className="overflow-y-auto max-h-[75vh] pr-2 custom-scrollbar">
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Section 1: Personal Info */}
@@ -169,9 +212,12 @@ const EmployeeModal: React.FC<EmployeeModalProps> = ({ isOpen, onClose, onSave, 
               />
             </div>
           </div>
-
-          {/* Actions */}
-          <div className="flex justify-end gap-3 pt-4">
+     {/* Actions */}
+         
+        </form>
+       
+        </div>
+        <div className="flex justify-end gap-3 pt-4">
             <button
               type="button"
               onClick={onClose}
@@ -180,13 +226,14 @@ const EmployeeModal: React.FC<EmployeeModalProps> = ({ isOpen, onClose, onSave, 
               Cancel
             </button>
             <button
+              
               type="submit"
+              onClick={handleSubmit}
               className="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700"
             >
               {initialData ? 'Update' : 'Create'}
             </button>
           </div>
-        </form>
       </div>
     </div>
   );

@@ -1,10 +1,10 @@
 // pullable request
 import React, { useState } from 'react';
 import { AttendanceEditModeProps, ShiftType, shiftTimeMap } from './AttendanceTypes';
-import { markAttendance,  markSingleAttendance } from '../../../api/attendance';
+import {  markAttendanceBulk,  markSingleAttendance } from '../../../api/attendance';
 import { TailwindDialog } from '../../ui/Dialog';
 import { useQueryClient } from '@tanstack/react-query';
-import { MarkAttendancePayload } from '@/types/attendance';
+import { showError, showSuccess } from './utils/toastutils';
 
 
 const AttendanceEditMode: React.FC<
@@ -16,8 +16,6 @@ const AttendanceEditMode: React.FC<
     onSubmitSuccess?: () => void;
   }
 > = ({ employees, attendance, onTimeChange, onOvertimeChange, pageStart, date, rangeMode, rangeStart, rangeEnd, onSubmitSuccess }) => {
-  console.log('employees', employees)
-  console.log('attendance', attendance)
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const queryClient = useQueryClient();
@@ -38,29 +36,47 @@ const AttendanceEditMode: React.FC<
   const handleSubmit = async () => {
     setIsSubmitting(true);
     try {
-      const payload: MarkAttendancePayload = {
+      const payload: any = {
         date,
         records: employees.map((emp) => {
           const att = attendance[emp.employee_id];
-          const overtime = att?.overtime_hours || 0;
           const isPresent = att?.shift !== 'ABSENT';
-
-          return {
-            employee_id: emp.employee_id,
-            in_time: att?.in_time || '',
-            out_time: att?.out_time || '',
-            total_hours: isPresent ? 8 + overtime : 0,
-            overtime_hours: overtime,
-            status: isPresent ? 'PRESENT' : 'ABSENT',
-            shift: att?.shift as ShiftType,
-          };
+  
+          if (!att) {
+            throw new Error(`Missing attendance data for employee ${emp.employee.name}`);
+          }
+  
+          if (isPresent) {
+            const inTimeString = `${date}T${att.in_time || '00:00'}:00`;
+            const outTimeString = `${date}T${att.out_time || '00:00'}:00`;
+  
+            return {
+              employee_id: emp.employee_id,
+              shift: att.shift,
+              status: 'PRESENT',
+              in_time: new Date(inTimeString).toISOString(),
+              out_time: new Date(outTimeString).toISOString(),
+              overtime_hours: att.overtime_hours || 0,
+            };
+          } else {
+            // For ABSENT employees
+            const fallbackTime = new Date(`${date}T00:00:00.001Z`).toISOString();
+            return {
+              employee_id: emp.employee_id,
+              shift: 'N/A',
+              status: 'ABSENT',
+              in_time: fallbackTime,
+              out_time: fallbackTime,
+              overtime_hours: 0,
+            };
+          }
         }),
       };
-
-      console.log('Attendance  befor marking.', payload);
-
-      await markAttendance(payload);
-      console.log('Attendance marked successfully, invalidating queries...');
+  
+      console.log('📤 Submitting attendance payload:', payload);
+  
+      await markAttendanceBulk(payload);
+  
       queryClient.invalidateQueries({ 
         queryKey: ['attendance-summary', rangeMode, date, rangeStart, rangeEnd],
         refetchType: 'all'
@@ -69,10 +85,12 @@ const AttendanceEditMode: React.FC<
         queryKey: ['attendance', rangeMode, rangeStart, rangeEnd],
         refetchType: 'all'
       });
+  
       setIsModalOpen(false);
       onSubmitSuccess?.();
     } catch (err) {
       console.error('❌ Error submitting attendance:', err);
+      showError('Something went wrong while submitting attendance.');
     } finally {
       setIsSubmitting(false);
     }
@@ -176,7 +194,7 @@ const AttendanceEditMode: React.FC<
                             console.log('payload', payload)
                         
                             await markSingleAttendance(payload);
-                            alert(`✅ Attendance updated for ${emp.employee.name}`);
+                            showSuccess(`Attendance updated for ${emp.employee.name}`);
                             queryClient.invalidateQueries({ queryKey: ['attendance', rangeMode, rangeStart, rangeEnd] });
                             queryClient.invalidateQueries({ queryKey: ['attendance-summary', rangeMode, date, rangeStart, rangeEnd] });
                           } catch (error) {
@@ -193,6 +211,15 @@ const AttendanceEditMode: React.FC<
             })}
           </tbody>
         </table>
+      </div>
+
+      <div className="flex justify-end">
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded"
+        >
+          Submit Attendance
+        </button>
       </div>
 
       <TailwindDialog
