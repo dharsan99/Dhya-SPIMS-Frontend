@@ -70,6 +70,7 @@ const CreateMailingListModal: React.FC<Props> = ({ isOpen, onClose }) => {
     setSelected([]);
   };
 
+ 
   const handleSubmit = () => {
     if (!name.trim() || selected.length === 0) {
       toast.error('List name and selection are required');
@@ -91,12 +92,18 @@ const CreateMailingListModal: React.FC<Props> = ({ isOpen, onClose }) => {
         recipients,
       };
   
+      console.log('📨 Creating list from Potential Buyers');
+      console.log('📝 Payload:', payload);
+  
       createMutation.mutate(payload);
     } else {
       const payload: CreateMailingListDto = {
         name: name.trim(),
         buyerIds: selected,
       };
+  
+      console.log('📨 Creating list from Registered Buyers');
+      console.log('📝 Payload:', payload);
   
       createMutation.mutate(payload);
     }

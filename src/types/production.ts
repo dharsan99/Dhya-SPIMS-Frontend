@@ -78,11 +78,3 @@ export interface MachineEfficiency {
 // Alias for UI-friendly usage
 export type Production = ProductionRecord;
 
-export interface MachineStatus {
-  machine_id: string;
-  machine_name: string;
-  status: 'running' | 'idle' | 'maintenance' | 'offline';
-  efficiency: number;
-  current_order?: string;
-}
-

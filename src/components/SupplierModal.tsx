@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import toast from 'react-hot-toast';
+import { useOptimizedToast } from '@/hooks/useOptimizedToast';
 import { createSupplier, updateSupplier } from '../api/suppliers';
 import { Supplier } from '../types/supplier';
 
@@ -17,6 +17,7 @@ const SupplierModal = ({
   onSaved,
   supplierToEdit,
 }: SupplierModalProps) => {
+  const { success, error } = useOptimizedToast();
   const isEditMode = !!supplierToEdit;
 
   const [name, setName] = useState('');
@@ -36,7 +37,7 @@ const SupplierModal = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) {
-      toast.error('Supplier name is required.');
+      error('Supplier name is required.');
       return;
     }
 
@@ -45,16 +46,16 @@ const SupplierModal = ({
     try {
       if (isEditMode) {
         const updated = await updateSupplier(supplierToEdit!.id, supplierData);
-        toast.success('Supplier updated successfully!');
+        success('Supplier updated successfully!');
         onSaved(updated.data);
       } else {
         const created = await createSupplier(supplierData);
-        toast.success('Supplier created successfully!');
+        success('Supplier created successfully!');
         onSaved(created.data);
       }
       onClose();
-    } catch (error) {
-      toast.error('Failed to save supplier.');
+    } catch (err) {
+      error('Failed to save supplier.');
     }
   };
 

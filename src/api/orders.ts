@@ -10,16 +10,10 @@ const endpoint = '/orders';
 /**
  * ✅ Fetch all orders
  */
-export const getAllOrders = async (params?: { withRealisation?: boolean }): Promise<Order[]> => {
-  const response = await api.get(endpoint, { params });
-  return normalizeOrders(response.data);
-};
 
-/**
- * ✅ Fetch orders with realisation
- */
-export const getOrdersWithRealisation = async (): Promise<Order[]> => {
-  return getAllOrders({ withRealisation: true });
+export const getAllOrders = async (): Promise<Order[]> => {
+  const response = await api.get(endpoint);
+  return normalizeOrders(response.data); // Normalize here
 };
 
 /**
@@ -45,6 +39,7 @@ export const createOrder = (data: {
   realisation?: number;
   count?: number; // ✅ New
 }) => {
+  console.log('📤 Creating order:', data);
   return api.post(endpoint, data);
 };
 
@@ -71,6 +66,7 @@ export const updateOrder = (
     }[]; // ✅ Added
   }
 ) => {
+  console.log(`🛠️ Updating order ${id}:`, data);
   return api.put(`${endpoint}/${id}`, data);
 };
 
@@ -78,13 +74,15 @@ export const updateOrder = (
  * ✅ Delete an order
  */
 export const deleteOrder = (id: string) => {
+  console.log(`🗑️ Deleting order ${id}`);
   return api.delete(`${endpoint}/${id}`);
 };
 
 /**
  * ✅ Update only the order status
  */
-export const updateOrderStatus = (id: string, status: 'pending' | 'in_progress' | 'completed' | 'dispatched') => {
+export const updateOrderStatus = (id: string, status: 'pending' | 'in_progress' | 'completed') => {
+  console.log(`🔄 Updating status for order ${id} → ${status}`);
   return api.put(`${endpoint}/${id}/status`, { status });
 };
 
@@ -108,11 +106,4 @@ export const getOrderProgressDetails = async (id: string): Promise<{
 }> => {
   const response = await api.get(`${endpoint}/${id}/progress-details`);
   return response.data;
-};
-
-/**
- * ✅ Get a single order by ID
- */
-export const getOrder = (id: string) => {
-  return api.get<Order>(`${endpoint}/${id}`);
 };

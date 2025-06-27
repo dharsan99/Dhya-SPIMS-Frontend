@@ -2,14 +2,14 @@ export interface PurchaseOrderItemFormValues {
   orderCode?: string;
   yarnDescription: string;
   color?: string;
-  count?: number;
+  count?: number; // ✅ Add this line
   uom?: string;
   bagCount?: number;
   quantity: number;
   rate: number;
   gstPercent?: number;
   taxableAmount: number;
-  shade_id?: string;
+  shadeNo?: string;
 }
 export interface PurchaseOrderFormValues {
   poNumber: string;
@@ -19,7 +19,6 @@ export interface PurchaseOrderFormValues {
   buyerContactPhone?: string;
   buyerEmail?: string;
   buyerAddress?: string;
-  buyerPhone?: string;
   buyerGstNo?: string;
   buyerPanNo?: string;
   supplierName?: string;
@@ -39,7 +38,6 @@ export interface PurchaseOrderFormValues {
 }
 
 export interface PurchaseOrderItem {
-  shade_no: any;
   id: string;
   order_code?: string;
   yarn_description: string;
@@ -51,7 +49,7 @@ export interface PurchaseOrderItem {
   rate: number;
   gst_percent?: number;
   taxable_amount: number;
-  shade_id?: string;
+  shade_no?: string;
 }
 
 export interface PurchaseOrder {

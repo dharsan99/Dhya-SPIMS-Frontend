@@ -1,59 +1,41 @@
-// pullable request
-import { AttendanceRecord, SingleAttendancePayload } from '@/types/attendance';
 import api from './axios';
 
 export type ShiftType = 'SHIFT_1' | 'SHIFT_2' | 'SHIFT_3';
 export type AttendanceStatus = 'PRESENT' | 'HALF_DAY' | 'ABSENT';
 
-interface PaginatedResponse<T> {
-  data: T[];
-  total: number;
-  page: number;
-  limit: number;
+export interface AttendanceRecord {
+  employee_id: string;
+  shift: ShiftType;
+  overtime_hours: number;
+  status: AttendanceStatus;
 }
 
-interface PaginationParams {
-  page?: number;
-  limit?: number;
+interface SingleAttendancePayload {
+  date: string;
+  employee_id: string;
+  in_time: string;
+  out_time: string;
+  overtime_hours: number;
+  status: 'PRESENT' | 'ABSENT';
+  shift: ShiftType;
 }
 
-export const getAllAttendances = async (date?: string, pagination?: PaginationParams): Promise<PaginatedResponse<AttendanceRecord>> => {
-  const url = date ? `/attendance/by-date?date=${date}` : '/attendance';
-  const params = {
-    page: pagination?.page || 1,
-    limit: pagination?.limit || 10,
-  };
-  const res = await api.get(url, { params });
-  return res.data;
-};
 
-export const getAttendanceInRange = async (
-  start: string, 
-  end: string, 
-  pagination?: PaginationParams
-): Promise<PaginatedResponse<AttendanceRecord>> => {
-  const params = {
-    start,
-    end,
-    page: pagination?.page || 1,
-    limit: pagination?.limit || 10,
-  };
-  const response = await api.get('/attendance/range', { params });
-  return response.data;
-};
+export interface MarkAttendancePayload {
+  date: string; // Format: yyyy-MM-dd
+  records: AttendanceRecord[];
+}
 
 /**
  * ✅ Submit attendance data
  */
-export const markAttendance = async (payload: any) => {
-  const res = await api.post('/attendance', payload);
+export const markAttendance = async (payload: MarkAttendancePayload) => {
+  const res = await api.post('/attendance/mark', payload);
   return res.data;
 };
 
-export const markSingleAttendance = async (payload: Omit<SingleAttendancePayload, 'employee_id'> & { employee_id: string }) => {
-  const { employee_id, ...rest } = payload;
-
-  const res = await api.put(`/attendance/${employee_id}`, rest);
+export const markSingleAttendance = async (payload: SingleAttendancePayload) => {
+  const res = await api.post('/attendance', payload);
   return res.data;
 };
 
@@ -61,17 +43,6 @@ export const markSingleAttendance = async (payload: Omit<SingleAttendancePayload
  * ✅ Optional: Fetch attendance for a specific date
  */
 
-
-export const getAttendanceSummary = async (params: {
-  date?: string;
-  startDate?: string;
-  endDate?: string;
-  month?: number;
-  year?: number;
-}) => {
-  console.log('📊 getAttendanceSummary called with params:', params);
-  return  await api.get('/attendance/summary-range', { params }).then((res) => res.data);
-};
 
 export const fetchAttendanceByDate = async (date: string) => {
     const res = await api.get(`/attendance/by-date?date=${date}`); // ✅ Correct
@@ -82,5 +53,3 @@ export const fetchAttendanceByDate = async (date: string) => {
     const res = await api.get(`/attendance/range?start=${start}&end=${end}`);
     return res.data;
   };
-
-  

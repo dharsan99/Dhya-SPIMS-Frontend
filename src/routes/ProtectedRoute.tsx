@@ -2,7 +2,16 @@ import { Navigate } from 'react-router-dom';
 import useAuthStore from '../hooks/auth';
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { token, hasHydrated } = useAuthStore();
+  const { token, hasHydrated, user } = useAuthStore();
+
+  // 🚀 Optional: Log debug info
+  if (import.meta.env.DEV) {
+    console.log('[ProtectedRoute]', {
+      token,
+      hydrated: hasHydrated,
+      user,
+    });
+  }
 
   // Wait until Zustand hydration is complete
   if (!hasHydrated) {
@@ -14,7 +23,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   }
 
   // If no token, redirect to login
-  if (!token) return <Navigate to="/login" />;
+  if (!token) return <Navigate to="/login" replace />;
 
   return <>{children}</>;
 };

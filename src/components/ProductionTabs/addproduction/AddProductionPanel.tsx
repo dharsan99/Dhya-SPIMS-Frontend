@@ -2,7 +2,7 @@
 
 import React from 'react';
 import AddProductionForm from './AddProductionForm';
-import { toast } from 'react-hot-toast';
+import { useOptimizedToast } from '@/hooks/useOptimizedToast';
 import { createProduction } from '../../../api/production';
 import useAuthStore from '../../../hooks/auth';
 import { Order } from '../../../types/order';
@@ -21,11 +21,15 @@ const AddProductionPanel: React.FC<AddProductionPanelProps> = ({
   loadingOrders,
 }) => {
   const { user } = useAuthStore();
+  const { success, error } = useOptimizedToast();
 
   const handleFormSubmit = async (formData: any) => {
     try {
+      console.log('🧑 Auth User:', user);
+      console.log('📝 Form Data:', formData);
+
       if (!user?.id || !user?.tenant_id) {
-        toast.error('Missing user or tenant info');
+        error('Missing user or tenant info');
         return;
       }
 
@@ -35,11 +39,15 @@ const AddProductionPanel: React.FC<AddProductionPanelProps> = ({
         tenant_id: user.tenant_id,
       };
 
+      console.log('📤 Final Payload:', payload);
+
       await createProduction(payload);
-      toast.success('✅ Production record saved successfully!');
+      console.log('✅ Production created successfully!');
+      success('✅ Production record saved successfully!');
       onClose();
     } catch (err: any) {
-      toast.error('❌ Failed to save production');
+      console.error('❌ Error saving production:', err);
+      error('❌ Failed to save production');
     }
   };
 

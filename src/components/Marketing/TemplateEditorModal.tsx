@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { EditableEmailTemplate } from '../../types/marketing';
 import { TailwindDialog } from '../ui/Dialog';
-import toast from 'react-hot-toast';
+import { useOptimizedToast } from '@/hooks/useOptimizedToast';
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
 
@@ -12,6 +12,7 @@ interface Props {
 }
 
 const TemplateEditorModal: React.FC<Props> = ({ initialData, onClose, onSave }) => {
+  const { error } = useOptimizedToast();
   const [template, setTemplate] = useState<EditableEmailTemplate>({
     name: '',
     subject: '',
@@ -30,7 +31,7 @@ const TemplateEditorModal: React.FC<Props> = ({ initialData, onClose, onSave }) 
 
   const handleSubmit = () => {
     if (!template.name || !template.subject || !template.body) {
-      toast.error('All fields are required');
+      error('All fields are required');
       return;
     }
     onSave(template);

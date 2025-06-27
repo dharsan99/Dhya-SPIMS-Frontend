@@ -1,31 +1,34 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import WebsiteHeader from '../components/website/WebsiteHeader';
 import WebsiteFooter from '../components/website/WebsiteFooter';
 import LoginModal from '../components/website/LoginModal';
 import useAuthStore from '../hooks/auth';
+import { useThemeStore } from '../hooks/useThemeStore';
 
 export default function LoginPage() {
   const [fadeOutPage, setFadeOutPage] = useState(false);
   const [showLoginForm, setShowLoginForm] = useState(false);
   const { token } = useAuthStore();
   const navigate = useNavigate();
+  const { setTheme } = useThemeStore();
+
+  useEffect(() => {
+    setTheme('light', false);
+  }, [setTheme]);
 
   const handleLoginClick = () => setShowLoginForm(true);
   const handleSignupClick = () => {
-
     window.open('https://calendly.com/dharsan-dhya/TexIntelli-meeting', '_blank');
   };  const handleDashboardAccess = () => navigate('/app/dashboard');
 
-
-  const handleDashboardAccess = () => navigate('/app/dashboard');
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="flex flex-col min-h-screen relative overflow-hidden transition-colors duration-300 bg-gray-50 dark:bg-gray-900"
+      className="flex flex-col min-h-screen relative overflow-hidden transition-colors duration-300 bg-gray-50"
     >
       {/* Particles Background */}
       <AnimatePresence>
@@ -42,7 +45,7 @@ export default function LoginPage() {
               return (
                 <div
                   key={i}
-                  className="absolute rounded-full bg-white/40 dark:bg-white/20 animate-particle animate-twinkle"
+                  className="absolute rounded-full bg-white/40 animate-particle animate-twinkle"
                   style={{
                     width: `${randomSize}px`,
                     height: `${randomSize}px`,
@@ -71,7 +74,7 @@ export default function LoginPage() {
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
-              className="text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-white leading-tight"
+              className="text-4xl md:text-5xl font-extrabold text-gray-900 leading-tight"
             >
               Manage Production Smarter, <br /> Scale Faster.
             </motion.h1>
@@ -81,13 +84,13 @@ export default function LoginPage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2, duration: 0.8 }}
-              className="text-lg md:text-xl text-gray-600 dark:text-gray-300"
+              className="text-lg md:text-xl text-gray-600"
             >
               TexIntelli empowers factories to streamline fibers, shades, orders, and production workflows — simple, scalable, and powerful.
             </motion.p>
 
             {/* Features List */}
-            <div className="flex flex-col gap-3 mt-4 text-left text-gray-700 dark:text-gray-300">
+            <div className="flex flex-col gap-3 mt-4 text-left text-gray-700">
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
                 Real-time inventory & production insights
@@ -103,7 +106,7 @@ export default function LoginPage() {
             </div>
 
             {/* Action Card */}
-            <div className="mt-8 bg-white dark:bg-gray-800 shadow-2xl rounded-2xl p-8 w-full max-w-sm border border-gray-100 dark:border-gray-700">
+            <div className="mt-8 bg-white shadow-2xl rounded-2xl p-8 w-full max-w-sm border border-gray-100">
               {!token ? (
                 <>
                   <button
@@ -112,11 +115,11 @@ export default function LoginPage() {
                   >
                     Sign In
                   </button>
-                  <p className="mt-4 text-sm text-gray-600 dark:text-gray-400">
+                  <p className="mt-4 text-sm text-gray-600">
                     Don't have an account?{' '}
                     <button
                       onClick={handleSignupClick}
-                      className="text-blue-600 dark:text-blue-400 hover:underline font-semibold"
+                      className="text-blue-600 hover:underline font-semibold"
                     >
                       Sign Up
                     </button>
@@ -151,7 +154,7 @@ export default function LoginPage() {
 
       {/* Loading Spinner on fade out */}
       {fadeOutPage && (
-        <div className="absolute inset-0 flex items-center justify-center bg-white/80 dark:bg-black/70 backdrop-blur-md z-50">
+        <div className="absolute inset-0 flex items-center justify-center bg-white/80 backdrop-blur-md z-50">
           <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
         </div>
       )}

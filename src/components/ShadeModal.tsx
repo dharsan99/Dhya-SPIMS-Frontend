@@ -1,31 +1,25 @@
 import { Fragment, useEffect, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
-import toast from 'react-hot-toast';
-import { Shade, ShadeCreateInput, RawCottonCompositionInput } from '../types/shade';
+import { useOptimizedToast } from '@/hooks/useOptimizedToast';
+import { Shade } from '../types/shade';
 import { Fiber } from '../types/fiber';
 
 interface ShadeModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onCreate: (shade: ShadeCreateInput) => void;
-  onUpdate: (shade: Shade & ShadeCreateInput) => void;
+  onCreate: (shade: Omit<Shade, 'id'> & { blend_composition: { fibre_id: string; percentage: number }[], raw_cotton_composition?: { percentage: number } }) => void;
+  onUpdate: (shade: Shade & { blend_composition: { fibre_id: string; percentage: number }[], raw_cotton_composition?: { percentage: number } }) => void;
   shadeToEdit?: Shade | null;
   fibres: Fiber[];
 }
-
 const ShadeModal = ({ isOpen, onClose, onCreate, onUpdate, shadeToEdit, fibres }: ShadeModalProps) => {
+  const { success, error } = useOptimizedToast();
   const isEditMode = !!shadeToEdit;
   const [useRawCotton, setUseRawCotton] = useState(false);
 
   const [shadeCode, setShadeCode] = useState('');
   const [shadeName, setShadeName] = useState('');
-  const [rawCottonDetails, setRawCottonDetails] = useState<RawCottonCompositionInput>({
-    lot_number: '',
-    grade: '',
-    source: '',
-    notes: '',
-    percentage: 0
-  });
+  const [] = useState(false);
   const [composition, setComposition] = useState<{
     fibre_id: string;
     percentage: number;
@@ -51,27 +45,10 @@ const ShadeModal = ({ isOpen, onClose, onCreate, onUpdate, shadeToEdit, fibres }
           showFibreDropdown: false,
         })) || []
       );
-      if (shadeToEdit.raw_cotton_compositions?.[0]) {
-        const rawCotton = shadeToEdit.raw_cotton_compositions[0];
-        setRawCottonDetails({
-          lot_number: rawCotton.lot_number || '',
-          grade: rawCotton.grade || '',
-          source: rawCotton.source || '',
-          notes: rawCotton.notes || '',
-          percentage: rawCotton.percentage
-        });
-      }
     } else {
       setShadeCode(`SHD${Math.floor(10000 + Math.random() * 90000)}`);
       setShadeName('');
       setComposition([]);
-      setRawCottonDetails({
-        lot_number: '',
-        grade: '',
-        source: '',
-        notes: '',
-        percentage: 0
-      });
     }
   }, [shadeToEdit, isOpen, fibres]);
 
@@ -107,44 +84,46 @@ const ShadeModal = ({ isOpen, onClose, onCreate, onUpdate, shadeToEdit, fibres }
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!shadeCode || !shadeName || composition.length === 0) {
-      toast.error('All fields are required');
+      error('All fields are required');
       return;
     }
     if (Math.round(totalPercentage * 100) / 100 !== 100) {
-      toast.error(`Total percentage must equal 100%. Current total: ${totalPercentage.toFixed(2)}%`);
+      error(`Total percentage must equal 100%. Current total: ${totalPercentage.toFixed(2)}%`);
       return;
     }
 
-    const blend_composition = composition
-      .filter((c) => c.fibre_id)
-      .map(({ fibre_id, percentage }) => ({ fibre_id, percentage }));
+    blend_composition: composition
+    .filter(({ fibre_id }) => fibre_id) // Exclude RAW cotton placeholder
+    .map(({ fibre_id, percentage }) => ({ fibre_id, percentage }))
 
-    const raw_cotton_composition = composition.find(
-      (c) => !c.fibre_id && isRawCottonCategory(fibreGroups[c.selectedCategoryId]?.categoryName)
-    );
+   
 
-    const payload: ShadeCreateInput = {
-      shade_code: shadeCode.trim(),
-      shade_name: shadeName.trim(),
-      percentage: `100%`,
-      blend_composition,
-      ...(raw_cotton_composition && {
-        raw_cotton_compositions: [{
-          percentage: raw_cotton_composition.percentage,
-          lot_number: rawCottonDetails.lot_number,
-          grade: rawCottonDetails.grade,
-          source: rawCottonDetails.source,
-          notes: rawCottonDetails.notes
-        }]
-      }),
-    };
+
+
+const blend_composition = composition
+  .filter((c) => c.fibre_id)
+  .map(({ fibre_id, percentage }) => ({ fibre_id, percentage }));
+
+const raw_cotton_composition = composition.find(
+  (c) => !c.fibre_id && isRawCottonCategory(fibreGroups[c.selectedCategoryId]?.categoryName)
+);
+
+const payload = {
+  shade_code: shadeCode.trim(),
+  shade_name: shadeName.trim(),
+  percentage: `100%`,
+  blend_composition,
+  ...(raw_cotton_composition && {
+    raw_cotton_composition: { percentage: raw_cotton_composition.percentage },
+  }),
+};
 
     if (isEditMode && shadeToEdit) {
       onUpdate({ ...shadeToEdit, ...payload });
-      toast.success('✅ Shade updated successfully');
+      success('✅ Shade updated successfully');
     } else {
       onCreate(payload);
-      toast.success('✅ Shade created successfully');
+      success('✅ Shade created successfully');
     }
     onClose();
   };
@@ -230,7 +209,7 @@ const ShadeModal = ({ isOpen, onClose, onCreate, onUpdate, shadeToEdit, fibres }
             },
           ]);
         } else {
-          toast.error("No 'RAW Cotton' category found.");
+          error("No 'RAW Cotton' category found.");
           setUseRawCotton(false);
         }
       } else {
@@ -439,40 +418,6 @@ const ShadeModal = ({ isOpen, onClose, onCreate, onUpdate, shadeToEdit, fibres }
                     {isEditMode ? 'Update' : 'Create'}
                   </button>
                 </div>
-
-                {/* Raw Cotton Details */}
-                {useRawCotton && (
-                  <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border dark:border-gray-700">
-                    <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Raw Cotton Details</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <input
-                        value={rawCottonDetails.lot_number}
-                        onChange={(e) => setRawCottonDetails(prev => ({ ...prev, lot_number: e.target.value }))}
-                        placeholder="Lot Number"
-                        className="border p-2 rounded dark:bg-gray-800 dark:border-gray-600 dark:text-white"
-                      />
-                      <input
-                        value={rawCottonDetails.grade}
-                        onChange={(e) => setRawCottonDetails(prev => ({ ...prev, grade: e.target.value }))}
-                        placeholder="Grade"
-                        className="border p-2 rounded dark:bg-gray-800 dark:border-gray-600 dark:text-white"
-                      />
-                      <input
-                        value={rawCottonDetails.source}
-                        onChange={(e) => setRawCottonDetails(prev => ({ ...prev, source: e.target.value }))}
-                        placeholder="Source"
-                        className="border p-2 rounded dark:bg-gray-800 dark:border-gray-600 dark:text-white"
-                      />
-                      <textarea
-                        value={rawCottonDetails.notes}
-                        onChange={(e) => setRawCottonDetails(prev => ({ ...prev, notes: e.target.value }))}
-                        placeholder="Notes"
-                        className="border p-2 rounded dark:bg-gray-800 dark:border-gray-600 dark:text-white"
-                        rows={2}
-                      />
-                    </div>
-                  </div>
-                )}
 
               </form>
 

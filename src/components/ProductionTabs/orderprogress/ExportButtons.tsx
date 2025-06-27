@@ -1,6 +1,4 @@
 import { CSVLink } from 'react-csv';
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
 import Button from '../../ui/button'; // Adjust path based on your project
 
 interface ExportButtonsProps {
@@ -12,10 +10,12 @@ interface ExportButtonsProps {
 const ExportButtons = ({ data, fileName, includePrint = false }: ExportButtonsProps) => {
   const hasData = data.length > 0;
 
-  const handlePDFExport = () => {
+  const handlePDFExport = async () => {
     if (!hasData) return;
 
-    const doc = new jsPDF();
+    const jsPDFModule = await import('jspdf');
+    const autoTable = (await import('jspdf-autotable')).default;
+    const doc = new jsPDFModule.default();
     autoTable(doc, {
       head: [Object.keys(data[0])],
       body: data.map((row) => Object.values(row)),

@@ -1,18 +1,16 @@
 import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { getProduction } from '../api/production';
+import { getProduction, getOrderProgress } from '../api/production';
 import { ProductionRecord } from '../types/production';
-import { Order } from '../types/order';
-import { getOrderById } from '../api/orders';
-import { aggregateSectionProgress } from '../utils/sectionProgress';
 import Loader from '../components/Loader';
 import ProductionModal from '../components/ProductionModal';
 import ProductionSummaryCard from '../components/ProductionSummaryCard';
-import ProductionCharts from '../components/ProductionCharts';
-import OrderProgressChart from '../components/OrderProgressChart';
-import SectionProgressPanel from '../components/SectionProgressPanel';
+import React, { Suspense } from 'react';
 
 const hardcodedOrderId = '41aa32f5-0bcd-4bea-8137-2e10e946b57f';
+
+const ProductionCharts = React.lazy(() => import('../components/ProductionCharts'));
+const OrderProgressChart = React.lazy(() => import('../components/OrderProgressChart'));
 
 const ProductionPage = () => {
   const [modalOpen, setModalOpen] = useState(false);
@@ -28,10 +26,11 @@ const ProductionPage = () => {
   });
 
   const {
-    data: order,
-  } = useQuery<Order>({
-    queryKey: ['order', hardcodedOrderId],
-    queryFn: () => getOrderById(hardcodedOrderId),
+    data: progress,
+    isLoading: loadingProgress,
+  } = useQuery({
+    queryKey: ['orderProgress', hardcodedOrderId],
+    queryFn: () => getOrderProgress(hardcodedOrderId),
   });
 
   useEffect(() => {
@@ -48,7 +47,9 @@ const ProductionPage = () => {
     setModalOpen(true);
   };
 
-  const sectionProgress = aggregateSectionProgress(productions, hardcodedOrderId);
+  const efficiency = progress
+    ? ((progress.producedQty / progress.requiredQty) * 100).toFixed(2)
+    : '0';
 
   return (
     <div className="p-6 space-y-8">
@@ -62,20 +63,36 @@ const ProductionPage = () => {
         </button>
       </div>
 
-      {order && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Suspense fallback={<Loader />}>
           <OrderProgressChart orderId={hardcodedOrderId} />
-          <SectionProgressPanel 
-            order={order}
-            sectionProgress={sectionProgress}
-            onStatusChange={refetch}
-          />
+        </Suspense>
+        <div className="bg-white p-4 shadow rounded">
+          <h3 className="text-blue-700 font-semibold mb-2">🎯 Order Completion</h3>
+          {loadingProgress ? (
+            <Loader />
+          ) : (
+            <>
+              <div className="w-full bg-gray-200 rounded h-4">
+                <div
+                  className="h-4 bg-green-500 rounded"
+                  style={{ width: `${efficiency}%` }}
+                ></div>
+              </div>
+              <p className="text-sm text-gray-600 mt-1">
+                {progress?.producedQty} kg / {progress?.requiredQty} kg (
+                <span className="font-medium text-green-600">{efficiency}%</span>)
+              </p>
+            </>
+          )}
         </div>
-      )}
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <ProductionSummaryCard />
-        <ProductionCharts />
+        <Suspense fallback={<Loader />}>
+          <ProductionCharts />
+        </Suspense>
       </div>
 
       <div className="bg-white rounded shadow overflow-x-auto">

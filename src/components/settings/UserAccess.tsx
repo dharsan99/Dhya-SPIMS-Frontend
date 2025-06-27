@@ -1,4 +1,3 @@
-// pullable request
 import { useState } from 'react';
 import RoleTable from './useraccess/RoleTable';
 import UserTable from './useraccess/UserTable';

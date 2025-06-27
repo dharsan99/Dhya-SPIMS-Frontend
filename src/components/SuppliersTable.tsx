@@ -1,12 +1,13 @@
 // src/components/SupplierTable.tsx
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getAllSuppliers, deleteSupplier } from '../api/suppliers';
-import toast from 'react-hot-toast';
+import { useOptimizedToast } from '@/hooks/useOptimizedToast';
 import { Supplier } from '../types/supplier';
 import useAuthStore from '@/hooks/auth';
 
 const SupplierTable = ({ onEdit }: { onEdit: (supplier: Supplier) => void }) => {
   const queryClient = useQueryClient();
+  const { success, error } = useOptimizedToast();
 
   const hasPermission = useAuthStore((state) => state.hasPermission);
 
@@ -23,9 +24,9 @@ const SupplierTable = ({ onEdit }: { onEdit: (supplier: Supplier) => void }) => 
     mutationFn: deleteSupplier,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['suppliers'] });
-      toast.success('Supplier deleted');
+      success('Supplier deleted');
     },
-    onError: () => toast.error('Failed to delete supplier'),
+    onError: () => error('Failed to delete supplier'),
   });
 
   return (

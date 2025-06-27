@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
-import toast from 'react-hot-toast';
+import { useOptimizedToast } from '@/hooks/useOptimizedToast';
 import FibreCategoryModal from './FibreCategoryModal';
 import {
   getFibreCategories,
@@ -9,11 +9,13 @@ import {
   deleteFibreCategory,
 } from '../api/fibreCategories';
 import { FiberCategory } from '../types/fiber';
+import toast from 'react-hot-toast';
 
 const FibreCategoriesTable = () => {
   const queryClient = useQueryClient();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<FiberCategory | null>(null);
+  useOptimizedToast();
 
   const {
     data: categoriesRaw,

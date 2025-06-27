@@ -1,15 +1,15 @@
+// src/components/Employees/attendance/AttendanceExportModal.tsx
+import { Employee } from '../../../types/employee';
 import { AttendanceRow } from './AttendanceTypes';
 import { generateAttendancePDF } from '../../../utils/pdf/attendanceExport';
 import React, { useEffect, useMemo, useState } from 'react';
-import * as XLSX from 'xlsx';
 import { fetchAttendanceByDate } from '../../../api/attendance';
-import { AttendanceRecord } from '@/types/attendance';
 
 interface AttendanceExportModalProps {
   isOpen: boolean;
   onClose: () => void;
   exportType: 'xlsx' | 'pdf';
-  employees: AttendanceRecord[];
+  employees: Employee[];
   dates: string[];
   departmentName?: string;
   dateRange?: string;
@@ -31,16 +31,12 @@ const AttendanceExportModal: React.FC<AttendanceExportModalProps> = ({
   const [attendanceMap, setAttendanceMap] = useState<Record<string, Record<string, AttendanceRow>>>({});
   const [loading, setLoading] = useState(true);
 
-  console.log('employees', employees);
-
   const fetchAttendanceMap = async () => {
     setLoading(true);
     const map: Record<string, Record<string, AttendanceRow>> = {};
-  
     for (const date of dates) {
       try {
-        const response = await fetchAttendanceByDate(date);
-        const rows: AttendanceRow[] = Array.isArray(response.data) ? response.data : [];
+        const rows = await fetchAttendanceByDate(date);
         map[date] = {};
         rows.forEach((row: AttendanceRow) => {
           map[date][row.employee_id] = row;
@@ -50,12 +46,9 @@ const AttendanceExportModal: React.FC<AttendanceExportModalProps> = ({
         map[date] = {};
       }
     }
-  
     setAttendanceMap(map);
     setLoading(false);
   };
-
-  console.log('attendanceMap', attendanceMap);
 
   useEffect(() => {
     if (isOpen) fetchAttendanceMap();
@@ -73,7 +66,7 @@ const AttendanceExportModal: React.FC<AttendanceExportModalProps> = ({
     for (const d of dates) {
       const map = attendanceMap[d] || {};
       for (const emp of employees) {
-        const row = map[emp.employee_id];
+        const row = map[emp.id];
         switch (row?.status) {
           case 'PRESENT': present++; break;
           case 'HALF_DAY': halfDay++; break;
@@ -83,8 +76,6 @@ const AttendanceExportModal: React.FC<AttendanceExportModalProps> = ({
     }
     return { present, halfDay, leave, absent };
   }, [attendanceMap, dates, employees]);
-
-  console.log('summaryStats', summaryStats);
 
   const handleExport = () => {
     if (exportType === 'pdf') {
@@ -103,15 +94,14 @@ const AttendanceExportModal: React.FC<AttendanceExportModalProps> = ({
     onClose();
   };
 
-  const handleXLSXExport = () => {
+  const handleXLSXExport = async () => {
+    const XLSX = await import('xlsx');
     const header = ['T.No', 'Employee', ...dates.map(d => d)];
     const data = employees.map(emp => [
-      emp?.employee?.token_no,
-      emp.employee?.name,
-      ...dates.map(d => getStatusLabel(attendanceMap[d]?.[emp.employee_id]?.status))
+      emp.token_no,
+      emp.name,
+      ...dates.map(d => getStatusLabel(attendanceMap[d]?.[emp.id]?.status))
     ]);
-
-    console.log('data', data);
 
     const worksheet = XLSX.utils.aoa_to_sheet([header, ...data]);
     const workbook = XLSX.utils.book_new();
@@ -164,11 +154,11 @@ const AttendanceExportModal: React.FC<AttendanceExportModalProps> = ({
                 </thead>
                 <tbody>
                   {employees.map((emp, i) => (
-                    <tr key={emp.employee_id} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                      <td className="px-3 py-2 border text-center">{emp.employee.token_no}</td>
-                      <td className="px-3 py-2 border truncate max-w-[200px]">{emp.employee.name}</td>
+                    <tr key={emp.id} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                      <td className="px-3 py-2 border text-center">{emp.token_no}</td>
+                      <td className="px-3 py-2 border truncate max-w-[200px]">{emp.name}</td>
                       {dates.map((d) => {
-                        const att = attendanceMap[d]?.[emp.employee_id];
+                        const att = attendanceMap[d]?.[emp.id];
                         return (
                           <td key={d} className="px-3 py-2 border text-center">
                             {getStatusLabel(att?.status)}

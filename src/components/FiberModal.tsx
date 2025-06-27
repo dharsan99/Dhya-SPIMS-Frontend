@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Fiber, FiberCategory } from '../types/fiber';
-import { toast } from 'react-hot-toast';
+import { useOptimizedToast } from '@/hooks/useOptimizedToast';
 
 interface FibreModalProps {
   isOpen: boolean;
@@ -28,6 +28,8 @@ const FibreModal = ({
   const [categoryId, setCategoryId] = useState<string>('');
 
   const nameRef = useRef<HTMLInputElement>(null);
+
+  const { success, error } = useOptimizedToast();
 
   const selectedCategory = categories.find((c) => c.id === categoryId);
   const isRawCotton = selectedCategory?.name.toLowerCase() === 'raw cotton';
@@ -61,13 +63,13 @@ const FibreModal = ({
     e.preventDefault();
 
     if (isRawCotton) {
-      toast.error('RAW Cotton fibres are added during realisation only.');
+      error('RAW Cotton fibres are added during realisation only.');
       return;
     }
 
     const stock = parseFloat(stockKg);
     if (isNaN(stock) || stock < 0) {
-      toast.error('Invalid stock value');
+      error('Invalid stock value');
       return;
     }
 
@@ -86,10 +88,10 @@ const FibreModal = ({
 
     if (fibreToEdit && onUpdate) {
       onUpdate({ ...fibreToEdit, ...payload });
-      toast.success('Fibre updated successfully');
+      success('Fibre updated successfully');
     } else {
       onCreate(payload);
-      toast.success('Fibre created successfully');
+      success('Fibre created successfully');
     }
 
     onClose();

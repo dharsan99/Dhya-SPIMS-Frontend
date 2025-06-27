@@ -1,4 +1,3 @@
-// pullable request
 import { useEffect, useState } from 'react';
 import { Role, User } from '../../../types/user';
 import Modal from '@/components/Modal';

@@ -18,7 +18,8 @@ export function normalizeOrders(orders: any[]): Order[] {
       shade: {
         ...shade,
         blend_composition,
-        raw_cotton_compositions: shade.raw_cotton_compositions ?? shade.raw_cotton_composition ?? [],
+        // Keep raw_cotton_composition if present
+        raw_cotton_composition: shade.raw_cotton_composition ?? null,
       },
     };
   });

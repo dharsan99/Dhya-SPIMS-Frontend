@@ -10,9 +10,6 @@ import { mockStockData as initialMockData } from '@/mock/stockData';
 import EditFiberStockModal from '../stock/EditFiberStockModal';
 import toast from 'react-hot-toast';
 import StockSummaryCard from '../stock/StockSummaryCard';
-import * as XLSX from 'xlsx';
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
 import ExportDropdown from '../stock/ExportDropdown';
 import ViewLogsModal, { StockLogEntry } from '../stock/ViewStockLogsModal';
 import useAuthStore from '@/hooks/auth';
@@ -128,7 +125,7 @@ const FiberStocksPanel = () => {
 };
 
 
- const handleExport = (format: 'xlsx' | 'pdf') => {
+ const handleExport = async (format: 'xlsx' | 'pdf') => {
   const exportData = (exportCurrentPageOnly ? paginatedStock : filteredStock).map(item => ({
     Fibre: item.fibre_name,
     Category: item.category,
@@ -138,6 +135,7 @@ const FiberStocksPanel = () => {
   }));
 
   if (format === 'xlsx') {
+    const XLSX = await import('xlsx');
     const worksheet = XLSX.utils.json_to_sheet(exportData);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Fiber Stock');
@@ -145,7 +143,9 @@ const FiberStocksPanel = () => {
   }
 
   if (format === 'pdf') {
-    const doc = new jsPDF();
+    const jsPDFModule = await import('jspdf');
+    const autoTable = (await import('jspdf-autotable')).default;
+    const doc = new jsPDFModule.default();
     autoTable(doc, {
       head: [['Fibre', 'Category', 'Stock (kg)', 'Threshold (kg)', 'Last Updated']],
       body: exportData.map(item => Object.values(item)),

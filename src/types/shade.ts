@@ -17,11 +17,10 @@ export interface FibreComposition extends FibreCompositionInput {
 // Used when creating or updating raw cotton entry
 export interface RawCottonCompositionInput {
   lot_number?: string;
-  percentage?: number;
+  percentage: number;
   grade?: string;
   source?: string;
   notes?: string;
-  stock_kg?: string;
 }
 
 // Used when fetching raw cotton entries from backend
@@ -37,8 +36,9 @@ export interface Shade {
   shade_name: string;
   percentage: string;
   available_stock_kg?: number;
+
+  // ✅ fibre composition (renamed blend_composition for backward compatibility)
   blend_composition: FibreComposition[];
-  raw_cotton_compositions?: RawCottonComposition[];
 }
 
 // ✅ Used in create and update API payloads
@@ -51,12 +51,12 @@ export interface ShadeCreateInput {
     fibre_id: string;
     percentage: number;
   }[];
-  raw_cotton_compositions?: RawCottonCompositionInput[];
+  raw_cotton_composition?: RawCottonCompositionInput[];
 }
 
 // ✅ Used in frontend display views (with metadata & optional helpers)
 export interface ShadeWithBlendDescription extends Shade {
-  raw_cotton_compositions?: RawCottonComposition[]; // updated to array
+  raw_cotton_composition?: RawCottonComposition[]; // updated to array
   blend_composition: FibreComposition[];
 
   // Optional helpers for UI display (e.g. table)

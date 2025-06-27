@@ -1,7 +1,5 @@
 import { FC } from 'react';
 import { CSVLink } from 'react-csv';
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
 
 interface ExportControlsProps {
   data: any[];
@@ -9,10 +7,12 @@ interface ExportControlsProps {
 }
 
 const ExportControls: FC<ExportControlsProps> = ({ data, fileName }) => {
-  const handlePDFExport = () => {
+  const handlePDFExport = async () => {
     if (!data.length) return;
 
-    const doc = new jsPDF();
+    const jsPDFModule = await import('jspdf');
+    const autoTable = (await import('jspdf-autotable')).default;
+    const doc = new jsPDFModule.default();
     const tableHead = Object.keys(data[0]);
     const tableBody = data.map((row) => tableHead.map((key) => row[key]));
 

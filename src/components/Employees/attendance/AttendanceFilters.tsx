@@ -4,7 +4,6 @@ import AttendanceExportModal from './AttendanceExportModal';
 import { generateMonthRanges, generateWeekRanges } from '@/components/Employees/attendance/utils/attendence';
 import AttendanceFiltersForm from './AttendanceFiltersForm';
 import ExportDropdown from './ExportDropown';
-import AddAttendanceModal from './AddAttendanceModal';
 
 
 const AttendanceFilters: React.FC<AttendanceFiltersProps> = ({
@@ -22,11 +21,9 @@ const AttendanceFilters: React.FC<AttendanceFiltersProps> = ({
   const [exportType, setExportType] = useState<'xlsx' | 'pdf' | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [addModalOpen, setAddModalOpen] = useState(false);
 
-
-  const weekRanges = useMemo(() => generateWeekRanges(new Date(date)), [date]);
-const monthRanges = useMemo(() => generateMonthRanges(new Date(date)), [date]);
+  const weekRanges = useMemo(() => generateWeekRanges(), []);
+  const monthRanges = useMemo(() => generateMonthRanges(), []);
 
   const handleExport = (type: 'xlsx' | 'pdf') => {
     setExportType(type);
@@ -49,13 +46,6 @@ const monthRanges = useMemo(() => generateMonthRanges(new Date(date)), [date]);
           weekRanges={weekRanges}
           monthRanges={monthRanges}
         />
-<div className='flex flex-col md:flex-row gap-2 items-center'>
-<button
-  onClick={() => setAddModalOpen(true)}
-  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
->
-  Add Attendance
-</button>
 
       {/* 📤 Export Dropdown */}
      <ExportDropdown
@@ -63,7 +53,7 @@ const monthRanges = useMemo(() => generateMonthRanges(new Date(date)), [date]);
         toggleDropdown={() => setDropdownOpen(prev => !prev)}
         onExport={handleExport}
       />
-</div>
+
       {/* 📦 Export Modal */}
       {showModal && exportType && (
         <AttendanceExportModal
@@ -80,13 +70,6 @@ const monthRanges = useMemo(() => generateMonthRanges(new Date(date)), [date]);
           rangeMode={rangeMode}    // ✅ must pass
         />
       )}
-
-{addModalOpen && (
-  <AddAttendanceModal
-    onClose={() => setAddModalOpen(false)}
-    defaultDate={date}
-  />
-)}
     </div>
   );
 };

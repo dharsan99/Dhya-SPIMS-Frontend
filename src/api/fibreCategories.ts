@@ -4,6 +4,7 @@ import { FiberCategory } from '../types/fiber';
 
 export const getFibreCategories = async (): Promise<FiberCategory[]> => {
   const response = await api.get('/fibres/categories');
+  console.log('✔️ API response:', response.data);
   return response.data; // Ensure this is an array
 };
 

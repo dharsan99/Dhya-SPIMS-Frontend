@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FiPlus } from 'react-icons/fi';
 import EmployeeModal from '../components/Employees/EmployeeModal';
 import EmployeeTable from '../components/Employees/EmployeeTable';
@@ -12,26 +12,31 @@ import {
 } from '../api/employees';
 import Loader from '../components/Loader';
 import useAuthStore from '@/hooks/auth';
-import { useQuery } from '@tanstack/react-query';
-
 
 const Employees = () => {
   const [activeTab, setActiveTab] = useState<'employees' | 'attendance'>('attendance');
+  const [employees, setEmployees] = useState<Employee[]>([]);
+  const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const hasPermission = useAuthStore((state) => state.hasPermission);
   const canViewAttendance = hasPermission('Attendance', 'View Attendance'); 
 
-  const { data: employees = [], isLoading, refetch } = useQuery<Employee[]>({
-    queryKey: ['employees'],
-    queryFn: getAllEmployees,
-  });
+  const fetchEmployees = async () => {
+    try {
+      const res = await getAllEmployees();
+      setEmployees(res);
+    } catch (err) {
+      console.error('Error fetching employees:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  
-
-  console.log('employees', employees)
-
+  useEffect(() => {
+    fetchEmployees();
+  }, []);
 
   const handleEdit = (emp: Employee) => {
     setEditingEmployee(emp);
@@ -45,9 +50,9 @@ const Employees = () => {
       } else {
         await createEmployee(data);
       }
-      refetch(); // refresh the list
+      await fetchEmployees();
     } catch (err) {
-      // ... removed all console.error ...
+      console.error('Error saving employee:', err);
     } finally {
       setModalOpen(false);
     }
@@ -57,7 +62,7 @@ const Employees = () => {
     setConfirmDeleteId(id);
   };
 
-  if (isLoading) return <Loader />;
+  if (loading) return <Loader />;
 
   return (
     <div className="p-6 transition-colors duration-300">
@@ -151,9 +156,9 @@ const Employees = () => {
                   try {
                     await deleteEmployee(confirmDeleteId);
                     setConfirmDeleteId(null);
-                    refetch();
+                    await fetchEmployees();
                   } catch (err) {
-                    // ... removed all console.error ...
+                    console.error('Failed to delete:', err);
                   }
                 }}
                 className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"

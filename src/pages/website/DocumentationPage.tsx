@@ -23,12 +23,30 @@ export default function DocumentationPage() {
     description: "Learn everything about TexIntelli to streamline your production and inventory management.",
   });
 
-  const [activeIndex, setActiveIndex] = useState(0);
+  // Set initial section based on hash
+  const getSectionIndexFromHash = () => {
+    const hash = window.location.hash.replace('#', '');
+    const idx = sections.findIndex(s => s.id === hash);
+    return idx >= 0 ? idx : 0;
+  };
+  const [activeIndex, setActiveIndex] = useState(getSectionIndexFromHash);
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
+    // Update hash when section changes
+    window.location.hash = sections[activeIndex].id;
   }, [activeIndex]);
+
+  // Listen for hash changes (e.g., user clicks FAQ in footer)
+  useEffect(() => {
+    const onHashChange = () => {
+      const idx = getSectionIndexFromHash();
+      setActiveIndex(idx);
+    };
+    window.addEventListener('hashchange', onHashChange);
+    return () => window.removeEventListener('hashchange', onHashChange);
+  }, []);
 
   const renderCurrentSection = () => {
     const currentId = sections[activeIndex]?.id;

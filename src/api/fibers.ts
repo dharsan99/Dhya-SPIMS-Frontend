@@ -31,11 +31,16 @@ export const getFiberById = async (id: string): Promise<Fiber> => {
 };
 
 export const getLowStockFibres = async (): Promise<Fiber[]> => {
-  const response = await api.get('/fibres/low-stock');
-  return response.data;
+  try {
+    const response = await api.get('/fibres/low-stock');
+    return response.data;
+  } catch (error: any) {
+    console.error('🚨 Server error:', error.response?.data || error.message);
+    throw error;
+  }
 };
 
 export const getFiberUsageTrend = async (fibreId: string): Promise<{ date: string; usedKg: number }[]> => {
-  const response = await api.get(`/api/fibres/${fibreId}/usage`);
+  const response = await api.get(`fibres${fibreId}/usage`);
   return response.data;
 };

@@ -1,4 +1,3 @@
-// pullable request
 import api from './axios';
 import { Role } from '../types/user';
 
@@ -24,12 +23,6 @@ export const createRole = (data: {
 // 🔹 Assign a role to a user (via /user-roles/assign)
 export const assignRoleToUser = (user_id: string, role_id: string) =>
   api.post('/user-roles/assign', { userId: user_id, roleId: role_id });
-
-
-export const getRolePermissions = async (): Promise<Record<string, string[]>> => {
-  const response = await api.get('/roles/permissions');
-  return response.data;
-};
 
 // 🔹 Get role assigned to a user
 export const getUserRole = (user_id: string) =>

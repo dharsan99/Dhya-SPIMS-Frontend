@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { toast } from "react-hot-toast";
+import { useOptimizedToast } from '@/hooks/useOptimizedToast';
 
 const ContactForm = () => {
+  const { success, error } = useOptimizedToast();
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -16,12 +17,13 @@ const ContactForm = () => {
     e.preventDefault();
 
     if (!form.name || !form.email || !form.message) {
-      toast.error("❌ Please fill in all fields!");
+      error("❌ Please fill in all fields!");
       return;
     }
 
     // 🔥 You can integrate your email API or backend API here later
-    toast.success("✅ Message sent successfully!");
+    console.log("Submitted Contact Form:", form);
+    success("✅ Message sent successfully!");
 
     // Reset form
     setForm({ name: "", email: "", message: "" });
@@ -35,7 +37,6 @@ const ContactForm = () => {
             Contact Us
           </h2>
           <p className="text-gray-600">
-
             Got a question or project idea? We'd love to hear from you!
           </p>
         </div>

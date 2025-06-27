@@ -45,6 +45,7 @@ const PotentialBuyerUploader: React.FC<Props> = ({ onUpload }) => {
       onUpload(formatted);
       toast.success(`Imported ${formatted.length} potential buyers`);
     } catch (error) {
+      console.error('Error reading file:', error);
       toast.error('Failed to parse the Excel file');
     }
   };

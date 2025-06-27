@@ -20,7 +20,7 @@ const Suppliers = () => {
       const res = await getAllSuppliers();
       setSuppliers(res);
     } catch (err) {
-      // console.error('Error fetching suppliers:', err);
+      console.error('Error fetching suppliers:', err);
     } finally {
       setLoading(false);
     }

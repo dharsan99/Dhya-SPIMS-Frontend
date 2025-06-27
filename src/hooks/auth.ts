@@ -1,6 +1,5 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import useTenantStore from './useTenantStore';
 
 interface AuthState {
   token: string | null;
@@ -32,14 +31,7 @@ const useAuthStore = create<AuthState>()(
       user: null,
       hasHydrated: false,
 
-      setAuth: (token, user) => {
-        set({ token, user });
-      
-        // ✅ Sync tenantId into tenant store
-        if (user?.tenant_id) {
-          useTenantStore.getState().setTenantId(user.tenant_id);
-        }
-      },
+      setAuth: (token, user) => set({ token, user }),
       logout: () => set({ token: null, user: null }),
       setHasHydrated: (val) => set({ hasHydrated: val }),
 

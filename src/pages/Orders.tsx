@@ -21,7 +21,7 @@ const Orders = () => {
       const data = await getAllOrders();
       setOrders(data);
     } catch (err) {
-      // console.error('Error fetching orders:', err);
+      console.error('Error fetching orders:', err);
     }
   };
 
@@ -30,22 +30,13 @@ const Orders = () => {
       const data = await getBuyers();
       setBuyers(data);
     } catch (err) {
-      // console.error('Error fetching buyers:', err);
+      console.error('Error fetching buyers:', err);
     }
   };
 
   useEffect(() => {
     Promise.all([fetchOrders(), fetchBuyers()]).finally(() => setLoading(false));
   }, []);
-
-  // Refresh data on tab change
-  useEffect(() => {
-    if (tab === 'Sales Order') {
-      fetchOrders();
-    } else if (tab === 'buyer') {
-      fetchBuyers();
-    }
-  }, [tab]);
 
   if (loading) return <Loader />;
 

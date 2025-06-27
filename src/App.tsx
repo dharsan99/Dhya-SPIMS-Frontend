@@ -1,143 +1,112 @@
-import { useEffect, useState } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import { Suspense, lazy } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
-import { useThemeStore } from './hooks/useThemeStore';
-import ScrollToTop from './components/ScrollToTop';
-
-import DashboardLayout from './layout/DashboardLayout';
-import SuperAdminLayout from './components/superadmin/SuperAdminLayout';
+import useAuthStore from './hooks/auth';
 import ProtectedRoute from './routes/ProtectedRoute';
-import WebsiteHeader from './components/website/WebsiteHeader';
-import WebsiteFooter from './components/website/WebsiteFooter';
-import CookieConsentBanner from './components/CookieConsentBanner';
+import PublicRoute from './routes/PublicRoute';
+import WebsiteLayout from './layout/WebsiteLayout';
 
-import LoginPage from './pages/Login';
-import Dashboard from './pages/Dashboard';
-import Orders from './pages/Orders';
-import ProductionDashboard from './pages/ProductionDashboard';
-import Blends from './pages/Blends';
-import Brands from './pages/Brands';
-import Shades from './pages/Shades';
-import Suppliers from './pages/Suppliers';
-import Yarns from './pages/Yarns';
-import YarnMapping from './pages/YarnMapping';
-import Fibers from './pages/Fibers';
-import Settings from './pages/Settings';
-import NotFoundPage from './pages/NotFoundPage';
+// Lazy load components
+const LandingPage = lazy(() => import('./pages/website/LandingPage'));
+const Login = lazy(() => import('./pages/Login'));
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 
-import LandingPage from './pages/website/LandingPage';
-import AboutPage from './pages/website/AboutPage';
-import ContactPage from './pages/website/ContactPage';
-import DocumentationPage from './pages/website/DocumentationPage';
-import TermsPage from './pages/website/TermsPage';
-import PrivacyPolicyPage from './pages/website/PrivacyPolicyPage';
-import RefundPolicyPage from './pages/website/RefundPolicyPage';
-import DisclaimerPage from './pages/website/DisclaimerPage';
-import Employees from './pages/Employees';
-import Marketing from './pages/Marketing';
+// Lazy load other pages
+const Orders = lazy(() => import('./pages/Orders'));
+const Production = lazy(() => import('./pages/Production'));
+const ProductionDashboard = lazy(() => import('./pages/ProductionDashboard'));
+const Fibers = lazy(() => import('./pages/Fibers'));
+const Yarns = lazy(() => import('./pages/Yarns'));
+const Blends = lazy(() => import('./pages/Blends'));
+const Brands = lazy(() => import('./pages/Brands'));
+const Shades = lazy(() => import('./pages/Shades'));
+const Suppliers = lazy(() => import('./pages/Suppliers'));
+const Employees = lazy(() => import('./pages/Employees'));
+const Marketing = lazy(() => import('./pages/Marketing'));
+const Settings = lazy(() => import('./pages/Settings'));
+const YarnMapping = lazy(() => import('./pages/YarnMapping'));
 
-import FeaturesPage from './pages/website/FeaturesPage';
-import ProductionEntryPage from './pages/ProductionEntryPage';
-import SignupPage from './pages/Signup';
+// Website pages
+const AboutPage = lazy(() => import('./pages/website/AboutPage'));
+const ContactPage = lazy(() => import('./pages/website/ContactPage'));
+const DisclaimerPage = lazy(() => import('./pages/website/DisclaimerPage'));
+const PrivacyPolicyPage = lazy(() => import('./pages/website/PrivacyPolicyPage'));
+const TermsPage = lazy(() => import('./pages/website/TermsPage'));
+const FeaturesPage = lazy(() => import('./pages/website/FeaturesPage'));
+const ProductsPage = lazy(() => import('./pages/website/ProductsPage'));
+const ServicesPage = lazy(() => import('./pages/website/ServicesPage'));
+const RefundPolicyPage = lazy(() => import('./pages/website/RefundPolicyPage'));
+const DocumentationPage = lazy(() => import('./pages/website/DocumentationPage'));
 
-// Super Admin Pages
-import SuperAdminDashboard from './pages/superadmin/Dashboard';
-import Tenants from './pages/superadmin/Tenants';
-// Layout Components
-const WebsiteLayout = () => (
-  <>
-    <WebsiteHeader />
-    <Outlet />
-    <WebsiteFooter />
-  </>
+// Simple loading component
+const LoadingSpinner = () => (
+  <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="text-center">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+      <p className="text-gray-600">Loading...</p>
+    </div>
+  </div>
 );
 
-const DelayedNotFound = () => {
-  const [show404, setShow404] = useState(false);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setShow404(true), 5000);
-    return () => clearTimeout(timer);
-  }, []);
-
-  if (!show404) return null;
-  return <NotFoundPage />;
-};
-
-
-
 function App() {
-  const { setTheme } = useThemeStore();
-
-  useEffect(() => {
-    // Always set light theme on app initialization without showing toast
-    setTheme('light', false);
-  }, [setTheme]);
-
+  const { hasHydrated } = useAuthStore();
+  if (!hasHydrated) return <LoadingSpinner />;
   return (
-    <>
-      <Toaster position="top-center" />
+    <Router>
+      <div className="App">
+        {/* Toast notifications */}
+        <Toaster 
+          position="top-right"
+          toastOptions={{
+            duration: 4000,
+            style: {
+              background: '#ffffff',
+              color: '#111827',
+            },
+          }}
+        />
 
-      <BrowserRouter>
-        <ScrollToTop />
-        <Routes>
-          {/* Website Layout */}
-          <Route path="/" element={<WebsiteLayout />}>
-            <Route index element={<LandingPage />} />
-            <Route path="about" element={<AboutPage />} />
-            <Route path="contact" element={<ContactPage />} />
-            <Route path="docs" element={<DocumentationPage />} />
-            <Route path="features" element={<FeaturesPage />} />
-            <Route path="terms" element={<TermsPage />} />
-            <Route path="privacy-policy" element={<PrivacyPolicyPage />} />
-            <Route path="refund-policy" element={<RefundPolicyPage />} />
-            <Route path="disclaimer" element={<DisclaimerPage />} />
-          </Route>
-
-          {/* Login */}
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/signup" element={<SignupPage />} />
-
-          {/* Protected Dashboard */}
-          <Route path="/app" element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
-            <Route index element={<Navigate to="dashboard" replace />} />
-            <Route path="dashboard" element={<Dashboard />} />
-            <Route path="orders" element={<Orders />} />
-            <Route path="production">
-              <Route index element={<ProductionDashboard />} />
-              <Route path="new" element={<ProductionEntryPage />} />
-              <Route path=":date" element={<ProductionEntryPage />} />
+        {/* Main app content */}
+        <Suspense fallback={<LoadingSpinner />}>
+          <Routes>
+            {/* All pages with header/footer */}
+            <Route element={<WebsiteLayout />}>
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/about" element={<AboutPage />} />
+              <Route path="/contact" element={<ContactPage />} />
+              <Route path="/disclaimer" element={<DisclaimerPage />} />
+              <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+              <Route path="/terms" element={<TermsPage />} />
+              <Route path="/features" element={<FeaturesPage />} />
+              <Route path="/products" element={<ProductsPage />} />
+              <Route path="/services" element={<ServicesPage />} />
+              <Route path="/refund-policy" element={<RefundPolicyPage />} />
+              <Route path="/docs" element={<DocumentationPage />} />
+              {/* Protected routes */}
+              <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+              <Route path="/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
+              <Route path="/production" element={<ProtectedRoute><Production /></ProtectedRoute>} />
+              <Route path="/production-dashboard" element={<ProtectedRoute><ProductionDashboard /></ProtectedRoute>} />
+              <Route path="/fibers" element={<ProtectedRoute><Fibers /></ProtectedRoute>} />
+              <Route path="/yarns" element={<ProtectedRoute><Yarns /></ProtectedRoute>} />
+              <Route path="/blends" element={<ProtectedRoute><Blends /></ProtectedRoute>} />
+              <Route path="/brands" element={<ProtectedRoute><Brands /></ProtectedRoute>} />
+              <Route path="/shades" element={<ProtectedRoute><Shades /></ProtectedRoute>} />
+              <Route path="/suppliers" element={<ProtectedRoute><Suppliers /></ProtectedRoute>} />
+              <Route path="/employees" element={<ProtectedRoute><Employees /></ProtectedRoute>} />
+              <Route path="/marketing" element={<ProtectedRoute><Marketing /></ProtectedRoute>} />
+              <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+              <Route path="/yarn-mapping" element={<ProtectedRoute><YarnMapping /></ProtectedRoute>} />
             </Route>
-            <Route path="brands" element={<Brands />} />
-            <Route path="blends" element={<Blends />} />
-            <Route path="shades" element={<Shades />} />
-            <Route path="suppliers" element={<Suppliers />} />
-            <Route path="yarns" element={<Yarns />} />
-            <Route path="yarn-mapping" element={<YarnMapping />} />
-            <Route path="fibers" element={<Fibers />} />
-            <Route path="settings" element={<Settings />} />
-            <Route path="employees" element={<Employees />} />
-            <Route path="marketing" element={<Marketing />} />
-            <Route path="*" element={<DelayedNotFound />} />
-          </Route>
-
-
-          {/* Protected Super Admin */}
-          <Route path="/superadmin" element={<ProtectedRoute><SuperAdminLayout /></ProtectedRoute>}>
-            <Route index element={<Navigate to="dashboard" replace />} />
-            <Route path="dashboard" element={<SuperAdminDashboard />} />
-            <Route path="tenants" element={<Tenants />} />
-          </Route>
-          
-
-          {/* Catch-all */}
-          <Route path="*" element={<DelayedNotFound />} />
-        </Routes>
-
-        {/* 🍪 Cookie Consent Banner */}
-        <CookieConsentBanner />
-      </BrowserRouter>
-    </>
+            {/* Login page without header/footer */}
+            <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
+            {/* Catch all route */}
+            <Route path="*" element={<NotFoundPage />} />
+          </Routes>
+        </Suspense>
+      </div>
+    </Router>
   );
 }
 

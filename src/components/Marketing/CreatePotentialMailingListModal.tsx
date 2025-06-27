@@ -76,6 +76,9 @@ const CreatePotentialMailingListModal: React.FC<Props> = ({ buyers, onSelect, on
     const allBuyers = [...buyers, ...uploaded];
     const selectedBuyers = allBuyers.filter((b) => selected.includes(b.id));
 
+    console.log('📦 Confirming with selected IDs:', selected);
+    console.log('📤 Final selected buyer objects:', selectedBuyers);
+
     if (selectedBuyers.length === 0) return;
 
     const uploadedSubset = uploaded.filter((b) => selected.includes(b.id));

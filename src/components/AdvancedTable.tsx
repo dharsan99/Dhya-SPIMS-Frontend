@@ -13,6 +13,7 @@ interface AdvancedTableProps<T> {
   searchKeys?: (keyof T)[];
   itemsPerPage?: number;
   emptyMessage?: string;
+  debug?: boolean;
 }
 
 const AdvancedTable = <T extends object>({
@@ -21,6 +22,7 @@ const AdvancedTable = <T extends object>({
   searchKeys = [],
   itemsPerPage = 5,
   emptyMessage = 'No data found.',
+  debug = false,
 }: AdvancedTableProps<T>) => {
   const [search, setSearch] = useState('');
   const [sortKey, setSortKey] = useState<keyof T | null>(null);
@@ -57,6 +59,7 @@ const AdvancedTable = <T extends object>({
       });
     }
 
+    if (debug) console.log('Filtered', filtered);
     return filtered;
   }, [data, search, searchKeys, sortKey, sortOrder]);
 
@@ -64,6 +67,7 @@ const AdvancedTable = <T extends object>({
   const paginated = useMemo(() => {
     const start = (currentPage - 1) * itemsPerPage;
     const paged = filteredData.slice(start, start + itemsPerPage);
+    if (debug) console.log('Page Data', paged);
     return paged;
   }, [filteredData, currentPage, itemsPerPage]);
 

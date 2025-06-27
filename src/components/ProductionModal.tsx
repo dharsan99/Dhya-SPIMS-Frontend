@@ -1,8 +1,7 @@
 import { FC, useState, useEffect } from 'react';
 import { ProductionRecord, ProductionForm } from '../types/production';
-import { updateProduction } from '../api/production';
-import toast from 'react-hot-toast';
-import api from '../api/axios';
+import { createProduction, updateProduction } from '../api/production';
+import { useOptimizedToast } from '@/hooks/useOptimizedToast';
 
 export interface ProductionModalProps {
   isOpen: boolean;
@@ -17,6 +16,7 @@ const ProductionModal: FC<ProductionModalProps> = ({
   initialData,
   onSaved,
 }) => {
+  const { success, error } = useOptimizedToast();
   const [form, setForm] = useState<Omit<ProductionForm, 'tenant_id' | 'user_id' | 'order_id'>>({
     date: '',
     section: '',
@@ -74,7 +74,7 @@ const ProductionModal: FC<ProductionModalProps> = ({
 
   const handleSubmit = async () => {
     if (!initialData?.tenant_id || !initialData?.user_id || !initialData?.order_id) {
-      toast.error('Missing tenant, user, or order ID');
+      error('Missing tenant, user, or order ID');
       return;
     }
 
@@ -88,16 +88,16 @@ const ProductionModal: FC<ProductionModalProps> = ({
     try {
       if (initialData?.id) {
         await updateProduction(initialData.id, payload);
-        toast.success('Production updated!');
+        success('Production updated!');
       } else {
-        await api.post('/productions/entry', payload);
-        toast.success('Production created!');
+        await createProduction(payload);
+        success('Production created!');
       }
       onClose();
       onSaved();
     } catch (err) {
       console.error(err);
-      toast.error('Something went wrong!');
+      error('Something went wrong!');
     }
   };
 

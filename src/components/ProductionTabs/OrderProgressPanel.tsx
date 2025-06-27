@@ -1,16 +1,16 @@
 import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import React, { Suspense } from 'react';
 
 import OrderSelectPanel from './orderprogress/OrderSelectPanel';
 import ProgressKPI from './orderprogress/ProgressKPI';
-import OrderProgressCharts from './orderprogress/OrderProgressCharts';
+const OrderProgressCharts = React.lazy(() => import('./orderprogress/OrderProgressCharts'));
 import ProgressTimeline from './orderprogress/ProgressTimeline';
 import FiberSummary from './orderprogress/FiberSummary';
 import EfficiencyInsights from './orderprogress/EfficiencyInsights';
 import ExportButtons from './orderprogress/ExportButtons';
 
 import { getAllOrders, getOrderProgressDetails } from '../../api/orders';
-import { Order } from '../../types/order';
 
 const OrderProgressPanel = () => {
   const [selectedOrderId, setSelectedOrderId] = useState<string>('');
@@ -19,9 +19,9 @@ const OrderProgressPanel = () => {
     data: orders = [],
     isLoading: loadingOrders,
     isError: ordersError,
-  } = useQuery<Order[]>({
+  } = useQuery({
     queryKey: ['orders'],
-    queryFn: () => getAllOrders({}),
+    queryFn: getAllOrders,
   });
 
   const {
@@ -52,12 +52,14 @@ const OrderProgressPanel = () => {
   <>
     <ProgressKPI data={progressDetails.kpis} />
 
-    <OrderProgressCharts
-      requiredQty={progressDetails.kpis.requiredQty}
-      producedQty={progressDetails.kpis.producedQty}
-      trendData={progressDetails.dailyChart}
-      loading={loadingProgress}
-    />
+    <Suspense fallback={<div>Loading charts...</div>}>
+      <OrderProgressCharts
+        requiredQty={progressDetails.kpis.requiredQty}
+        producedQty={progressDetails.kpis.producedQty}
+        trendData={progressDetails.dailyChart}
+        loading={loadingProgress}
+      />
+    </Suspense>
 
     <FiberSummary data={progressDetails.fiberSummary} />
 

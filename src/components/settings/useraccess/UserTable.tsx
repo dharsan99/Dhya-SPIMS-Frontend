@@ -1,4 +1,3 @@
-// pullable request
 import { useMemo, useState } from 'react';
 import { User, Role } from '../../../types/user';
 import UserModal from './UserModal';

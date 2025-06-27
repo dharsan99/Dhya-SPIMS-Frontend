@@ -10,10 +10,11 @@ import {
   deleteEmailTemplate,
 } from '../../api/emailTemplates';
 import { EmailTemplate, EditableEmailTemplate } from '../../types/marketing';
-import toast from 'react-hot-toast';
+import { useOptimizedToast } from '@/hooks/useOptimizedToast';
 
 const TemplatePanel: React.FC = () => {
   const queryClient = useQueryClient();
+  const { success, error } = useOptimizedToast();
 
   const [isCreateModalOpen, setCreateModalOpen] = useState(false);
   const [isEditModalOpen, setEditModalOpen] = useState(false);
@@ -28,19 +29,19 @@ const TemplatePanel: React.FC = () => {
     mutationFn: (template: EditableEmailTemplate) =>
       updateEmailTemplate(template.id!, template),
     onSuccess: () => {
-      toast.success('Template updated');
+      success('Template updated');
       queryClient.invalidateQueries({ queryKey: ['emailTemplates'] });
     },
-    onError: () => toast.error('Failed to update template'),
+    onError: () => error('Failed to update template'),
   });
 
   const deleteMutation = useMutation({
     mutationFn: deleteEmailTemplate,
     onSuccess: () => {
-      toast.success('Template deleted');
+      success('Template deleted');
       queryClient.invalidateQueries({ queryKey: ['emailTemplates'] });
     },
-    onError: () => toast.error('Failed to delete template'),
+    onError: () => error('Failed to delete template'),
   });
 
   const handleEditSave = (template: EditableEmailTemplate) => {

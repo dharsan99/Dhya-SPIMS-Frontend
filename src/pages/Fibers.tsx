@@ -11,13 +11,14 @@ import { Fiber, FiberCategory } from '../types/fiber';
 import FibreModal from '../components/FiberModal';
 import FibreCategoriesPanel from '../components/Fibers/FibreCategoriesPanel';
 import FiberStockModal from '../components/FiberStockModal';
-import toast from 'react-hot-toast';
+import { useOptimizedToast } from '@/hooks/useOptimizedToast';
 import { debounce } from 'lodash';
 import Pagination from '../components/Pagination';
 import FibreSuppliersPanel from '../components/Fibers/FibreSuppliersPanel';
 import FibreTransfersPanel from '../components/Fibers/FibreTransfersPanel';
 import FibersToolbar from '../components/Fibers/FibersToolbar';
 import FibersTable from '../components/Fibers/FibersTable';
+import { CreateFibreTransfer, FibreTransfer } from '../types/fibreTransfer';
 import FiberStocksPanel from '@/components/Fibers/FibreStocksPanel';
 import useAuthStore from '@/hooks/auth';
 
@@ -32,6 +33,7 @@ const Fibers = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const hasPermission = useAuthStore((state) => state.hasPermission); // 👈 get permission checker
+  const { success, error } = useOptimizedToast();
 
   const canViewSuppliers = hasPermission('Suppliers', 'View Supplier');
   const canViewStocks = hasPermission('Stocks', 'View Stock');
@@ -51,29 +53,29 @@ const Fibers = () => {
     mutationFn: createFiber,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['fibres'] });
-      toast.success('Fibre created');
+      success('Fibre created');
       setIsModalOpen(false);
       setFiberToEdit(null);
     },
-    onError: () => toast.error('Failed to create fibre'),
+    onError: () => error('Failed to create fibre'),
   });
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<Fiber> }) => updateFiber(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['fibres'] });
-      toast.success('Fibre updated');
+      success('Fibre updated');
     },
-    onError: () => toast.error('Failed to update fibre'),
+    onError: () => error('Failed to update fibre'),
   });
 
   const deleteMutation = useMutation({
     mutationFn: deleteFiber,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['fibres'] });
-      toast.success('Fibre deleted');
+      success('Fibre deleted');
     },
-    onError: () => toast.error('Failed to delete fibre'),
+    onError: () => error('Failed to delete fibre'),
   });
 
   const handleSearchChange = debounce((text: string) => {
@@ -100,8 +102,9 @@ const Fibers = () => {
     currentPage * rowsPerPage
   );
 
-  const handleTransferSave = () => {
-    toast.success('Transfer saved (not implemented)');
+  const handleTransferSave = (data: CreateFibreTransfer | FibreTransfer) => {
+    console.log('Transfer saved:', data);
+    success('Transfer saved (not implemented)');
   };
 
   const handleCreate = (newFibre: Omit<Fiber, 'id'>) => createMutation.mutate(newFibre);

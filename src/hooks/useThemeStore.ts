@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import toast from 'react-hot-toast';
 
 export type Theme = 'light';
 
@@ -19,13 +18,17 @@ export const useThemeStore = create<ThemeStore>((set) => ({
     set({ theme: 'light' });
 
     if (showToast) {
-      toast.success('Light Theme', {
+      // Handle toast asynchronously without blocking the theme change
+      import('./useOptimizedToast').then(({ useOptimizedToast }) => {
+        const { success } = useOptimizedToast();
+        success('Light Theme', {
         style: {
           borderRadius: '8px',
           background: '#333',
           color: '#fff',
         },
       });
+      }).catch(console.error);
     }
   },
 }));

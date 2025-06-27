@@ -60,6 +60,7 @@ const PotentialBuyersPanel: React.FC = () => {
       uploadMutation.mutate(fromUpload);
     } else {
       toast.success(`Mailing list created with ${fromDB.length} buyers`);
+      console.log('✅ Final mailing list buyers:', fromDB);
     }
   };
 
@@ -69,6 +70,7 @@ const PotentialBuyersPanel: React.FC = () => {
       return;
     }
     const selectedBuyers = potentialBuyers.filter((b) => selected.includes(b.id));
+    console.log('Exporting:', selectedBuyers);
     toast.success(`Exported ${selectedBuyers.length} buyers`);
   };
 

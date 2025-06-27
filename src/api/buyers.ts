@@ -14,10 +14,8 @@ export interface UpdateBuyerInput extends CreateBuyerInput {
   id: string;
 }
 
-const endpoint = '/buyers';
-
 export const getBuyers = async (): Promise<Buyer[]> => {
-  const response = await api.get(endpoint);
+  const response = await api.get('/buyers');
   return response.data;
 };
 
@@ -26,8 +24,8 @@ export const getBuyerById = async (id: string): Promise<Buyer> => {
   return response.data;
 };
 
-export const createBuyer = async (data: Partial<Buyer>): Promise<Buyer> => {
-  const response = await api.post(endpoint, data);
+export const createBuyer = async (data: CreateBuyerInput): Promise<Buyer> => {
+  const response = await api.post('/buyers', data);
   return response.data;
 };
 
