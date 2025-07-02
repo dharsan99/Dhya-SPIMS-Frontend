@@ -62,6 +62,9 @@ const UserAccess = () => {
     refetchUsers();
   };*/
 
+
+
+
   // ✅ Role Operations
   const handleSaveRole = async (data: { id?: string; name: string; permissions: Record<string, string[]> }) => {
     try {
@@ -74,11 +77,8 @@ const UserAccess = () => {
         });
         toast.success('Role updated successfully');
   
-        console.log('auth.user', auth.user?.id);
         if (auth.user?.id) {
-          console.log('🔍 Fetching updated user info...');
           const res = await getUserById(auth.user.id);
-          console.log('✅ Updated user:', res.data);
         
           auth.setAuth(auth.token!, res.data);
         }

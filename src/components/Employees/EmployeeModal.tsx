@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Employee } from '../../types/employee';
-import { showError, showSuccess } from './attendance/utils/toastutils';
+import { showError } from './attendance/utils/toastutils';
+import CreatableSelect from 'react-select/creatable';
+import { useQuery } from '@tanstack/react-query';
+import { getDepartments } from '@/api/attendance';
 
 interface EmployeeModalProps {
   isOpen: boolean;
@@ -19,6 +22,11 @@ const EmployeeModal: React.FC<EmployeeModalProps> = ({ isOpen, onClose, onSave, 
     bank_acc_2: '',
     department: '',
     join_date: '', // optional
+  });
+
+  const { data: departmentOptions = [], isLoading: departmentsLoading, isError: departmentsError } = useQuery({
+    queryKey: ['departments'],
+    queryFn: getDepartments,
   });
 
   useEffect(() => {
@@ -95,7 +103,6 @@ const EmployeeModal: React.FC<EmployeeModalProps> = ({ isOpen, onClose, onSave, 
     }
     onSave(formData, initialData?.id);
     onClose();
-    showSuccess(initialData ? 'Employee updated successfully.' : 'Employee created successfully.');
   };
 
   if (!isOpen) return null;
@@ -191,15 +198,21 @@ const EmployeeModal: React.FC<EmployeeModalProps> = ({ isOpen, onClose, onSave, 
 
           {/* Section 3: Other */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
+            <div className='flex flex-col gap-2.5'>
               <label className="text-sm text-gray-600 dark:text-gray-300">Department (Optional)</label>
-              <input
+              <CreatableSelect
                 name="department"
-                type="text"
-                value={formData.department}
-                onChange={handleChange}
-                className="w-full p-2 mt-1 border rounded bg-white dark:bg-gray-800 dark:text-white"
+                options={departmentOptions.map((d) => ({ label: d, value: d }))}
+                value={formData.department ? { label: formData.department, value: formData.department } : null}
+                onChange={(option) => setFormData((prev) => ({ ...prev, department: option ? option.value : '' }))}
+                onCreateOption={(inputValue) => setFormData((prev) => ({ ...prev, department: inputValue }))}
+                isClearable
+                isLoading={departmentsLoading}
+                placeholder={departmentsLoading ? 'Loading...' : 'Select or type department'}
+                classNamePrefix="react-select"
+                menuPlacement='top'
               />
+              {departmentsError && <div className="text-red-500 text-xs mt-1">Failed to load departments</div>}
             </div>
             <div>
               <label className="text-sm text-gray-600 dark:text-gray-300">Joining Date (Optional)</label>

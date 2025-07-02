@@ -128,8 +128,6 @@ const AddAttendanceModal: React.FC<AddAttendanceModalProps> = ({
       status,
     };
 
-    console.log('payload', payload)
-  
     mutate(payload);
   };
   

@@ -31,8 +31,6 @@ const AttendanceExportModal: React.FC<AttendanceExportModalProps> = ({
   const [attendanceMap, setAttendanceMap] = useState<Record<string, Record<string, AttendanceRow>>>({});
   const [loading, setLoading] = useState(true);
 
-  console.log('employees', employees);
-
   const fetchAttendanceMap = async () => {
     setLoading(true);
     const map: Record<string, Record<string, AttendanceRow>> = {};
@@ -55,7 +53,6 @@ const AttendanceExportModal: React.FC<AttendanceExportModalProps> = ({
     setLoading(false);
   };
 
-  console.log('attendanceMap', attendanceMap);
 
   useEffect(() => {
     if (isOpen) fetchAttendanceMap();
@@ -84,7 +81,6 @@ const AttendanceExportModal: React.FC<AttendanceExportModalProps> = ({
     return { present, halfDay, leave, absent };
   }, [attendanceMap, dates, employees]);
 
-  console.log('summaryStats', summaryStats);
 
   const handleExport = () => {
     if (exportType === 'pdf') {
@@ -106,12 +102,11 @@ const AttendanceExportModal: React.FC<AttendanceExportModalProps> = ({
   const handleXLSXExport = () => {
     const header = ['T.No', 'Employee', ...dates.map(d => d)];
     const data = employees.map(emp => [
-      emp?.employee?.token_no,
-      emp.employee?.name,
+      emp?.employee?.token_no || emp.token_no,
+      emp.employee?.name || emp.name,
       ...dates.map(d => getStatusLabel(attendanceMap[d]?.[emp.employee_id]?.status))
     ]);
 
-    console.log('data', data);
 
     const worksheet = XLSX.utils.aoa_to_sheet([header, ...data]);
     const workbook = XLSX.utils.book_new();
@@ -165,8 +160,8 @@ const AttendanceExportModal: React.FC<AttendanceExportModalProps> = ({
                 <tbody>
                   {employees.map((emp, i) => (
                     <tr key={emp.employee_id} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                      <td className="px-3 py-2 border text-center">{emp.employee.token_no}</td>
-                      <td className="px-3 py-2 border truncate max-w-[200px]">{emp.employee.name}</td>
+                      <td className="px-3 py-2 border text-center">{emp.employee?.token_no || emp.token_no}</td>
+                      <td className="px-3 py-2 border truncate max-w-[200px]">{emp.employee?.name || emp.name}</td>
                       {dates.map((d) => {
                         const att = attendanceMap[d]?.[emp.employee_id];
                         return (

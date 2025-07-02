@@ -90,7 +90,6 @@ const CreateInvoiceModal: React.FC<CreateInvoiceModalProps> = ({ isOpen, onClose
     
     if (validateForm()) {
       // Here you would typically make an API call to create/update the invoice
-      console.log('Form data:', formData);
       
       // Simulate API call
       setTimeout(() => {

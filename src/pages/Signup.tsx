@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import WebsiteHeader from '../components/website/WebsiteHeader';
 import WebsiteFooter from '../components/website/WebsiteFooter';
-import SubscriptionPlanModal from '@/components/SubscriptionPlanModal';
 
 export default function SignupPage() {
   const [fadeOutPage, setFadeOutPage] = useState(false);
@@ -24,8 +23,8 @@ export default function SignupPage() {
   const handleSignup = (e: any) => {
     e.preventDefault();
     
-    // Show subscription plan modal instead of direct navigation
-    setShowPlanModal(true);
+    // Navigate to plan selection page with form data
+    navigate('/select-plan', { state: { formData } });
   };
 
   const handlePlanSelect = (plan: any) => {
@@ -161,14 +160,6 @@ export default function SignupPage() {
       </main>
 
       <WebsiteFooter />
-
-      {/* Subscription Plan Modal */}
-      <SubscriptionPlanModal
-        isOpen={showPlanModal}
-        onClose={() => setShowPlanModal(false)}
-        onPlanSelect={handlePlanSelect}
-        formData={formData}
-      />
 
       {/* Spinner on fade out */}
       {fadeOutPage && (

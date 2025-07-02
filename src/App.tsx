@@ -36,6 +36,7 @@ import Employees from './pages/Employees';
 import Marketing from './pages/Marketing';
 import ProductionEntryPage from './pages/ProductionEntryPage';
 import SignupPage from './pages/Signup';
+import SubscriptionPlanPage from './pages/SubscriptionPlanPage';
 
 // Super Admin Pages
 import SuperAdminDashboard from './pages/superadmin/Dashboard';
@@ -43,6 +44,7 @@ import Tenants from './pages/superadmin/Tenants';
 import Plans from './pages/superadmin/Plans';
 import Billing from './pages/superadmin/Billing';
 import ParsingUsage from './pages/superadmin/ParsingUsage';
+import SuperAdminSettings from './pages/superadmin/Settings';
 
 function App() {
   const { setTheme } = useThemeStore();
@@ -75,6 +77,7 @@ function App() {
           {/* Login */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
+          <Route path="/select-plan" element={<SubscriptionPlanPage />} />
 
           {/* Protected Dashboard */}
           <Route path="/app" element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
@@ -108,6 +111,7 @@ function App() {
             <Route path="plans" element={<Plans />} />
             <Route path="billing" element={<Billing />} />
             <Route path="parsing-usage" element={<ParsingUsage />} />
+            <Route path="/superadmin/settings" element={<SuperAdminSettings />} />
           </Route>
           
           {/* Catch-all - moved to end */}

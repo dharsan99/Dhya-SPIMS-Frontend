@@ -18,7 +18,6 @@ export const getAllUsers = () => api.get(endpoint);
 
 // Get a specific user by ID
 export const getUserById = (id: string) => {
-  console.log(`📡 Calling getUserById with id: ${id}`);
   return api.get(`${endpoint}/${id}`);
 };
 

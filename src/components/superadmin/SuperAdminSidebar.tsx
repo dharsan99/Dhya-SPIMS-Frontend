@@ -9,6 +9,7 @@ import {
   FiDollarSign,
   FiCreditCard,
   FiBarChart,
+  FiSettings,
 } from 'react-icons/fi';
 
 import logo from '../../assets/dhya_texintelli.png';
@@ -87,6 +88,7 @@ const SuperAdminSidebar = ({ onLinkClick }: { onLinkClick?: () => void }) => {
             {createNavLink('/superadmin/plans', 'Plans', FiDollarSign)}
             {createNavLink('/superadmin/billing', 'Billing', FiCreditCard)}
             {createNavLink('/superadmin/parsing-usage', 'Parsing Usage', FiBarChart)}
+            {createNavLink('/superadmin/settings', 'Settings', FiSettings)}
           </div>
         </div>
       </nav>

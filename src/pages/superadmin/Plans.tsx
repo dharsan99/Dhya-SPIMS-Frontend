@@ -1,76 +1,73 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   FiPlus, FiEdit, FiTrash2, FiSearch, FiDollarSign,
   FiUsers, FiCheck, FiBriefcase
 } from 'react-icons/fi';
 import SubscriptionFormModal from '../../components/superadmin/plans/SubscriptionFormModal';
+import { useSubscriptionStore } from '@/stores/admin/useSubscriptionStore';
+import { getStatusBadge } from '@/components/superadmin/plans/utils/planUtils';
 
-interface TenantSubscription {
-  id: string;
-  tenantName: string;
-  planName: string;
-  description: string;
-  price: number;
-  billingCycle: 'monthly' | 'yearly';
-  maxUsers: number;
-  maxOrders: number;
-  maxStorage: string;
-  status: 'active' | 'inactive';
-  createdAt: string;
-  updatedAt: string;
-}
 
 const Plans: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingSubscription, setEditingSubscription] = useState<TenantSubscription | null>(null);
-
-  // Mock tenant subscription data
-  const [subscriptions, setSubscriptions] = useState<TenantSubscription[]>([
-    {
-      id: 'sub1',
-      tenantName: 'Millennium Spinners Pvt Ltd',
-      planName: 'Professional',
-      description: 'Mid-sized spinning unit with growing digital needs',
-      price: 299,
-      billingCycle: 'monthly',
-      maxUsers: 50,
-      maxOrders: 10000,
-      maxStorage: '25GB',
-      status: 'active',
-      createdAt: '2024-01-15',
-      updatedAt: '2024-06-10',
-    },
-    {
-      id: 'sub2',
-      tenantName: 'CottonWeave Industries',
-      planName: 'Enterprise',
-      description: 'Large-scale mill with automation integrations',
-      price: 799,
-      billingCycle: 'monthly',
-      maxUsers: -1,
-      maxOrders: -1,
-      maxStorage: 'Unlimited',
-      status: 'active',
-      createdAt: '2023-11-01',
-      updatedAt: '2024-06-01',
-    },
-    {
-      id: 'sub3',
-      tenantName: 'Shree Textiles',
-      planName: 'Basic',
-      description: 'Small mill using standard tracking features',
-      price: 99,
-      billingCycle: 'monthly',
-      maxUsers: 10,
-      maxOrders: 1000,
-      maxStorage: '5GB',
-      status: 'inactive',
-      createdAt: '2024-02-20',
-      updatedAt: '2024-05-15',
-    },
-  ]);
+  const {
+    subscriptions,
+    isModalOpen,
+    setModalOpen,
+    editingSubscription,
+    setEditingSubscription,
+    addOrUpdateSubscription,
+    setSubscriptions,
+  } = useSubscriptionStore();
+  
+  useEffect(() => {
+    setSubscriptions([
+      {
+        id: 'sub1',
+        tenantName: 'Millennium Spinners Pvt Ltd',
+        planName: 'Professional',
+        description: 'Mid-sized spinning unit with growing digital needs',
+        price: 299,
+        billingCycle: 'monthly',
+        maxUsers: 50,
+        maxOrders: 10000,
+        maxStorage: '25GB',
+        status: 'active',
+        createdAt: '2024-01-15',
+        updatedAt: '2024-06-10',
+      },
+      {
+        id: 'sub2',
+        tenantName: 'CottonWeave Industries',
+        planName: 'Enterprise',
+        description: 'Large-scale mill with automation integrations',
+        price: 799,
+        billingCycle: 'monthly',
+        maxUsers: -1,
+        maxOrders: -1,
+        maxStorage: 'Unlimited',
+        status: 'active',
+        createdAt: '2023-11-01',
+        updatedAt: '2024-06-01',
+      },
+      {
+        id: 'sub3',
+        tenantName: 'Shree Textiles',
+        planName: 'Basic',
+        description: 'Small mill using standard tracking features',
+        price: 99,
+        billingCycle: 'monthly',
+        maxUsers: 10,
+        maxOrders: 1000,
+        maxStorage: '5GB',
+        status: 'inactive',
+        createdAt: '2024-02-20',
+        updatedAt: '2024-05-15',
+      },
+    ]);
+  }, [setSubscriptions]);
+ 
 
   const filteredSubscriptions = subscriptions.filter((sub) => {
     const matchesSearch = sub.tenantName.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -79,16 +76,7 @@ const Plans: React.FC = () => {
     return matchesSearch && matchesStatus;
   });
 
-  const getStatusBadge = (status: 'active' | 'inactive') => (
-    <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-      status === 'active'
-        ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'
-        : 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300'
-    }`}>
-      {status.charAt(0).toUpperCase() + status.slice(1)}
-    </span>
-  );
-
+ 
   const formatLimit = (limit: number) => limit === -1 ? 'Unlimited' : limit.toLocaleString();
 
   return (
@@ -106,7 +94,7 @@ const Plans: React.FC = () => {
         <button
           onClick={() => {
             setEditingSubscription(null);
-            setIsModalOpen(true);
+            setModalOpen(true);
           }}
           className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
         >
@@ -182,7 +170,7 @@ const Plans: React.FC = () => {
               <button
                 onClick={() => {
                   setEditingSubscription(sub);
-                  setIsModalOpen(true);
+                  setModalOpen(true);
                 }}
                 className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 p-1"
                 title="Edit subscription"
@@ -209,16 +197,9 @@ const Plans: React.FC = () => {
       {/* Modal Placeholder */}
       <SubscriptionFormModal 
             isOpen={isModalOpen}
-            onClose={() => setIsModalOpen(false)}
+            onClose={() => setModalOpen(false)}
             editingSubscription={editingSubscription}
-            onSave={(newSub) => {
-              setSubscriptions((prev) => {
-                const exists = prev.some((sub) => sub.id === newSub.id);
-                return exists
-                  ? prev.map((sub) => (sub.id === newSub.id ? newSub : sub))
-                  : [...prev, newSub];
-              });
-            }}
+            onSave={addOrUpdateSubscription}
           />
 
               </div>

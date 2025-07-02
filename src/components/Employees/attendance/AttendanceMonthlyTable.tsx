@@ -2,6 +2,7 @@
 import React, { useMemo } from 'react';
 import AttendancePagination from './AttendancePagination';
 import { getStatusBadge } from './StatusBadge';
+import { getEmployeeSummary } from './utils/attendence';
 
 
 interface Props {  
@@ -23,8 +24,6 @@ const AttendanceMonthlyTable: React.FC<Props> = ({
   onPageChange,
   onPageSizeChange,
 }) => {
-  console.log('attendanceData', attendanceData);
-  console.log('monthDates', monthDates);
   
   // Early return if monthDates is not available
   if (!monthDates || !Array.isArray(monthDates) || monthDates.length === 0) {
@@ -37,10 +36,14 @@ const AttendanceMonthlyTable: React.FC<Props> = ({
     );
   }
 
+  const renderHeaderCell = (label: string, className = '') => (
+    <th className={`px-4 py-3 text-center ${className}`}>{label}</th>
+  );
+
   // Ensure employees are unique by ID
 
 
-  // Convert attendance data to a map for fast lookup
+  // Memoized attendance lookup by date and employee_id for fast access
   const attendanceMap = useMemo(() => {
     const map: Record<string, Record<string, any>> = {};
     
@@ -64,7 +67,6 @@ const AttendanceMonthlyTable: React.FC<Props> = ({
     return map;
   }, [attendanceData, monthDates]);
 
-  console.log('attendanceMap', attendanceMap);
 
 
 
@@ -77,8 +79,8 @@ const AttendanceMonthlyTable: React.FC<Props> = ({
             <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 text-sm">
               <thead className="bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-semibold sticky top-0 z-10">
                 <tr>
-                  <th className="px-4 py-3 text-center">T.No</th>
-                  <th className="px-4 py-3 text-left">Employee</th>
+                  {renderHeaderCell('T.No')}
+                  {renderHeaderCell('Employee')}
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
@@ -133,29 +135,14 @@ const AttendanceMonthlyTable: React.FC<Props> = ({
             <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 text-sm">
               <thead className="bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-semibold sticky top-0 z-10">
                 <tr>
-                  <th className="px-4 py-3 text-center">WD</th>
-                  <th className="px-4 py-3 text-center">OT</th>
-                  <th className="px-4 py-3 text-center">TH</th>
-                  <th className="px-4 py-3 text-center">Wages</th>
+                  {renderHeaderCell('WD')}
+                  {renderHeaderCell('OT')}
+                  {renderHeaderCell('TH')}
+                  {renderHeaderCell('Wages')}
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-                {attendanceData.map((emp) => {
-                  let workDays = 0;
-                  let totalHours = 0;
-                  let totalOvertime = 0;
-
-                  monthDates.forEach((date) => {
-                    const att = attendanceMap[date]?.[emp.employee_id];
-                    if (att && ['PRESENT', 'HALF_DAY'].includes(att.status)) {
-                      totalHours += att.total_hours;
-                      totalOvertime += att.overtime_hours;
-                      workDays += att.status === 'PRESENT' ? 1 : 0.5;
-                    }
-                  });
-
-                  const hourlyRate = Number(emp.employee.shift_rate || 0) / 8;
-                  const wages = parseFloat((hourlyRate * totalHours).toFixed(2));
+                {attendanceData.map((emp) => {const { workDays, totalHours, totalOvertime, wages } = getEmployeeSummary(emp, attendanceMap, monthDates);
 
                   return (
                     <tr key={emp.employee_id} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition">

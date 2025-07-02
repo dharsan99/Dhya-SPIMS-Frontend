@@ -161,21 +161,22 @@ const Shades = () => {
         </div>
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="min-w-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded shadow text-sm">
-          <thead className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300">
+      {/* Table Container with BulkEmailPanel style */}
+      <div className="w-full overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm bg-white dark:bg-gray-900">
+        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 text-sm">
+          <thead className="bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-semibold">
             <tr>
-              <th className="p-3 border">Shade Code</th>
-              <th className="p-3 border">Shade Name</th>
-              <th className="p-3 border">Composition</th>
-              <th className="p-3 border">Actions</th>
+              <th className="px-4 py-3 text-left">Shade Code</th>
+              <th className="px-4 py-3 text-left">Shade Name</th>
+              <th className="px-4 py-3 text-left">Composition</th>
+              <th className="px-4 py-3 text-left">Actions</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
             {paginated.map((shade) => (
-              <tr key={shade.id} className="border-t dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800">
-                <td className="p-3">{shade.shade_code}</td>
-                <td className="p-3">{shade.shade_name}</td>
+              <tr key={shade.id} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition">
+                <td className="px-4 py-3 text-gray-900 dark:text-white font-medium">{shade.shade_code}</td>
+                <td className="px-4 py-3 text-gray-900 dark:text-white font-medium">{shade.shade_name}</td>
                 <td className="p-3 text-xs text-gray-800 dark:text-gray-200">
                   {(shade.blend_composition || []).map((b, i) => (
                     <div key={b.fibre_id + i}>

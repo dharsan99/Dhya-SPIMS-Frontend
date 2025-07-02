@@ -9,6 +9,7 @@ const getPageTitle = (pathname: string) => {
   if (pathname.includes('/superadmin/tenants')) return 'Tenants Management';
   if (pathname.includes('/superadmin/plans')) return 'Subscription Plans Management';
   if (pathname.includes('/superadmin/billing')) return 'Billing & Revenue Management';
+  if (pathname.includes('/superadmin/settings')) return 'Settings';
   return 'Super Admin';
 };
 

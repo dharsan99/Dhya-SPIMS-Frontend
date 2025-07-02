@@ -12,7 +12,7 @@ async function extractFromImage(imagePath) {
 }
 
 async function extractFromPDF(pdfPath) {
-  console.log(`📂 Converting PDF to PNG using Poppler...`);
+
 
   if (fs.existsSync(outputDir)) fs.rmSync(outputDir, { recursive: true });
   fs.mkdirSync(outputDir);
@@ -31,7 +31,6 @@ async function extractFromPDF(pdfPath) {
   let fullText = '';
   for (const file of imageFiles) {
     const filePath = path.join(outputDir, file);
-    console.log(`🧠 OCR on ${file}...`);
     const text = await extractFromImage(filePath);
     fullText += `\n\n--- ${file} ---\n${text}`;
   }
@@ -49,7 +48,6 @@ async function extractFromPDF(pdfPath) {
   const ext = path.extname(filePath).toLowerCase();
   let text = '';
 
-  console.log(`📂 Processing file: ${filePath}`);
 
   if (ext === '.pdf') {
     text = await extractFromPDF(filePath);
@@ -60,6 +58,4 @@ async function extractFromPDF(pdfPath) {
     process.exit(1);
   }
 
-  console.log('\n📄 Extracted Text:\n');
-  console.log(text || '[No text found]');
 })();
