@@ -122,8 +122,10 @@ export const generateAttendancePDF = (props: {
 
   const body = employees.map(emp => {
     const summary = summaryMap[emp.employee_id] || { wd: 0, ot: 0, th: 0, wages: 0 };
+    const tokenNo = emp?.employee?.token_no ?? emp?.token_no ?? ''; // Fallback logic
+  
     return [
-      emp.employee.token_no ?? '',
+      tokenNo,
       emp.name ?? '',
       ...dates.map(date => getStatusLabel(attendanceMap[date]?.[emp.employee_id]?.status, displayMode) ?? '-'),
       summary.wd,

@@ -78,11 +78,13 @@ export const calculateWeeklyTotals = (
 
   weekDates.forEach((date) => {
     const att = emp.attendance?.[date];
+
     if (att && att.status !== 'ABSENT') {
+
       totalHours += att.total_hours || 0;
       totalOvertime += att.overtime_hours || 0;
       totalDays += att.status === 'PRESENT' ? 1 : att.status === 'HALF_DAY' ? 0.5 : 0;
-    }
+    } 
   });
 
   const shiftRate = parseFloat(emp.employee?.shift_rate || '0');
@@ -98,6 +100,7 @@ export const calculateWeeklyTotals = (
 };
 
 
+
 export const formatINR = (value: number) =>
   new Intl.NumberFormat('en-IN', {
     style: 'currency',
@@ -105,4 +108,23 @@ export const formatINR = (value: number) =>
     maximumFractionDigits: 2,
   }).format(value);
 
-
+  export const getEmployeeSummary = (emp: any, attendanceMap: any, monthDates: any) => {
+    let workDays = 0;
+    let totalHours = 0;
+    let totalOvertime = 0;
+  
+    monthDates.forEach((date: any) => {
+      const att = attendanceMap[date]?.[emp.employee_id];
+      if (att && ['PRESENT', 'HALF_DAY'].includes(att.status)) {
+        totalHours += att.total_hours || 0;
+        totalOvertime += att.overtime_hours || 0;
+        workDays += att.status === 'PRESENT' ? 1 : 0.5;
+      }
+    });
+  
+    const hourlyRate = Number(emp.employee.shift_rate || 0) / 8;
+    const wages = parseFloat((hourlyRate * totalHours).toFixed(2));
+  
+    return { workDays, totalHours, totalOvertime, wages };
+  };
+  

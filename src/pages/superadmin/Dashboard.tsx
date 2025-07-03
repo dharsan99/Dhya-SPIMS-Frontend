@@ -2,7 +2,7 @@ import React from 'react';
 import { FiUsers, FiHome, FiActivity, FiTrendingUp } from 'react-icons/fi';
 
 const SuperAdminDashboard: React.FC = () => {
-  // Mock data - replace with actual API calls
+  
   const stats = [
     {
       title: 'Total Tenants',
@@ -37,6 +37,7 @@ const SuperAdminDashboard: React.FC = () => {
       color: 'bg-orange-500',
     },
   ];
+
 
   return (
     <div className="space-y-6">
@@ -136,6 +137,8 @@ const SuperAdminDashboard: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Parsing Usage Panel */}
     </div>
   );
 };

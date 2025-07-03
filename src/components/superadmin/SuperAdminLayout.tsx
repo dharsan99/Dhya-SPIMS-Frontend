@@ -7,6 +7,9 @@ import SuperAdminSidebar from './SuperAdminSidebar';
 const getPageTitle = (pathname: string) => {
   if (pathname.includes('/superadmin/dashboard')) return 'Super Admin Dashboard';
   if (pathname.includes('/superadmin/tenants')) return 'Tenants Management';
+  if (pathname.includes('/superadmin/plans')) return 'Subscription Plans Management';
+  if (pathname.includes('/superadmin/billing')) return 'Billing & Revenue Management';
+  if (pathname.includes('/superadmin/settings')) return 'Settings';
   return 'Super Admin';
 };
 
@@ -75,7 +78,7 @@ const SuperAdminLayout = () => {
 
         {/* Header */}
         <header
-          className="sticky top-0 z-40 bg-white dark:bg-gray-900 border-b dark:border-gray-800 px-4 md:px-6 py-3 flex items-center justify-between shadow-md h-20"
+          className="sticky top-0 z-40 bg-white dark:bg-gray-900 border-b dark:border-gray-800 px-4 md:px-6 py-5 flex items-center justify-between shadow-md h-28"
           role="banner"
         >
           {/* Left: Menu Button & Page Title */}
@@ -87,13 +90,16 @@ const SuperAdminLayout = () => {
             >
               <FiMenu className="w-6 h-6" />
             </button>
-            <div className="flex items-center gap-6 min-w-0">
+            
+          </div>
+
+          <div className='flex flex-col md:flex-row justify-center items-center md:justify-between gap-2 md:gap-0 w-full'>
+
+          <div className="flex items-center gap-6 min-w-0">
               <span className="font-extrabold text-red-700 dark:text-red-300 text-xl tracking-wide truncate max-w-xs flex items-center" title={getPageTitle(location.pathname)}>
                 {getPageTitle(location.pathname)}
               </span>
             </div>
-          </div>
-
           {/* Right: User Info & Actions */}
           <div className="flex items-center gap-4">
             {/* User Avatar & Dropdown */}
@@ -118,6 +124,7 @@ const SuperAdminLayout = () => {
                 </div>
               )}
             </div>
+          </div>
           </div>
         </header>
 

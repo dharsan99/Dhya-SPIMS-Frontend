@@ -17,13 +17,12 @@ const UserTable = ({ users, roles, onSave, onDelete }: UserTableProps) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const { page, setPage, rowsPerPage, setRowsPerPage } = usePaginationStore();
+
   const hasPermission = useAuthStore((state) => state.hasPermission);
     const canAdd = hasPermission('Users', 'Add User');
     const canEdit = hasPermission('Users', 'Update User');
     const canDelete = hasPermission('Users', 'Delete User');
     const showActions = canEdit || canDelete;
-      
-    console.log('users', users)
 
   const paginatedUsers = useMemo(()=>{
     const startIndex = (page - 1) * rowsPerPage;

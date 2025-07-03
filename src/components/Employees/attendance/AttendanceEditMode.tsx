@@ -1,10 +1,10 @@
 // pullable request
 import React, { useState } from 'react';
 import { AttendanceEditModeProps, ShiftType, shiftTimeMap } from './AttendanceTypes';
-import { markAttendance,  markSingleAttendance } from '../../../api/attendance';
+import {  markAttendanceBulk,  markSingleAttendance } from '../../../api/attendance';
 import { TailwindDialog } from '../../ui/Dialog';
 import { useQueryClient } from '@tanstack/react-query';
-import { MarkAttendancePayload } from '@/types/attendance';
+import { showError, showSuccess } from './utils/toastutils';
 
 
 const AttendanceEditMode: React.FC<
@@ -16,11 +16,10 @@ const AttendanceEditMode: React.FC<
     onSubmitSuccess?: () => void;
   }
 > = ({ employees, attendance, onTimeChange, onOvertimeChange, pageStart, date, rangeMode, rangeStart, rangeEnd, onSubmitSuccess }) => {
-  console.log('employees', employees)
-  console.log('attendance', attendance)
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const queryClient = useQueryClient();
+
 
   const handleShiftChange = (empId: string, shift: string) => {
     onTimeChange(empId, 'shift', shift as ShiftType | 'ABSENT');
@@ -38,29 +37,47 @@ const AttendanceEditMode: React.FC<
   const handleSubmit = async () => {
     setIsSubmitting(true);
     try {
-      const payload: MarkAttendancePayload = {
-        date,
+      const formattedDate = new Date(date).toISOString().slice(0, 10);
+      const payload: any = {
+        date: formattedDate,
         records: employees.map((emp) => {
           const att = attendance[emp.employee_id];
-          const overtime = att?.overtime_hours || 0;
-          const isPresent = att?.shift !== 'ABSENT';
-
-          return {
-            employee_id: emp.employee_id,
-            in_time: att?.in_time || '',
-            out_time: att?.out_time || '',
-            total_hours: isPresent ? 8 + overtime : 0,
-            overtime_hours: overtime,
-            status: isPresent ? 'PRESENT' : 'ABSENT',
-            shift: att?.shift as ShiftType,
-          };
+          const isPresent = ['SHIFT_1', 'SHIFT_2', 'SHIFT_3'].includes(att?.shift || '');
+  
+          if (!att) {
+            throw new Error(`Missing attendance data for employee ${emp.employee.name}`);
+          }
+  
+          if (isPresent) {
+            const inTimeString = `${date}T${att.in_time || '00:00'}:00`;
+            const outTimeString = `${date}T${att.out_time || '00:00'}:00`;
+  
+            return {
+              employee_id: emp.employee_id,
+              shift: att.shift,
+              status: 'PRESENT',
+              in_time: new Date(inTimeString).toISOString(),
+              out_time: new Date(outTimeString).toISOString(),
+              overtime_hours: att.overtime_hours || 0,
+            };
+          } else {
+            // For ABSENT employees
+            const fallbackTime = new Date(`${date}T00:00:00.001Z`).toISOString();
+            return {
+              
+              employee_id: emp.employee_id,
+              shift: 'N/A',
+              status: 'ABSENT',
+              in_time: fallbackTime,
+              out_time: fallbackTime,
+              overtime_hours: 0,
+            };
+          }
         }),
       };
-
-      console.log('Attendance  befor marking.', payload);
-
-      await markAttendance(payload);
-      console.log('Attendance marked successfully, invalidating queries...');
+  
+      await markAttendanceBulk(payload);
+  
       queryClient.invalidateQueries({ 
         queryKey: ['attendance-summary', rangeMode, date, rangeStart, rangeEnd],
         refetchType: 'all'
@@ -69,14 +86,17 @@ const AttendanceEditMode: React.FC<
         queryKey: ['attendance', rangeMode, rangeStart, rangeEnd],
         refetchType: 'all'
       });
+  
       setIsModalOpen(false);
       onSubmitSuccess?.();
     } catch (err) {
       console.error('❌ Error submitting attendance:', err);
+      showError('Something went wrong while submitting attendance.');
     } finally {
       setIsSubmitting(false);
     }
   };
+
 
   return (
     <div className="space-y-4">
@@ -98,7 +118,8 @@ const AttendanceEditMode: React.FC<
           <tbody>
             {employees.map((emp, idx) => {
               const att = attendance[emp.employee_id];
-              const shiftValue = att?.shift || 'ABSENT';
+              const rawShift = att?.shift;
+              const shiftValue = ['SHIFT_1', 'SHIFT_2', 'SHIFT_3'].includes(rawShift || '') ? rawShift : 'ABSENT';
               const isPresent = shiftValue !== 'ABSENT';
               const overtime = att?.overtime_hours ?? 0;
               const totalHours = isPresent ? 8 + overtime : 0;
@@ -106,7 +127,7 @@ const AttendanceEditMode: React.FC<
               return (
                 <tr key={idx} className="border-t dark:border-gray-700 even:bg-gray-50 dark:even:bg-gray-900">
                   <td className="px-3 py-2 text-center">{pageStart + idx + 1}</td>
-                  <td className="px-3 py-2 text-left truncate max-w-[160px]">{emp.employee.name}</td>
+                  <td className="px-3 py-2 text-left truncate max-w-[160px]">{emp.name}</td>
                   <td className="px-3 py-2 text-center">
                   <select
                       value={shiftValue}
@@ -114,9 +135,9 @@ const AttendanceEditMode: React.FC<
                       className="w-28 px-2 py-1 rounded border text-sm dark:bg-gray-800 dark:text-white"
                     >
                       <option value="ABSENT">Absent</option>
-                      <option value="MORNING">Morning</option>
-                      <option value="EVENING">Evening</option>
-                      <option value="NIGHT">Night</option>
+                      <option value="SHIFT_1">Shift 1</option>
+                      <option value="SHIFT_2">Shift 2</option>
+                      <option value="SHIFT_3">Shift 3</option>
                     </select>
 
                   </td>
@@ -141,7 +162,6 @@ const AttendanceEditMode: React.FC<
                         onClick={async () => {
 
                           const att = attendance[emp.employee_id];
-                          console.log('att', att)
                           if (!att || att.shift === 'ABSENT') {
                             alert('Cannot update attendance for absent employees.');
                             return;
@@ -164,6 +184,7 @@ const AttendanceEditMode: React.FC<
                               throw new Error('Invalid date/time format');
                             }
                         
+                            const formattedDate = new Date(date).toISOString().slice(0, 10);
                             const payload = {
                               employee_id: emp.employee_id,
                               in_time: inDateTime.toISOString(),
@@ -171,12 +192,12 @@ const AttendanceEditMode: React.FC<
                               overtime_hours: att.overtime_hours || 0,
                               status: 'PRESENT' as const,
                               shift: att.shift,
+                              date: formattedDate,
                             };
 
-                            console.log('payload', payload)
                         
                             await markSingleAttendance(payload);
-                            alert(`✅ Attendance updated for ${emp.employee.name}`);
+                            showSuccess(`Attendance updated for ${emp.name}`);
                             queryClient.invalidateQueries({ queryKey: ['attendance', rangeMode, rangeStart, rangeEnd] });
                             queryClient.invalidateQueries({ queryKey: ['attendance-summary', rangeMode, date, rangeStart, rangeEnd] });
                           } catch (error) {
@@ -193,6 +214,15 @@ const AttendanceEditMode: React.FC<
             })}
           </tbody>
         </table>
+      </div>
+
+      <div className="flex justify-end">
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded"
+        >
+          Submit Attendance
+        </button>
       </div>
 
       <TailwindDialog

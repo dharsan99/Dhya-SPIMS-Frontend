@@ -17,7 +17,9 @@ export const createUser = async (data: CreateUserPayload): Promise<any> => {
 export const getAllUsers = () => api.get(endpoint);
 
 // Get a specific user by ID
-export const getUserById = (id: string) => api.get(`${endpoint}/${id}`);
+export const getUserById = (id: string) => {
+  return api.get(`${endpoint}/${id}`);
+};
 
 // ✅ Create a new user (role_id instead of role string)
 

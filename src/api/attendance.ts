@@ -50,6 +50,13 @@ export const markAttendance = async (payload: any) => {
   return res.data;
 };
 
+export const markAttendanceBulk = (payload: any) => {
+  return api.post('/attendance/mark-bulk', payload);
+};
+
+
+
+
 export const markSingleAttendance = async (payload: Omit<SingleAttendancePayload, 'employee_id'> & { employee_id: string }) => {
   const { employee_id, ...rest } = payload;
 
@@ -69,7 +76,6 @@ export const getAttendanceSummary = async (params: {
   month?: number;
   year?: number;
 }) => {
-  console.log('📊 getAttendanceSummary called with params:', params);
   return  await api.get('/attendance/summary-range', { params }).then((res) => res.data);
 };
 
@@ -82,5 +88,10 @@ export const fetchAttendanceByDate = async (date: string) => {
     const res = await api.get(`/attendance/range?start=${start}&end=${end}`);
     return res.data;
   };
+
+export const getDepartments = async (): Promise<string[]> => {
+  const res = await api.get('/employees/departments/all');
+  return res.data;
+};
 
   

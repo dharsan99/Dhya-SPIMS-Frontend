@@ -18,13 +18,13 @@ const OrdersTable: React.FC<OrdersTableProps> = ({ orders, onEdit, onDelete }) =
   }, [orders]);
 
   // Debug log for orders with shades
-  useEffect(() => {
+/*  useEffect(() => {
     console.log('Orders with shades:', orders.map(order => ({
       orderNumber: order.order_number,
       shade: order.shade,
       rawCotton: order.shade?.raw_cotton_compositions
     })));
-  }, [orders]);
+  }, [orders]);*/
 
   const paginatedOrders = useMemo(() => {
     const start = (page - 1) * rowsPerPage;

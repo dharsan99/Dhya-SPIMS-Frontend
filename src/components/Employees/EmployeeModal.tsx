@@ -1,5 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Employee } from '../../types/employee';
+import { showError } from './attendance/utils/toastutils';
+import CreatableSelect from 'react-select/creatable';
+import { useQuery } from '@tanstack/react-query';
+import { getDepartments } from '@/api/attendance';
 
 interface EmployeeModalProps {
   isOpen: boolean;
@@ -18,6 +22,11 @@ const EmployeeModal: React.FC<EmployeeModalProps> = ({ isOpen, onClose, onSave, 
     bank_acc_2: '',
     department: '',
     join_date: '', // optional
+  });
+
+  const { data: departmentOptions = [], isLoading: departmentsLoading, isError: departmentsError } = useQuery({
+    queryKey: ['departments'],
+    queryFn: getDepartments,
   });
 
   useEffect(() => {
@@ -51,8 +60,47 @@ const EmployeeModal: React.FC<EmployeeModalProps> = ({ isOpen, onClose, onSave, 
     }));
   };
 
+  const validateForm = (data: Omit<Employee, 'id'>) => {
+    const cleanedAadhar = data.aadhar_no.replace(/\D/g, ''); // remove all non-digit characters
+  
+    if (cleanedAadhar.length !== 12) {
+      return 'Aadhar number must be exactly 12 digits.';
+    }
+  
+    if (!/^[a-zA-Z0-9]+$/.test(data.token_no)) {
+      return 'Token number must be alphanumeric.';
+    }
+  
+    if (data.shift_rate <= 0) {
+      return 'Shift rate must be a positive number.';
+    }
+
+    if (!/^\d+$/.test(data.bank_acc_1)) {
+      return 'Bank Account 1 must contain only digits.';
+    }
+  
+    if (data.bank_acc_1.length < 9 || data.bank_acc_1.length > 18) {
+      return 'Bank Account 1 must be between 9 and 18 digits.';
+    }
+  
+    if (data.bank_acc_2) {
+      if (!/^\d+$/.test(data.bank_acc_2)) {
+        return 'Bank Account 2 must contain only digits.';
+      }
+      if (data.bank_acc_2.length < 9 || data.bank_acc_2.length > 18) {
+        return 'Bank Account 2 must be between 9 and 18 digits.';
+      }
+    }
+  
+    return null;
+  };
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const error = validateForm(formData);
+    if (error) {
+      showError(error);
+      return;
+    }
     onSave(formData, initialData?.id);
     onClose();
   };
@@ -65,6 +113,8 @@ const EmployeeModal: React.FC<EmployeeModalProps> = ({ isOpen, onClose, onSave, 
         <h2 className="text-xl font-bold mb-6 text-gray-800 dark:text-white">
           {initialData ? 'Edit Employee Record' : 'Add New Employee'}
         </h2>
+
+        <div className="overflow-y-auto max-h-[75vh] pr-2 custom-scrollbar">
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Section 1: Personal Info */}
@@ -148,15 +198,21 @@ const EmployeeModal: React.FC<EmployeeModalProps> = ({ isOpen, onClose, onSave, 
 
           {/* Section 3: Other */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
+            <div className='flex flex-col gap-2.5'>
               <label className="text-sm text-gray-600 dark:text-gray-300">Department (Optional)</label>
-              <input
+              <CreatableSelect
                 name="department"
-                type="text"
-                value={formData.department}
-                onChange={handleChange}
-                className="w-full p-2 mt-1 border rounded bg-white dark:bg-gray-800 dark:text-white"
+                options={departmentOptions.map((d) => ({ label: d, value: d }))}
+                value={formData.department ? { label: formData.department, value: formData.department } : null}
+                onChange={(option) => setFormData((prev) => ({ ...prev, department: option ? option.value : '' }))}
+                onCreateOption={(inputValue) => setFormData((prev) => ({ ...prev, department: inputValue }))}
+                isClearable
+                isLoading={departmentsLoading}
+                placeholder={departmentsLoading ? 'Loading...' : 'Select or type department'}
+                classNamePrefix="react-select"
+                menuPlacement='top'
               />
+              {departmentsError && <div className="text-red-500 text-xs mt-1">Failed to load departments</div>}
             </div>
             <div>
               <label className="text-sm text-gray-600 dark:text-gray-300">Joining Date (Optional)</label>
@@ -169,9 +225,12 @@ const EmployeeModal: React.FC<EmployeeModalProps> = ({ isOpen, onClose, onSave, 
               />
             </div>
           </div>
-
-          {/* Actions */}
-          <div className="flex justify-end gap-3 pt-4">
+     {/* Actions */}
+         
+        </form>
+       
+        </div>
+        <div className="flex justify-end gap-3 pt-4">
             <button
               type="button"
               onClick={onClose}
@@ -180,13 +239,14 @@ const EmployeeModal: React.FC<EmployeeModalProps> = ({ isOpen, onClose, onSave, 
               Cancel
             </button>
             <button
+              
               type="submit"
+              onClick={handleSubmit}
               className="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700"
             >
               {initialData ? 'Update' : 'Create'}
             </button>
           </div>
-        </form>
       </div>
     </div>
   );

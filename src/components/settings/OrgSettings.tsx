@@ -1,34 +1,33 @@
+import useAuthStore from '@/hooks/auth';
 import { useState } from 'react';
 
 const OrgSettings = () => {
+  const { user: authUser } = useAuthStore();
   const [isEditing, setIsEditing] = useState(false);
 
-  const [orgName, setOrgName] = useState('Dhya Innovations Pvt Ltd');
-  const [contactEmail, setContactEmail] = useState('info@dhya.in');
-  const [website, setWebsite] = useState('https://www.dhya.in');
-  const [address, setAddress] = useState('Coimbatore, Tamil Nadu, India');
+  const [userName, setUserName] = useState(authUser?.name || '');
+  const [email, setEmail] = useState(authUser?.email || '');
 
   const handleSave = () => {
     setIsEditing(false);
-    alert('Organization settings updated successfully');
+    alert('User details updated (locally)');
+    // Optionally update the backend here
   };
 
   return (
     <section className="space-y-6 max-w-3xl mx-auto">
       <header>
-        <h2 className="text-xl font-semibold text-gray-800 dark:text-white">Organization Settings</h2>
+        <h2 className="text-xl font-semibold text-gray-800 dark:text-white">User Info</h2>
         <p className="text-sm text-gray-500 dark:text-gray-400">
-          Manage organization details for your account.
+          Manage your personal account details.
         </p>
       </header>
 
       <div className="bg-white dark:bg-gray-900 border dark:border-gray-700 rounded shadow-sm p-6 transition-colors">
         {!isEditing ? (
           <div className="space-y-4">
-            <DetailRow label="Organization Name" value={orgName} />
-            <DetailRow label="Contact Email" value={contactEmail} />
-            <DetailRow label="Website" value={<a href={website} className="text-blue-600 dark:text-blue-400 underline">{website}</a>} />
-            <DetailRow label="Address" value={address} />
+            <DetailRow label="Name" value={userName} />
+            <DetailRow label="Email" value={email} />
             <div className="flex justify-end">
               <button
                 onClick={() => setIsEditing(true)}
@@ -47,29 +46,17 @@ const OrgSettings = () => {
             className="space-y-4"
           >
             <InputField
-              label="Organization Name"
+              label="Name"
               type="text"
-              value={orgName}
-              onChange={(e) => setOrgName(e.target.value)}
+              value={userName}
+              onChange={(e) => setUserName(e.target.value)}
             />
             <InputField
-              label="Contact Email"
+              label="Email"
               type="email"
-              value={contactEmail}
-              onChange={(e) => setContactEmail(e.target.value)}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
-            <InputField
-              label="Website URL"
-              type="url"
-              value={website}
-              onChange={(e) => setWebsite(e.target.value)}
-            />
-            <TextAreaField
-              label="Address"
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-            />
-
             <div className="flex justify-end gap-2">
               <button
                 type="button"
@@ -124,26 +111,6 @@ const InputField = ({
     <label className="block text-sm text-gray-700 dark:text-gray-300 mb-1">{label}</label>
     <input
       type={type}
-      value={value}
-      onChange={onChange}
-      className="w-full border dark:border-gray-600 dark:bg-gray-800 dark:text-white px-3 py-2 rounded"
-    />
-  </div>
-);
-
-const TextAreaField = ({
-  label,
-  value,
-  onChange,
-}: {
-  label: string;
-  value: string;
-  onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
-}) => (
-  <div>
-    <label className="block text-sm text-gray-700 dark:text-gray-300 mb-1">{label}</label>
-    <textarea
-      rows={3}
       value={value}
       onChange={onChange}
       className="w-full border dark:border-gray-600 dark:bg-gray-800 dark:text-white px-3 py-2 rounded"

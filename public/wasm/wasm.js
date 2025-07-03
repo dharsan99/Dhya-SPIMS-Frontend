@@ -72,7 +72,6 @@ export class WasmWrapper {
     await this.loadModuleScript_("/wasm/" + dir + "/veryfi-wasm.js");
     this.wasmModule = await createModule();
     this.loaded = true;
-    console.log('Module initialized')
   }
 
   setDocumentCallback(callback) {
@@ -110,7 +109,6 @@ export class WasmWrapper {
 
   initCardDetector() {
     if (!this.loaded) return false;
-    console.log('CC inited')
     const success = this.wasmModule.ccall("initCardDetector", "bool", [], []);
     return success;
   }
@@ -128,7 +126,6 @@ export class WasmWrapper {
   }
 
   setCreditCardCallback(callback) {
-    console.log('Detector')
     // if (!this.loaded) return false;
     this.callback = this.wasmModule.addFunction(
       (autoCaptureState, namePtr, numPtr, datePtr, cvvPtr) => {
@@ -273,8 +270,6 @@ export class WasmWrapper {
   async checkFeatures_() {
     let useSimd = await this.simd();
     let useThreads = await this.threads();
-    console.log(`SIMD available: ${useSimd}`);
-    console.log(`Threads available: ${useThreads}`);
     !useThreads &&
       console.log(
         "Threads disabled, seems that the security requirements for SharedArrayBuffer are not met"

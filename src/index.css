@@ -49,6 +49,19 @@ body {
   scrollbar-width: none; /* Firefox */
 }
 
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(100, 116, 139, 0.6); /* slate-500 */
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
 /* Custom animation using @layer utilities */
 @layer utilities {
   @keyframes fadeInUp {

@@ -1,5 +1,5 @@
 // pullable request
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useCallback } from 'react';
 
 import format from 'date-fns/format';
 import AttendanceFilters from './AttendanceFilters';
@@ -13,16 +13,17 @@ import { ShiftType, shiftTimeMap, AttendanceRow, AttendanceStatus } from './Atte
 import { useQuery } from '@tanstack/react-query';
 import { buildAttendanceMap } from '@/components/Employees/attendance/utils/attendence';
 import { useAttendanceDates } from './hooks/useAttendanceDates';
-import { getAllAttendances, getAttendanceInRange, getAttendanceSummary } from '@/api/attendance';
+import { getAllAttendances, getAttendanceInRange, getAttendanceSummary, getDepartments } from '@/api/attendance';
 import { AttendanceRecord } from '@/types/attendance';
 import AttendanceHeaderStats from './AttendanceHeaderStats';
+import { startOfWeek, startOfMonth } from 'date-fns';
 
 
 
 
 const AttendanceTab = () => {
   const [date, setDate] = useState(() => format(new Date(), 'yyyy-MM-dd'));
-  const [shift, setShift] = useState<ShiftType>('MORNING');
+  const [shift, setShift] = useState<ShiftType>('SHIFT_1');
   const [attendance, setAttendance] = useState<Record<string, AttendanceRow>>({});
   const [departmentFilter, setDepartmentFilter] = useState('');
   const [page, setPage] = useState(1);
@@ -31,10 +32,11 @@ const AttendanceTab = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
+
   const { dates, weekDates, monthDates } = useAttendanceDates(rangeMode, date);
 
-  const rangeStart = dates[0];
-  const rangeEnd = dates[dates.length - 1];
+  const rangeStart = useMemo(() => dates[0], [dates]);
+  const rangeEnd = useMemo(() => dates[dates.length - 1], [dates]);
 
   const { data: attendancesData, isLoading } = useQuery({
     queryKey: ['attendance', rangeMode, rangeStart, rangeEnd, page, itemsPerPage],
@@ -48,8 +50,20 @@ const AttendanceTab = () => {
     },
   });
 
+  const { data: departments = []} = useQuery({
+    queryKey: ['departments'],
+    queryFn: getDepartments,
+  });
 
-  console.log('attendancesdata for range', attendancesData)
+  const normalizeDateForRangeMode = (rangeMode: 'day' | 'week' | 'month', date: string): string => {
+    const d = new Date(date);
+    if (rangeMode === 'week') {
+      return format(startOfWeek(d, { weekStartsOn: 1 }), 'yyyy-MM-dd');
+    } else if (rangeMode === 'month') {
+      return format(startOfMonth(d), 'yyyy-MM-dd');
+    }
+    return format(d, 'yyyy-MM-dd');
+  };
 
 
 
@@ -74,15 +88,19 @@ const AttendanceTab = () => {
         department,
       } = record;
   
-      console.log('record', record)
       const normalizedStatus = typeof status === 'string'
         ? status.toUpperCase()
         : 'ABSENT';
   
+      const validShifts = ['SHIFT_1', 'SHIFT_2', 'SHIFT_3'];
+      const normalizedShift = (shift && validShifts.includes(shift.toUpperCase()))
+        ? (shift.toUpperCase() as ShiftType)
+        : 'ABSENT';
+
       initialAttendance[employee_id] = {
         in_time: in_time ? new Date(in_time).toISOString().slice(11, 16) : '',
         out_time: out_time ? new Date(out_time).toISOString().slice(11, 16) : '',
-        shift: (shift?.toUpperCase() as ShiftType) ?? 'MORNING',
+        shift: normalizedShift,
         overtime_hours: overtime_hours || 0,
         total_hours: total_hours || 0,
         status: allowedStatuses.includes(normalizedStatus as AttendanceStatus)
@@ -98,7 +116,12 @@ const AttendanceTab = () => {
     setAttendance(initialAttendance);
   }, [attendancesData]);
 
-  console.log('date', date)
+  useEffect(() => {
+    if (rangeMode !== 'day' && viewMode === 'edit') {
+      setViewMode('view');
+    }
+  }, [rangeMode, viewMode]);
+
 
   const { data: summaryData } = useQuery({
     queryKey: ['attendance-summary', rangeMode, date, rangeStart, rangeEnd],
@@ -116,26 +139,31 @@ const AttendanceTab = () => {
     enabled: !!date, // only run if date is available
   });
 
-  console.log('summaryData', summaryData)
-  const departments = useMemo(() => {
-    return [...new Set(attendances.map((a: AttendanceRecord) => a.employee?.department).filter(Boolean))] as string[];
-  }, [attendances]);
+
+
 
   const filteredAttendances = useMemo(() => {
     return attendances.filter((emp: AttendanceRecord) => {
+      const department = rangeMode === 'day'
+        ? emp.department
+        : emp.employee?.department;
+  
       const matchesDept = departmentFilter
-        ? emp.employee?.department === departmentFilter
+        ? department === departmentFilter
         : true;
+  
+      const name = rangeMode === 'day'
+        ? emp.name
+        : emp.employee?.name;
   
       const q = searchQuery.toLowerCase();
       const matchesSearch =
-        emp.employee?.name?.toLowerCase().includes(q) ||
+        name?.toLowerCase().includes(q) ||
         emp.employee_id?.toLowerCase().includes(q);
   
       return matchesDept && matchesSearch;
     });
-  }, [attendances, departmentFilter, searchQuery]);
-
+  }, [attendances, departmentFilter, searchQuery, rangeMode]);
 
  
 
@@ -146,7 +174,7 @@ const AttendanceTab = () => {
   const startIdx = (page - 1) * itemsPerPage;
   const paginatedAttendances = filteredAttendances;
 
-  const handleTimeChange = (
+  const handleTimeChange = useCallback((
     id: string,
     field: 'in_time' | 'out_time' | 'shift',
     value: string | undefined
@@ -191,9 +219,9 @@ const AttendanceTab = () => {
 
       return { ...prev, [id]: updated };
     });
-  };
+  }, []);
 
-  const handleOvertimeChange = (id: string, value: number) => {
+  const handleOvertimeChange = useCallback((id: string, value: number) => {
     setAttendance((prev) => {
       const updated = { ...prev[id] };
       updated.overtime_hours = value;
@@ -201,7 +229,7 @@ const AttendanceTab = () => {
       updated.status = updated.total_hours > 0 ? 'PRESENT' : 'ABSENT';
       return { ...prev, [id]: updated };
     });
-  };
+  }, []);
 
   const normalizedDate = useMemo(() => {
     if (rangeMode === 'month') {
@@ -211,6 +239,18 @@ const AttendanceTab = () => {
     return date;
   }, [rangeMode, date]);
 
+  // Handle viewMode reset on range change
+  const handleRangeChange = useCallback((mode: 'day' | 'week' | 'month') => {
+    setRangeMode(mode);
+    if (mode === 'week') {
+      const normalized = normalizeDateForRangeMode(mode, date);
+      setDate(normalized);
+    }
+    if (mode !== 'day' && viewMode === 'edit') {
+      setViewMode('view');
+    }
+  }, [date, viewMode]);
+
   return (
     <div className="space-y-4">
      <AttendanceHeaderStats
@@ -218,12 +258,12 @@ const AttendanceTab = () => {
           loadingSummary={!summaryData}
           department={departmentFilter}
         />
-      <AttendanceModeTabs
-        mode={viewMode}
-        onModeChange={setViewMode}
-        range={rangeMode}
-        onRangeChange={setRangeMode}
-      />
+     <AttendanceModeTabs
+  mode={viewMode}
+  onModeChange={setViewMode}
+  range={rangeMode}
+  onRangeChange={handleRangeChange}
+/>
       <AttendanceFilters
         date={normalizedDate}
         onDateChange={setDate}

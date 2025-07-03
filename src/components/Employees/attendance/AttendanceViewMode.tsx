@@ -6,9 +6,9 @@ import { AttendanceViewModeProps } from './AttendanceTypes';
 
 // 🔹 Shift label and time map
 const shiftMap = {
-  MORNING: { label: 'Morning', time: '6 AM - 2 PM' },
-  EVENING: { label: 'Evening', time: '2 PM - 10 PM' },
-  NIGHT: { label: 'Night', time: '10 PM - 6 AM' },
+  SHIFT_1: { label: 'Shift 1', time: '6 AM - 2 PM' },
+  SHIFT_2: { label: 'Shift 2', time: '2 PM - 10 PM' },
+  SHIFT_3: { label: 'Shift 3', time: '10 PM - 6 AM' },
   ABSENT: { label: 'Absent', time: '--:--' },
 };
 
@@ -16,8 +16,6 @@ const AttendanceViewMode: React.FC<AttendanceViewModeProps & { date: string }> =
   employees,
   loading
 }) => {
-
-  console.log('employees', employees)
 
 
   if (loading) {
@@ -55,7 +53,7 @@ const AttendanceViewMode: React.FC<AttendanceViewModeProps & { date: string }> =
               const shift = shiftMap[rawShiftKey as keyof typeof shiftMap] ?? shiftMap['ABSENT'];
               const totalHours = isPresent ? 8 + overtime : 0;
               const workDays = isPresent ? 1 : 0;
-              const wageRate = Number(emp.employee.shift_rate) ?? 0;
+              const wageRate = Number(emp.shift_rate) ?? 0;
               const wages = (totalHours / 8) * wageRate;
 
 
@@ -65,13 +63,13 @@ const AttendanceViewMode: React.FC<AttendanceViewModeProps & { date: string }> =
                   className="hover:bg-gray-50 dark:hover:bg-gray-800 transition"
                 >
                   <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-300">
-                    {emp.employee.token_no || <span className="italic text-gray-400">–</span>}
+                    {emp.token_no || <span className="italic text-gray-400">–</span>}
                   </td>
                   <td
                     className="px-4 py-3 text-gray-900 dark:text-white max-w-[200px] truncate"
-                    title={emp.employee?.name}
+                    title={emp.name}
                   >
-                    {emp.employee?.name}
+                    {emp.name}
                   </td>
                   <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-300">
                     {shift?.label}

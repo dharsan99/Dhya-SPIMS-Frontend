@@ -4,6 +4,7 @@ import EmployeeModal from '../components/Employees/EmployeeModal';
 import EmployeeTable from '../components/Employees/EmployeeTable';
 import AttendanceTab from '../components/Employees/attendance/AttendanceTab';
 import { Employee } from '../types/employee';
+import { toast } from 'react-hot-toast';
 import {
   getAllEmployees,
   createEmployee,
@@ -30,32 +31,39 @@ const Employees = () => {
 
   
 
-  console.log('employees', employees)
 
 
   const handleEdit = (emp: Employee) => {
     setEditingEmployee(emp);
     setModalOpen(true);
   };
-
   const handleSave = async (data: Omit<Employee, 'id'>, id?: string) => {
     try {
       if (id) {
         await updateEmployee(id, data);
+        toast.success('Employee updated successfully');
       } else {
         await createEmployee(data);
+        toast.success('Employee created successfully');
       }
-      refetch(); // refresh the list
+      refetch();
     } catch (err) {
-      // ... removed all console.error ...
+      toast.error('Something went wrong while saving employee.');
     } finally {
       setModalOpen(false);
     }
   };
 
-  const handleDelete = (id: string) => {
-    setConfirmDeleteId(id);
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteEmployee(id);
+      toast.success('Employee deleted successfully');
+      refetch();
+    } catch (err) {
+      toast.error('Failed to delete employee');
+    }
   };
+  
 
   if (isLoading) return <Loader />;
 

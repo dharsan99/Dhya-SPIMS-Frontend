@@ -59,7 +59,7 @@ const Sidebar = ({ onLinkClick }: { onLinkClick?: () => void }) => {
   return (
 
     <aside
-      className={`h-full flex flex-col bg-white dark:bg-gray-900 border-r dark:border-gray-700 shadow-md transition-all duration-300 overflow-y-auto pt-20 ${collapsed ? 'w-20' : 'w-64'}` }
+      className={`h-full flex flex-col bg-white dark:bg-gray-900 border-r dark:border-gray-700 shadow-md transition-all duration-300 overflow-y-auto pt-20 md:pt-0 ${collapsed ? 'w-20' : 'w-64'}` }
       aria-label="Sidebar Navigation"
     >
       {/* Header Section */}

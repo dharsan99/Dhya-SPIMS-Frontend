@@ -52,10 +52,10 @@ const RoleTable = ({ roles, onEdit, onDelete, onAdd, loading }: RoleTableProps) 
               )}
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+          <tbody className="divide-y divide-gray-300 dark:divide-gray-800">
             {loading ? (
               <tr>
-                <td colSpan={3} className="text-center py-6 text-gray-500 italic dark:text-gray-400">
+                <td colSpan={3} className="text-center py-6 text-gray-800 italic dark:text-gray-400">
                 <div className="flex justify-center items-center h-24">
                   <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
                 </div>
@@ -71,43 +71,48 @@ const RoleTable = ({ roles, onEdit, onDelete, onAdd, loading }: RoleTableProps) 
                     {role.name}
                   </td>
                   <td className="px-4 py-3">
-                    {(() => {
-                      const entries = Object.entries(role.permissions);
-                      const isExpanded = expandedRoleId === role.id;
-                      const visibleEntries = isExpanded ? entries : entries.slice(0, 2);
-                      
-                      return (
-                        <div className="space-y-2">
-                          {visibleEntries.map(([feature, perms]) => (
-                            <div key={feature}>
-                              <div className="font-medium text-gray-800 dark:text-gray-200 mb-1">{feature}</div>
-                              <div className="flex flex-wrap gap-3">
-                                {perms.map((perm) => (
-                                  <span
-                                    key={perm}
-                                    className="inline-block bg-blue-100 text-blue-800 text-xs font-medium px-2 py-0.5 rounded dark:bg-blue-900 dark:text-blue-100"
-                                  >
-                                    {perm}
-                                  </span>
-                                ))}
-                              </div>
-                            </div>
-                          ))}
+  {(() => {
+    const entries = Object.entries(role.permissions);
+    const isExpanded = expandedRoleId === role.id;
+    const visibleEntries = isExpanded ? entries : entries.slice(0, 2);
 
-                          {entries.length > 2 && (
-                            <button
-                              className="text-blue-600 hover:underline text-xs mt-1"
-                              onClick={() =>
-                                setExpandedRoleId(isExpanded ? null : role.id)
-                              }
-                            >
-                              {isExpanded ? 'See less' : `+${entries.length - 2} more`}
-                            </button>
-                          )}
-                        </div>
-                      );
-                    })()}
-                  </td>
+    return (
+      <>
+        <div className="space-y-2 grid grid-cols-1 md:grid-cols-2 gap-2">
+          {visibleEntries.map(([feature, perms]) => (
+            <div key={feature}>
+              <div className="font-medium text-gray-800 dark:text-gray-200 mb-1">
+                {feature}
+              </div>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
+                {perms.map((perm) => (
+                  <span
+                    className="block bg-blue-100 text-blue-800 text-xs font-medium px-2 py-0.5 rounded dark:bg-blue-900 dark:text-blue-100 w-23 truncate"
+                    title={perm}
+                    key={perm}
+                  >
+                    {perm}
+                  </span>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {entries.length > 2 && (
+          <button
+            className="text-blue-600 hover:underline text-xs mt-1"
+            onClick={() =>
+              setExpandedRoleId(isExpanded ? null : role.id)
+            }
+          >
+            {isExpanded ? 'See less' : `+${entries.length - 2} more`}
+          </button>
+        )}
+      </>
+    );
+  })()}
+</td>
                   {showActions && (
                       <td className="px-4 py-3 text-center">
                         <div className="flex justify-center gap-2">
