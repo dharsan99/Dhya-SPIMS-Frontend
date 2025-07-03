@@ -1,0 +1,98 @@
+/* src/index.css */
+
+/* Tailwind v4 imports */
+@import "tailwindcss/preflight";
+@import "tailwindcss/utilities";
+@import "react-quill-new/dist/quill.snow.css";
+@import "quill-better-table/dist/quill-better-table.css";
+/* Optional: If you still want all Tailwind utilities */
+@import "tailwindcss";
+
+/* ➡️ Now your custom styles and animations */
+
+/* Smooth scroll and transitions */
+html {
+  scroll-behavior: smooth;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* ✨ Theme handling for Light / Dark */
+html.light {
+  background-color: #ffffff;
+  color: #1f2937; /* Tailwind's gray-800 */
+}
+
+html.dark {
+  background-color: #0f172a; /* Tailwind's gray-950 */
+  color: #f3f4f6; /* Tailwind's gray-100 */
+}
+
+body {
+  @apply transition-colors duration-300 ease-in-out;
+}
+
+/* in index.css or global styles */
+.react-select__control {
+  background-color: #f9fafb;
+  border-radius: 6px;
+  min-height: 40px;
+}
+.react-select__menu {
+  z-index: 9999 !important;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(100, 116, 139, 0.6); /* slate-500 */
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+/* Custom animation using @layer utilities */
+@layer utilities {
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fadeInUp {
+    animation: fadeInUp 0.3s ease-out both;
+  }
+}
+
+/* Custom Spinner Loader */
+@layer utilities {
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  .loader {
+    @apply border-4 border-t-blue-600 border-r-transparent border-b-transparent border-l-transparent rounded-full w-16 h-16;
+    animation: spin 1s linear infinite;
+  }
+}

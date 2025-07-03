@@ -1,0 +1,13 @@
+/* Global override styles for SPIMS */
+
+body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background-color: #f8fafc; /* light gray */
+    color: #1e293b; /* slate-800 */
+  }
+  
+  h1, h2, h3, h4, h5 {
+    font-weight: 600;
+    color: #1e293b;
+  }
+  
