@@ -1,14 +1,15 @@
 import { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
-import { useThemeStore } from './hooks/useThemeStore'; // ✅
+import { useThemeStore } from './hooks/useThemeStore';
+import ScrollToTop from './components/ScrollToTop';
 
 import DashboardLayout from './layout/DashboardLayout';
 import SuperAdminLayout from './components/superadmin/SuperAdminLayout';
 import ProtectedRoute from './routes/ProtectedRoute';
 import WebsiteHeader from './components/website/WebsiteHeader';
 import WebsiteFooter from './components/website/WebsiteFooter';
-import CookieConsentBanner from './components/CookieConsentBanner'; // ✅
+import CookieConsentBanner from './components/CookieConsentBanner';
 
 import LoginPage from './pages/Login';
 import Dashboard from './pages/Dashboard';
@@ -34,6 +35,8 @@ import RefundPolicyPage from './pages/website/RefundPolicyPage';
 import DisclaimerPage from './pages/website/DisclaimerPage';
 import Employees from './pages/Employees';
 import Marketing from './pages/Marketing';
+
+import FeaturesPage from './pages/website/FeaturesPage';
 import ProductionEntryPage from './pages/ProductionEntryPage';
 import SignupPage from './pages/Signup';
 import SubscriptionPlanPage from './pages/SubscriptionPlanPage';
@@ -41,26 +44,49 @@ import SubscriptionPlanPage from './pages/SubscriptionPlanPage';
 // Super Admin Pages
 import SuperAdminDashboard from './pages/superadmin/Dashboard';
 import Tenants from './pages/superadmin/Tenants';
+
 import Plans from './pages/superadmin/Plans';
 import Billing from './pages/superadmin/Billing';
 import ParsingUsage from './pages/superadmin/ParsingUsage';
 import SuperAdminSettings from './pages/superadmin/Settings';
 
+// Layout Components
+const WebsiteLayout = () => (
+  <>
+    <WebsiteHeader />
+    <Outlet />
+    <WebsiteFooter />
+  </>
+);
+
+const DelayedNotFound = () => {
+  const [show404, setShow404] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setShow404(true), 5000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (!show404) return null;
+  return <NotFoundPage />;
+};
+
+
+
 function App() {
   const { setTheme } = useThemeStore();
 
   useEffect(() => {
-    const storedTheme = localStorage.getItem('theme') as 'light' | 'dark' | 'auto' | null;
-    if (storedTheme) {
-      setTheme(storedTheme);
-    }
-  }, [setTheme]); // ✅ NOT on theme change, only once
+    // Always set light theme on app initialization without showing toast
+    setTheme('light', false);
+  }, [setTheme]);
 
   return (
     <>
       <Toaster position="top-center" />
 
       <BrowserRouter>
+        <ScrollToTop />
         <Routes>
           {/* Website Layout */}
           <Route path="/" element={<WebsiteLayout />}>
@@ -68,6 +94,7 @@ function App() {
             <Route path="about" element={<AboutPage />} />
             <Route path="contact" element={<ContactPage />} />
             <Route path="docs" element={<DocumentationPage />} />
+            <Route path="features" element={<FeaturesPage />} />
             <Route path="terms" element={<TermsPage />} />
             <Route path="privacy-policy" element={<PrivacyPolicyPage />} />
             <Route path="refund-policy" element={<RefundPolicyPage />} />
@@ -98,10 +125,10 @@ function App() {
             <Route path="fibers" element={<Fibers />} />
             <Route path="settings" element={<Settings />} />
             <Route path="employees" element={<Employees />} />
+            <Route path="marketing" element={<Marketing />} />
             <Route path="*" element={<DelayedNotFound />} />
-            <Route path="marketing" element={<Marketing />} /> {/* ✅ Added */}
-
           </Route>
+
 
           {/* Protected Super Admin */}
           <Route path="/superadmin" element={<ProtectedRoute><SuperAdminLayout /></ProtectedRoute>}>
@@ -124,25 +151,5 @@ function App() {
     </>
   );
 }
-
-const WebsiteLayout = () => (
-  <>
-    <WebsiteHeader />
-    <Outlet />
-    <WebsiteFooter />
-  </>
-);
-
-const DelayedNotFound = () => {
-  const [show404, setShow404] = useState(false);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setShow404(true), 5000);
-    return () => clearTimeout(timer);
-  }, []);
-
-  if (!show404) return null;
-  return <NotFoundPage />;
-};
 
 export default App;

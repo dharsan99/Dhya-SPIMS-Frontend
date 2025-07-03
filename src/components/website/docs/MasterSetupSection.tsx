@@ -1,77 +1,285 @@
 import { motion } from "framer-motion";
-
-const masterSetupSteps = [
-  {
-    title: "Create Fiber Categories",
-    desc: "Organize fibers into logical groups such as Cotton, Polyester, etc., enabling cleaner stock segmentation and easier reporting.",
-  },
-  {
-    title: "Add Fibers",
-    desc: "Maintain detailed records for every fiber material including stock quantity, properties, and tracking information.",
-  },
-  {
-    title: "Define Blends",
-    desc: "Build blends by combining different fibers with defined percentages to prepare for shade creation and production planning.",
-  },
-  {
-    title: "Setup Shades",
-    desc: "Configure shade numbers linked with fiber or blend compositions to manage inventory and fulfill order specifications accurately.",
-  },
-  {
-    title: "Add Buyers and Suppliers",
-    desc: "Manage key contacts across sales and procurement operations. Link buyers to orders and suppliers to procurement flows seamlessly.",
-  },
-  {
-    title: "Map Yarn Requirements",
-    desc: "Assign yarn composition and material requirements to shades or orders for automated production and procurement planning.",
-  },
-];
+import { FaBox, FaIndustry, FaUsers, FaCogs } from "react-icons/fa";
 
 export default function MasterSetupSection() {
+  const masterDataTypes = [
+    {
+      icon: <FaBox className="w-8 h-8 text-blue-600" />,
+      title: "Material Master",
+      description: "Configure raw materials, finished goods, and packaging materials",
+      items: [
+        {
+          name: "Fibers",
+          details: [
+            "Material type (Cotton, Polyester, etc.)",
+            "Grade and quality parameters",
+            "Unit of measurement",
+            "Standard specifications"
+          ]
+        },
+        {
+          name: "Yarns",
+          details: [
+            "Count and composition",
+            "Twist and construction",
+            "Quality parameters",
+            "Packing specifications"
+          ]
+        },
+        {
+          name: "Blends",
+          details: [
+            "Component materials",
+            "Blend ratios",
+            "Quality standards",
+            "Production parameters"
+          ]
+        }
+      ]
+    },
+    {
+      icon: <FaIndustry className="w-8 h-8 text-blue-600" />,
+      title: "Production Master",
+      description: "Set up production-related master data",
+      items: [
+        {
+          name: "Machines",
+          details: [
+            "Machine type and model",
+            "Capacity and specifications",
+            "Maintenance schedule",
+            "Performance parameters"
+          ]
+        },
+        {
+          name: "Processes",
+          details: [
+            "Process flow definition",
+            "Quality check points",
+            "Standard operating procedures",
+            "Efficiency parameters"
+          ]
+        },
+        {
+          name: "Shifts",
+          details: [
+            "Shift timings",
+            "Manpower allocation",
+            "Production targets",
+            "Break schedules"
+          ]
+        }
+      ]
+    },
+    {
+      icon: <FaUsers className="w-8 h-8 text-blue-600" />,
+      title: "Business Partners",
+      description: "Configure customer and supplier information",
+      items: [
+        {
+          name: "Customers",
+          details: [
+            "Company details",
+            "Contact information",
+            "Credit terms",
+            "Special requirements"
+          ]
+        },
+        {
+          name: "Suppliers",
+          details: [
+            "Material categories",
+            "Payment terms",
+            "Quality standards",
+            "Delivery schedules"
+          ]
+        },
+        {
+          name: "Transporters",
+          details: [
+            "Vehicle details",
+            "Route information",
+            "Capacity and rates",
+            "Documentation requirements"
+          ]
+        }
+      ]
+    },
+    {
+      icon: <FaCogs className="w-8 h-8 text-blue-600" />,
+      title: "System Configuration",
+      description: "Set up system-wide parameters and settings",
+      items: [
+        {
+          name: "Units & Measures",
+          details: [
+            "Weight units",
+            "Length units",
+            "Conversion factors",
+            "Standard formats"
+          ]
+        },
+        {
+          name: "Cost Centers",
+          details: [
+            "Department structure",
+            "Cost allocation",
+            "Budget parameters",
+            "Reporting hierarchy"
+          ]
+        },
+        {
+          name: "Quality Parameters",
+          details: [
+            "Testing methods",
+            "Acceptance criteria",
+            "Sampling procedures",
+            "Documentation standards"
+          ]
+        }
+      ]
+    }
+  ];
+
+  const setupSteps = [
+    {
+      title: "Initial Setup",
+      steps: [
+        "Define basic units of measurement",
+        "Set up cost centers and departments",
+        "Configure quality parameters",
+        "Establish standard formats"
+      ]
+    },
+    {
+      title: "Material Configuration",
+      steps: [
+        "Create fiber specifications",
+        "Define yarn parameters",
+        "Set up blend combinations",
+        "Configure packaging details"
+      ]
+    },
+    {
+      title: "Production Setup",
+      steps: [
+        "Register machines and equipment",
+        "Define process flows",
+        "Set up shift patterns",
+        "Configure quality check points"
+      ]
+    },
+    {
+      title: "Partner Setup",
+      steps: [
+        "Add customer profiles",
+        "Configure supplier details",
+        "Set up transporter information",
+        "Define credit and payment terms"
+      ]
+    }
+  ];
+
   return (
-    <section id="master-setup" className="px-6 bg-white dark:bg-gray-900 transition-colors duration-300">
+    <section id="master-setup" className="px-6 bg-white">
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.7 }}
-        className="max-w-6xl mx-auto flex flex-col justify-center min-h-[calc(100vh-8rem)]"
+        className="max-w-5xl mx-auto py-12"
       >
-        {/* Heading */}
-        <h1 className="text-4xl md:text-5xl font-extrabold text-center text-gray-900 dark:text-white mb-8">
-          Setting Up Your Master Data
-        </h1>
-
-        {/* Introduction */}
-        <p className="text-lg text-center text-gray-700 dark:text-gray-400 leading-relaxed max-w-3xl mx-auto mb-12">
-          A clean master setup is the foundation for smooth production, order tracking, and inventory management. Carefully setting up your initial data ensures operational consistency as you scale.
-        </p>
+        {/* Hero Section */}
+        <div className="text-center mb-16">
+          <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-6">
+            Master Data Setup
+          </h1>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            Configure essential master data to streamline your spinning mill operations and ensure accurate tracking across all processes.
+          </p>
+        </div>
 
         {/* Setup Steps */}
-        <div className="grid md:grid-cols-2 gap-8 mb-12">
-          {masterSetupSteps.map((step, index) => (
-            <motion.div
-              key={index}
-              whileHover={{ scale: 1.03 }}
-              transition={{ type: "spring", stiffness: 250 }}
-              className="p-6 rounded-2xl bg-gray-50 dark:bg-gray-800 shadow-md hover:shadow-lg border border-gray-100 dark:border-gray-700 transition duration-300"
-            >
-              <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-3">
-                {step.title}
-              </h3>
-              <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                {step.desc}
-              </p>
-            </motion.div>
-          ))}
+        <div className="mb-16">
+          <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
+            Setup Process
+          </h2>
+          <div className="grid md:grid-cols-2 gap-6">
+            {setupSteps.map((section, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                className="bg-gray-50 p-6 rounded-xl"
+              >
+                <h3 className="text-xl font-bold text-gray-900 mb-4">{section.title}</h3>
+                <ul className="space-y-2">
+                  {section.steps.map((step, idx) => (
+                    <li key={idx} className="flex items-center gap-2 text-gray-600">
+                      <span className="w-1.5 h-1.5 bg-blue-600 rounded-full"></span>
+                      {step}
+                    </li>
+                  ))}
+                </ul>
+              </motion.div>
+            ))}
+          </div>
         </div>
 
-        {/* CTA */}
-        <div className="text-center text-xl font-semibold text-blue-600 dark:text-blue-400 mb-8">
-          Once your master data is configured, you're ready to start managing orders and tracking production seamlessly.
+        {/* Master Data Types */}
+        <div>
+          <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
+            Master Data Categories
+          </h2>
+          <div className="space-y-8">
+            {masterDataTypes.map((category, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition"
+              >
+                <div className="flex items-start gap-4">
+                  <div className="flex-shrink-0">{category.icon}</div>
+                  <div className="flex-grow">
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">{category.title}</h3>
+                    <p className="text-gray-600 mb-6">{category.description}</p>
+                    <div className="grid md:grid-cols-3 gap-6">
+                      {category.items.map((item, idx) => (
+                        <div key={idx} className="bg-gray-50 p-4 rounded-lg">
+                          <h4 className="font-semibold text-gray-900 mb-3">{item.name}</h4>
+                          <ul className="space-y-2">
+                            {item.details.map((detail, detailIdx) => (
+                              <li key={detailIdx} className="text-sm text-gray-600">
+                                • {detail}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
         </div>
 
-        {/* Prev/Next Navigation */}
+        {/* Best Practices */}
+        <div className="mt-16 bg-blue-50 p-6 rounded-xl">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">Best Practices</h2>
+          <ul className="space-y-3 text-gray-700">
+            <li>• Start with essential master data and expand gradually</li>
+            <li>• Maintain consistent naming conventions across all master data</li>
+            <li>• Regularly review and update master data to ensure accuracy</li>
+            <li>• Document all master data configurations for future reference</li>
+            <li>• Train team members on master data management procedures</li>
+          </ul>
+        </div>
       </motion.div>
     </section>
   );
