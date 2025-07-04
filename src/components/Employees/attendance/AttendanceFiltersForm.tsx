@@ -80,9 +80,10 @@ const AttendanceFiltersForm: React.FC<AttendanceFiltersFormProps> = ({
 
   return (
     <div className="flex flex-col lg:flex-row gap-4">
-        <div className='flex flex-row gap-4'>
-      {renderDateSelector()}
-     
+        <div className='flex flex-col sm:flex-row gap-4 justify-center items-center md:items-start'>
+          <div className=''>
+            {renderDateSelector()}
+            </div>
       <div className="min-w-[200px]">
           <Select
             options={departmentOptions}

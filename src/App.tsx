@@ -45,6 +45,7 @@ import Plans from './pages/superadmin/Plans';
 import Billing from './pages/superadmin/Billing';
 import ParsingUsage from './pages/superadmin/ParsingUsage';
 import SuperAdminSettings from './pages/superadmin/Settings';
+import VerifyEmailPage from './pages/VerifyEmail';
 
 function App() {
   const { setTheme } = useThemeStore();
@@ -77,6 +78,7 @@ function App() {
           {/* Login */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
+          <Route path="/verify-email" element={<VerifyEmailPage />} />
           <Route path="/select-plan" element={<SubscriptionPlanPage />} />
 
           {/* Protected Dashboard */}
