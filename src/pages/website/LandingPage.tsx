@@ -1,11 +1,10 @@
 import { Link } from 'react-router-dom';
 import HeroSection from '../../components/website/HeroSection';
 import FeatureSection from '../../components/website/FeatureSection';
-import TestimonialSection from '../../components/website/TestimonialSection';
 
 const LandingPage = () => {
   return (
-    <div className="flex flex-col min-h-screen bg-white transition-colors duration-300">
+    <div className="flex flex-col min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300">
       {/* Main Content */}
       <main className="flex-1 overflow-x-hidden">
         
@@ -15,23 +14,20 @@ const LandingPage = () => {
         </section>
 
         {/* Features Section */}
-        <section className="relative bg-gradient-to-b from-white to-blue-50">
+        <section className="relative bg-gradient-to-b from-white to-blue-50 dark:from-gray-900 dark:to-gray-800">
           <div className="relative">
             <FeatureSection />
           </div>
         </section>
 
-        {/* Testimonials Section */}
-        <TestimonialSection />
-
         {/* Call to Action */}
-        <section className="relative bg-blue-600 text-center text-white overflow-hidden">
+        <section className="relative bg-blue-600 dark:bg-blue-700 text-center text-white overflow-hidden">
           <div className="max-w-4xl mx-auto px-6 py-28 animate-fadeInUp">
             <h2 className="text-3xl md:text-5xl font-extrabold leading-tight mb-6">
-              Transform Your Spinning Mill Operations
+              Simplify Your Production & Inventory Operations
             </h2>
             <p className="text-lg md:text-xl text-blue-100 mb-10">
-              TexIntelli helps you streamline fibers, shades, production tracking, and more with a smart, integrated platform designed for modern spinning mills.
+              Dhya SPIMS helps you streamline fibers, shades, production tracking, and more with a smart, integrated platform designed for modern factories.
             </p>
 
             <div className="flex justify-center gap-6 flex-wrap">
@@ -45,7 +41,7 @@ const LandingPage = () => {
 
               {/* Book a Meeting Button */}
               <a
-                href="https://calendly.com/dharsan-dhya/TexIntelli-meeting" 
+                href="https://calendly.com/dharsan-dhya/spims-meeting" 
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-block border-2 border-white text-white hover:bg-blue-500 font-semibold px-8 py-3 rounded-full transition transform hover:-translate-y-1"

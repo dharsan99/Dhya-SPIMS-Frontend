@@ -18,11 +18,13 @@ const UserModal = ({ isOpen, onClose, onSave, userToEdit, roles }: UserModalProp
   const [password, setPassword] = useState('');
   const [isActive, setIsActive] = useState(true);
 
+  console.log('userToEdit',userToEdit);
+
   useEffect(() => {
     if (userToEdit) {
       setName(userToEdit.name);
       setEmail(userToEdit.email);
-      setRoleId(userToEdit.role_id);
+      setRoleId(userToEdit.role?.id ?? '');
       setIsActive(userToEdit.is_active ?? true);
     } else {
       setName('');

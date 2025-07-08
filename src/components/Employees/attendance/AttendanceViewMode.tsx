@@ -17,6 +17,8 @@ const AttendanceViewMode: React.FC<AttendanceViewModeProps & { date: string }> =
   loading
 }) => {
 
+  console.log(employees);
+
 
   if (loading) {
     return (
@@ -47,15 +49,17 @@ const AttendanceViewMode: React.FC<AttendanceViewModeProps & { date: string }> =
         <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
           {employees.length > 0 ? (
             employees.map((emp, idx) => {
-              const isPresent = emp?.status === 'PRESENT';
+              const status = emp?.status || 'ABSENT';
               const overtime = emp?.overtime_hours || 0;
-              const rawShiftKey = isPresent ? emp?.shift?.toUpperCase() ?? 'MORNING' : 'ABSENT';
+              const rawShiftKey = emp?.shift?.toUpperCase() ?? 'ABSENT';
               const shift = shiftMap[rawShiftKey as keyof typeof shiftMap] ?? shiftMap['ABSENT'];
-              const totalHours = isPresent ? 8 + overtime : 0;
-              const workDays = isPresent ? 1 : 0;
+              
+              // Calculate total hours based on status
+              const baseHours = status === 'PRESENT' ? 8 : status === 'HALF_DAY' ? 4 : 0;
+              const totalHours = baseHours + overtime;
+              const workDays = status === 'PRESENT' ? 1 : status === 'HALF_DAY' ? 0.5 : 0;
               const wageRate = Number(emp.shift_rate) ?? 0;
               const wages = (totalHours / 8) * wageRate;
-
 
               return (
                 <tr

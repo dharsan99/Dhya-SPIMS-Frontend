@@ -70,9 +70,9 @@ const AddAttendanceModal: React.FC<AddAttendanceModalProps> = ({
     } else {
       // Set default shift if not already set
       if (!shift || shift === 'ABSENT') {
-        setShift('MORNING');
-        setInTime(shiftTimeMap['MORNING'].in_time);
-        setOutTime(shiftTimeMap['MORNING'].out_time);
+        setShift('SHIFT_1');
+        setInTime(shiftTimeMap['SHIFT_1'].in_time);
+        setOutTime(shiftTimeMap['SHIFT_1'].out_time);
       }
     }
   };
@@ -111,7 +111,7 @@ const AddAttendanceModal: React.FC<AddAttendanceModalProps> = ({
     let outDateTime = new Date(rawOutTime);
   
     // If it's NIGHT and outTime is less than inTime, roll to next day
-    if (shift === 'NIGHT' && outTime < inTime) {
+    if (shift === 'SHIFT_3' && outTime < inTime) {
       outDateTime.setDate(outDateTime.getDate() + 1);
     }
   

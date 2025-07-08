@@ -1,4 +1,3 @@
-
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
@@ -9,8 +8,7 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, 'src'),
-      // '@': path.resolve(path.dirname(new URL(import.meta.url).pathname), 'src'), // ✅ alias to match "@/..." imports
+      '@': path.resolve(path.dirname(new URL(import.meta.url).pathname), 'src'), // ✅ alias to match "@/..." imports
     },
   },
   server: {

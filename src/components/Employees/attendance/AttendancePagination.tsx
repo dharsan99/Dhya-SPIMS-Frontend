@@ -29,7 +29,7 @@ const AttendancePagination: React.FC<Props> = ({
       </div>
 
       {/* Right Controls */}
-      <div className="flex items-center gap-4">
+      <div className="flex flex-col md:flex-row items-center gap-4">
         {/* Page Size Selector */}
         <div className="flex items-center gap-2">
           <label htmlFor="pageSize" className="text-sm text-gray-600 dark:text-gray-400">

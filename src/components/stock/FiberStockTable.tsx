@@ -1,4 +1,3 @@
-
 import useAuthStore from '@/hooks/auth';
 import { StockItem } from '@/types/stock';
 import { formatValue } from '@/utils/stock';
@@ -8,15 +7,13 @@ interface StockTableProps {
   stock: StockItem[];
   onEditClick: (item: StockItem) => void;
   onViewLogsClick: (id: string) => void;
-  currentUser: { role: string } | null; // <-- fix here
+  currentUser: { role: string } | null;
 }
 
-
-const StockTable: React.FC<StockTableProps> = ({ stock , onEditClick, onViewLogsClick}) => {
+const StockTable: React.FC<StockTableProps> = ({ stock, onEditClick, onViewLogsClick }) => {
 
   const hasPermission = useAuthStore((state) => state.hasPermission);
   const canEditStock = hasPermission('Stocks', 'Update Stock');
-
 
   return (
     <div className="w-full overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm bg-white dark:bg-gray-900 mt-4">
@@ -35,20 +32,20 @@ const StockTable: React.FC<StockTableProps> = ({ stock , onEditClick, onViewLogs
           {stock.length > 0 ? (
             stock.map((item) => (
               <tr key={item.id} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition">
-               <td className="px-4 py-3">{formatValue(item.fibre_name)}</td>
-            <td className="px-4 py-3">{formatValue(item.category)}</td>
-            <td className="px-4 py-3 text-center">{formatValue(item.stock_kg, 2)}</td>
-            <td
-              className={`px-4 py-3 text-center ${
-                item.stock_kg < item.threshold_kg ? 'text-red-600 font-semibold' : ''
-              }`}
-            >
-              {formatValue(item.threshold_kg, 2)}
-            </td>
-            <td className="px-4 py-3 text-center">{formatValue(item.last_updated)}</td>
+                <td className="px-4 py-3">{formatValue(item.fibre_name)}</td>
+                <td className="px-4 py-3">{formatValue(item.category)}</td>
+                <td className="px-4 py-3 text-center">{formatValue(item.stock_kg, 2)}</td>
+                <td
+                  className={`px-4 py-3 text-center ${
+                    item.stock_kg < item.threshold_kg ? 'text-red-600 font-semibold' : ''
+                  }`}
+                >
+                  {formatValue(item.threshold_kg, 2)}
+                </td>
+                <td className="px-4 py-3 text-center">{formatValue(item.last_updated)}</td>
                 <td className="px-4 py-3 text-center space-x-2">
-                <div className='flex flex-col lg:flex-row gap-3'>
-                {canEditStock && (
+                  <div className='flex flex-col lg:flex-row gap-3'>
+                    {canEditStock && (
                       <button
                         onClick={() => onEditClick(item)}
                         className="px-2 py-1 text-xs font-medium bg-blue-500 hover:bg-blue-600 text-white rounded"
@@ -57,14 +54,14 @@ const StockTable: React.FC<StockTableProps> = ({ stock , onEditClick, onViewLogs
                       </button>
                     )}
 
-                <button
-                  onClick={() => onViewLogsClick(item.id)}
-                  className="px-2 py-1 text-xs font-medium bg-gray-500 hover:bg-gray-600 text-white rounded"
-                >
-                  View Logs
-                </button>
-                </div>
-              </td>
+                    <button
+                      onClick={() => onViewLogsClick(item.id)}
+                      className="px-2 py-1 text-xs font-medium bg-gray-500 hover:bg-gray-600 text-white rounded"
+                    >
+                      View Logs
+                    </button>
+                  </div>
+                </td>
               </tr>
             ))
           ) : (

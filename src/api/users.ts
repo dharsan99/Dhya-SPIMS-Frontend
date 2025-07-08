@@ -10,11 +10,17 @@ export interface CreateUserPayload {
   is_active?: boolean;
 }
 export const createUser = async (data: CreateUserPayload): Promise<any> => {
+  console.log('data',data);
   const response = await api.post('/users', data);
+  console.log('response',response.data);
   return response.data;
 };
 // Get all users
-export const getAllUsers = () => api.get(endpoint);
+export const getAllUsers = async (tenantId?: string) => {
+  const params = tenantId ? { tenant_id: tenantId } : {};
+  const res = await api.get(endpoint, { params });
+  return res.data.data; // returns only the array
+};
 
 // Get a specific user by ID
 export const getUserById = (id: string) => {

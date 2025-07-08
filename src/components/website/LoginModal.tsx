@@ -78,7 +78,7 @@ export default function LoginModal({ setFadeOutPage }: LoginModalProps) {
     }
 
     // Check for super-admin credentials
-    if (email === 'superadmin@dhya.in' && password === '12345') {
+    if (email === 'dharshan@dhya.in' && password === '12345') {
       // Create super-admin user object
       const superAdminUser = {
         token: 'super-admin-token',
@@ -87,9 +87,21 @@ export default function LoginModal({ setFadeOutPage }: LoginModalProps) {
           tenant_id: 'super-admin-tenant',
           name: 'Super Admin',
           email: 'superadmin@dhya.in',
-          role: 'super-admin',
-          permissions: ['all']
-        }
+          role: {
+            id: 'role-super-admin',
+            tenant_id: 'super-admin-tenant',
+            name: 'Super Admin Role',
+            description: 'Full access to all resources',
+            permissions: {
+              '*': ['*'], // Grant all permissions on all resources
+            },
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          },
+          is_active: true,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        },
       };
 
       setAuth(superAdminUser.token, superAdminUser.user);

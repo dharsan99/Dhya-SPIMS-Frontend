@@ -14,10 +14,8 @@ export default function LoginPage() {
 
   const handleLoginClick = () => setShowLoginForm(true);
   const handleSignupClick = () => {
-
-    window.open('https://calendly.com/dharsan-dhya/TexIntelli-meeting', '_blank');
-  };  const handleDashboardAccess = () => navigate('/app/dashboard');
-
+    navigate('/signup');
+  };
 
   const handleDashboardAccess = () => navigate('/app/dashboard');
   return (
@@ -83,7 +81,7 @@ export default function LoginPage() {
               transition={{ delay: 0.2, duration: 0.8 }}
               className="text-lg md:text-xl text-gray-600 dark:text-gray-300"
             >
-              TexIntelli empowers factories to streamline fibers, shades, orders, and production workflows — simple, scalable, and powerful.
+              Dhya SPIMS empowers factories to streamline fibers, shades, orders, and production workflows — simple, scalable, and powerful.
             </motion.p>
 
             {/* Features List */}

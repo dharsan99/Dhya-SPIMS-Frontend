@@ -1,299 +1,70 @@
 import { motion } from "framer-motion";
-import { FaChartBar, FaChartLine, FaChartPie, FaFileExport } from "react-icons/fa";
+
+const analyticsFeatures = [
+  {
+    title: "Production Reports",
+    desc: "Daily, weekly, and monthly summaries categorized by orders, machines, shifts, and shades. Improve operational efficiency with historical comparisons.",
+  },
+  {
+    title: "Inventory Insights",
+    desc: "Track fiber consumption, current stock, shortages, and aging inventory automatically — with smart alerts for reorder planning.",
+  },
+  {
+    title: "Order Progress Monitoring",
+    desc: "View realisation percentages, order completion status, shade-wise dispatches, and pending fulfillment balances at a glance.",
+  },
+  {
+    title: "Flexible Data Export",
+    desc: "Export any report as Excel (.xlsx) or CSV files for financial auditing, operational reviews, or offline analysis.",
+  },
+];
 
 export default function ReportsAnalyticsSection() {
-  const features = [
-    {
-      icon: <FaChartLine className="w-8 h-8 text-blue-600" />,
-      title: "Real-Time Analytics",
-      description: "Live insights and performance tracking",
-      details: [
-        "Production efficiency metrics",
-        "Machine performance analysis",
-        "Quality parameter tracking",
-        "Resource utilization stats"
-      ]
-    },
-    {
-      icon: <FaChartBar className="w-8 h-8 text-blue-600" />,
-      title: "Custom Reports",
-      description: "Flexible reporting capabilities",
-      details: [
-        "Configurable report templates",
-        "Multi-format export options",
-        "Scheduled report generation",
-        "Automated distribution"
-      ]
-    },
-    {
-      icon: <FaFileExport className="w-8 h-8 text-blue-600" />,
-      title: "AI-Powered Insights",
-      description: "Smart analytics and predictions",
-      details: [
-        "Trend analysis and forecasting",
-        "Anomaly detection",
-        "Performance optimization",
-        "Predictive maintenance"
-      ]
-    },
-    {
-      icon: <FaChartPie className="w-8 h-8 text-blue-600" />,
-      title: "Business Intelligence",
-      description: "Comprehensive business analytics",
-      details: [
-        "Financial performance metrics",
-        "Operational efficiency analysis",
-        "Cost optimization insights",
-        "Strategic decision support"
-      ]
-    }
-  ];
-
-  const reportTypes = [
-    {
-      title: "Production Reports",
-      items: [
-        "Daily production summary",
-        "Machine-wise output",
-        "Shift performance analysis",
-        "Efficiency metrics"
-      ]
-    },
-    {
-      title: "Quality Reports",
-      items: [
-        "Quality parameter trends",
-        "Defect analysis",
-        "Compliance reports",
-        "Quality improvement metrics"
-      ]
-    },
-    {
-      title: "Inventory Reports",
-      items: [
-        "Stock level analysis",
-        "Material consumption",
-        "Waste tracking",
-        "Stock movement"
-      ]
-    }
-  ];
-
-  const analytics = [
-    {
-      title: "Performance Analytics",
-      items: [
-        "Machine efficiency trends",
-        "Operator productivity",
-        "Resource utilization",
-        "Cost per unit analysis"
-      ]
-    },
-    {
-      title: "Quality Analytics",
-      items: [
-        "Quality trend analysis",
-        "Defect pattern detection",
-        "Parameter compliance",
-        "Quality improvement insights"
-      ]
-    },
-    {
-      title: "Business Analytics",
-      items: [
-        "Financial performance",
-        "Cost optimization",
-        "Resource allocation",
-        "Strategic insights"
-      ]
-    }
-  ];
-
-  const exportOptions = [
-    {
-      title: "Export Formats",
-      items: [
-        "PDF reports",
-        "Excel spreadsheets",
-        "CSV data files",
-        "Custom formats"
-      ]
-    },
-    {
-      title: "Distribution Options",
-      items: [
-        "Email automation",
-        "Cloud storage",
-        "API integration",
-        "Scheduled delivery"
-      ]
-    }
-  ];
-
   return (
-    <section id="reports-analytics" className="px-6 bg-white">
+    <section id="reports-analytics" className="px-6 bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.7 }}
-        className="max-w-5xl mx-auto py-12"
+        className="max-w-6xl mx-auto flex flex-col justify-center min-h-[calc(100vh-8rem)]"
       >
-        {/* Hero Section */}
-        <div className="text-center mb-16">
-          <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-6">
-            Reports & Analytics
-          </h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Comprehensive reporting and analytics platform for spinning mills. Transform your data into actionable insights with AI-powered analytics and customizable reports.
-          </p>
+        {/* Section Heading */}
+        <h1 className="text-4xl md:text-5xl font-extrabold text-center text-gray-900 dark:text-white mb-10">
+          Powerful Reports & Business Analytics
+        </h1>
+
+        {/* Intro */}
+        <p className="text-lg text-gray-700 dark:text-gray-400 leading-relaxed text-center max-w-3xl mx-auto mb-16">
+          Dhya SPIMS transforms raw production and inventory data into live dashboards, actionable reports, and smart forecasting tools — helping you make faster, smarter decisions.
+        </p>
+
+        {/* Feature Cards */}
+        <div className="grid md:grid-cols-2 gap-8 mb-16">
+          {analyticsFeatures.map((feature, index) => (
+            <motion.div
+              key={index}
+              whileHover={{ scale: 1.03 }}
+              transition={{ type: "spring", stiffness: 250 }}
+              className="p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-md hover:shadow-xl border border-gray-100 dark:border-gray-700 transition"
+            >
+              <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-3">
+                {feature.title}
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+                {feature.desc}
+              </p>
+            </motion.div>
+          ))}
         </div>
 
-        {/* Key Features */}
-        <div className="mb-16">
-          <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
-            Key Features
-          </h2>
-          <div className="grid md:grid-cols-2 gap-6">
-            {features.map((feature, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition"
-              >
-                <div className="flex items-start gap-4">
-                  <div className="flex-shrink-0">{feature.icon}</div>
-                  <div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-2">{feature.title}</h3>
-                    <p className="text-gray-600 mb-4">{feature.description}</p>
-                    <ul className="space-y-2">
-                      {feature.details.map((detail, idx) => (
-                        <li key={idx} className="flex items-center gap-2 text-gray-600">
-                          <span className="w-1.5 h-1.5 bg-blue-600 rounded-full"></span>
-                          {detail}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+        {/* Final Callout */}
+        <div className="text-center text-xl font-semibold text-blue-600 dark:text-blue-400 mb-12">
+          Gain full operational transparency — from fiber stock to customer delivery.
         </div>
 
-        {/* Report Types */}
-        <div className="mb-16">
-          <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
-            Report Types
-          </h2>
-          <div className="grid md:grid-cols-3 gap-6">
-            {reportTypes.map((type, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="bg-gray-50 p-6 rounded-xl"
-              >
-                <h3 className="text-xl font-bold text-gray-900 mb-4">{type.title}</h3>
-                <ul className="space-y-2">
-                  {type.items.map((item, idx) => (
-                    <li key={idx} className="flex items-center gap-2 text-gray-600">
-                      <span className="w-1.5 h-1.5 bg-blue-600 rounded-full"></span>
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-
-        {/* Analytics */}
-        <div className="mb-16">
-          <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
-            Advanced Analytics
-          </h2>
-          <div className="grid md:grid-cols-3 gap-6">
-            {analytics.map((item, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="bg-white p-6 rounded-xl shadow-md"
-              >
-                <h3 className="text-xl font-bold text-gray-900 mb-4">{item.title}</h3>
-                <ul className="space-y-2">
-                  {item.items.map((detail, idx) => (
-                    <li key={idx} className="flex items-center gap-2 text-gray-600">
-                      <span className="w-1.5 h-1.5 bg-blue-600 rounded-full"></span>
-                      {detail}
-                    </li>
-                  ))}
-                </ul>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-
-        {/* Export Options */}
-        <div className="mb-16">
-          <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
-            Export & Distribution
-          </h2>
-          <div className="grid md:grid-cols-2 gap-6">
-            {exportOptions.map((option, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="bg-blue-50 p-6 rounded-xl"
-              >
-                <h3 className="text-xl font-bold text-gray-900 mb-4">{option.title}</h3>
-                <ul className="space-y-2">
-                  {option.items.map((item, idx) => (
-                    <li key={idx} className="flex items-center gap-2 text-gray-700">
-                      <span className="w-1.5 h-1.5 bg-blue-600 rounded-full"></span>
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-
-        {/* Benefits */}
-        <div className="bg-gray-50 p-6 rounded-xl">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">The TexIntelli Advantage</h2>
-          <div className="grid md:grid-cols-2 gap-6">
-            <div>
-              <h3 className="font-semibold text-gray-900 mb-3">Traditional Systems</h3>
-              <ul className="space-y-2 text-gray-700">
-                <li>• Manual report generation</li>
-                <li>• Limited analytics</li>
-                <li>• Static reports</li>
-                <li>• Delayed insights</li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-semibold text-gray-900 mb-3">With TexIntelli</h3>
-              <ul className="space-y-2 text-gray-700">
-                <li>• Real-time analytics</li>
-                <li>• AI-powered insights</li>
-                <li>• Customizable reports</li>
-                <li>• Automated distribution</li>
-              </ul>
-            </div>
-          </div>
+        {/* Prev / Next Navigation */}
+        <div className="mt-8">
         </div>
       </motion.div>
     </section>

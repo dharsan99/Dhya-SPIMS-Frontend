@@ -176,7 +176,7 @@ const AttendanceTab = () => {
 
   const handleTimeChange = useCallback((
     id: string,
-    field: 'in_time' | 'out_time' | 'shift',
+    field: 'in_time' | 'out_time' | 'shift' | 'status',
     value: string | undefined
   ) => {
     setAttendance((prev) => {
@@ -215,6 +215,10 @@ const AttendanceTab = () => {
 
         updated.total_hours = parseFloat(total.toFixed(2));
         updated.status = total > 0 ? 'PRESENT' : 'ABSENT';
+      }
+
+      if (field === 'status') {
+        updated.status = value as any;
       }
 
       return { ...prev, [id]: updated };

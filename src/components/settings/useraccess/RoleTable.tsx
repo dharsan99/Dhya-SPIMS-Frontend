@@ -23,6 +23,8 @@ const RoleTable = ({ roles, onEdit, onDelete, onAdd, loading }: RoleTableProps) 
   const canAdd = hasPermission('Roles', 'Add Role');
   const showActions = canEdit || canDelete;
 
+  
+
   const startIndex = (page - 1) * rowsPerPage;
     const endIndex = startIndex + rowsPerPage;
     const paginatedRoles = roles.slice(startIndex, endIndex);

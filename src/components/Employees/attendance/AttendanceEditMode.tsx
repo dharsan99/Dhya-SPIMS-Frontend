@@ -27,10 +27,12 @@ const AttendanceEditMode: React.FC<
     if (shift === 'ABSENT') {
       onTimeChange(empId, 'in_time', '');
       onTimeChange(empId, 'out_time', '');
+      onTimeChange(empId, 'status', 'ABSENT');
     } else {
       const { in_time, out_time } = shiftTimeMap[shift as ShiftType];
       onTimeChange(empId, 'in_time', in_time);
       onTimeChange(empId, 'out_time', out_time);
+      onTimeChange(empId, 'status', 'PRESENT');
     }
   };
 
@@ -55,7 +57,7 @@ const AttendanceEditMode: React.FC<
             return {
               employee_id: emp.employee_id,
               shift: att.shift,
-              status: 'PRESENT',
+              status: att.status,
               in_time: new Date(inTimeString).toISOString(),
               out_time: new Date(outTimeString).toISOString(),
               overtime_hours: att.overtime_hours || 0,
@@ -108,11 +110,11 @@ const AttendanceEditMode: React.FC<
               <th className="px-3 py-2 border">T.No</th>
               <th className="px-3 py-2 border text-left">Employees</th>
               <th className="px-3 py-2 border">Shift</th>
+              <th className="px-3 py-2 border">Status</th>
               <th className="px-3 py-2 border">Overtime</th>
               <th className="px-3 py-2 border">Total Hours</th>
               <th className="px-3 py-2 border">Work Days</th>
-              <th className="px-3 py-2 border">Status</th>
-              <th className="px-3 py-2 border">Action</th> 
+              <th className="px-3 py-2 border">Action</th>
             </tr>
           </thead>
           <tbody>
@@ -120,16 +122,20 @@ const AttendanceEditMode: React.FC<
               const att = attendance[emp.employee_id];
               const rawShift = att?.shift;
               const shiftValue = ['SHIFT_1', 'SHIFT_2', 'SHIFT_3'].includes(rawShift || '') ? rawShift : 'ABSENT';
-              const isPresent = shiftValue !== 'ABSENT';
+              const statusValue = att?.status || 'ABSENT';
               const overtime = att?.overtime_hours ?? 0;
-              const totalHours = isPresent ? 8 + overtime : 0;
+              
+              // Calculate total hours based on status
+              const baseHours = statusValue === 'PRESENT' ? 8 : statusValue === 'HALF_DAY' ? 4 : 0;
+              const totalHours = baseHours + overtime;
+              const workDays = statusValue === 'PRESENT' ? 1 : statusValue === 'HALF_DAY' ? 0.5 : 0;
 
               return (
                 <tr key={idx} className="border-t dark:border-gray-700 even:bg-gray-50 dark:even:bg-gray-900">
                   <td className="px-3 py-2 text-center">{pageStart + idx + 1}</td>
                   <td className="px-3 py-2 text-left truncate max-w-[160px]">{emp.name}</td>
                   <td className="px-3 py-2 text-center">
-                  <select
+                    <select
                       value={shiftValue}
                       onChange={(e) => handleShiftChange(emp.employee_id, e.target.value)}
                       className="w-28 px-2 py-1 rounded border text-sm dark:bg-gray-800 dark:text-white"
@@ -139,7 +145,23 @@ const AttendanceEditMode: React.FC<
                       <option value="SHIFT_2">Shift 2</option>
                       <option value="SHIFT_3">Shift 3</option>
                     </select>
-
+                  </td>
+                  <td className="px-3 py-2 text-center">
+                    <select
+                      value={statusValue}
+                      onChange={(e) => onTimeChange(emp.employee_id, 'status', e.target.value as 'PRESENT' | 'ABSENT' | 'HALF_DAY')}
+                      disabled={shiftValue === 'ABSENT'}
+                      className="w-28 px-2 py-1 rounded border text-sm dark:bg-gray-800 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {shiftValue === 'ABSENT' ? (
+                        <option value="ABSENT">Absent</option>
+                      ) : (
+                        <>
+                          <option value="PRESENT">Present</option>
+                          <option value="HALF_DAY">Half Day</option>
+                        </>
+                      )}
+                    </select>
                   </td>
                   <td className="px-3 py-2 text-center">
                     <input
@@ -154,61 +176,60 @@ const AttendanceEditMode: React.FC<
                     />
                   </td>
                   <td className="px-3 py-2 text-center">{totalHours}</td>
-                  <td className="px-3 py-2 text-center">{isPresent ? 1 : 0}</td>
-                  <td className="px-3 py-2 text-center">{isPresent ? '✅' : '❌'}</td>
+                  <td className="px-3 py-2 text-center">{workDays}</td>
                   <td className="px-3 py-2 text-center">
-                      <button
-                        className="px-2 py-1 text-sm bg-green-600 hover:bg-green-700 text-white rounded"
-                        onClick={async () => {
+                    {statusValue === 'PRESENT' ? '✅' : statusValue === 'HALF_DAY' ? '🌓' : '❌'}
+                  </td>
+                  <td className="px-3 py-2 text-center">
+                    <button
+                      className="px-2 py-1 text-sm bg-green-600 hover:bg-green-700 text-white rounded"
+                      onClick={async () => {
+                        const att = attendance[emp.employee_id];
+                        if (!att || att.status === 'ABSENT') {
+                          alert('Cannot update attendance for absent employees.');
+                          return;
+                        }
 
-                          const att = attendance[emp.employee_id];
-                          if (!att || att.shift === 'ABSENT') {
-                            alert('Cannot update attendance for absent employees.');
+                        try {
+                          if (!att.in_time || !att.out_time) {
+                            alert('In time or out time is missing or invalid.');
                             return;
                           }
-                          
-                        
-                          try {
-                            if (!att.in_time || !att.out_time) {
-                              alert('In time or out time is missing or invalid.');
-                              return;
-                            }
-                        
-                            const inTimeString = `${date}T${att.in_time}:00`;
-                            const outTimeString = `${date}T${att.out_time}:00`;
-                        
-                            const inDateTime = new Date(inTimeString);
-                            const outDateTime = new Date(outTimeString);
-                        
-                            if (isNaN(inDateTime.getTime()) || isNaN(outDateTime.getTime())) {
-                              throw new Error('Invalid date/time format');
-                            }
-                        
-                            const formattedDate = new Date(date).toISOString().slice(0, 10);
-                            const payload = {
-                              employee_id: emp.employee_id,
-                              in_time: inDateTime.toISOString(),
-                              out_time: outDateTime.toISOString(),
-                              overtime_hours: att.overtime_hours || 0,
-                              status: 'PRESENT' as const,
-                              shift: att.shift,
-                              date: formattedDate,
-                            };
 
-                        
-                            await markSingleAttendance(payload);
-                            showSuccess(`Attendance updated for ${emp.name}`);
-                            queryClient.invalidateQueries({ queryKey: ['attendance', rangeMode, rangeStart, rangeEnd] });
-                            queryClient.invalidateQueries({ queryKey: ['attendance-summary', rangeMode, date, rangeStart, rangeEnd] });
-                          } catch (error) {
-                            console.error('❌ Failed to update single attendance:', error);
-                            alert('Failed to update attendance. Please check time fields.');
+                          const inTimeString = `${date}T${att.in_time}:00`;
+                          const outTimeString = `${date}T${att.out_time}:00`;
+
+                          const inDateTime = new Date(inTimeString);
+                          const outDateTime = new Date(outTimeString);
+
+                          if (isNaN(inDateTime.getTime()) || isNaN(outDateTime.getTime())) {
+                            throw new Error('Invalid date/time format');
                           }
-                        }}
-                      >
-                        Update
-                      </button>
-                    </td>
+
+                          const formattedDate = new Date(date).toISOString().slice(0, 10);
+                          const payload = {
+                            employee_id: emp.employee_id,
+                            in_time: inDateTime.toISOString(),
+                            out_time: outDateTime.toISOString(),
+                            overtime_hours: att.overtime_hours || 0,
+                            status: att.status as 'PRESENT' | 'HALF_DAY' | 'ABSENT',
+                            shift: att.shift === 'ABSENT' ? 'SHIFT_1' : att.shift,
+                            date: formattedDate,
+                          };
+
+                          await markSingleAttendance(payload);
+                          showSuccess(`Attendance updated for ${emp.name}`);
+                          queryClient.invalidateQueries({ queryKey: ['attendance', rangeMode, rangeStart, rangeEnd] });
+                          queryClient.invalidateQueries({ queryKey: ['attendance-summary', rangeMode, date, rangeStart, rangeEnd] });
+                        } catch (error) {
+                          console.error('❌ Failed to update single attendance:', error);
+                          alert('Failed to update attendance. Please check time fields.');
+                        }
+                      }}
+                    >
+                      Update
+                    </button>
+                  </td>
                 </tr>
               );
             })}

@@ -1,261 +1,73 @@
 import { motion } from "framer-motion";
-import { FaBoxes, FaWarehouse, FaClipboardList, FaBarcode } from "react-icons/fa";
+
+const inventoryFeatures = [
+  {
+    title: "Add New Fibers",
+    desc: "Create fiber entries with stock quantity, category assignment, and important attributes to organize your warehouse efficiently.",
+  },
+  {
+    title: "Update Stock Levels",
+    desc: "Manually update fiber stock after procurement, audits, or manual consumption, keeping real-time accuracy in inventory data.",
+  },
+  {
+    title: "Real-time Stock Monitoring",
+    desc: "Get instant visibility into fiber availability with color-coded indicators, helping you make faster material planning decisions.",
+  },
+  {
+    title: "Automatic Stock Usage",
+    desc: "Fiber usage is automatically deducted during production entry, linked to order realization and production weights.",
+  },
+  {
+    title: "Low Stock Alerts",
+    desc: "System visually alerts you when fiber stock falls below minimum thresholds, minimizing production risks proactively.",
+  },
+];
 
 export default function InventoryManagementSection() {
-  const features = [
-    {
-      icon: <FaBoxes className="w-8 h-8 text-blue-600" />,
-      title: "Real-Time Stock Tracking",
-      description: "Monitor inventory levels across all materials and locations",
-      details: [
-        "Live stock updates for fibers and yarns",
-        "Multi-location inventory tracking",
-        "Batch-wise stock management",
-        "Quality grade segregation"
-      ]
-    },
-    {
-      icon: <FaWarehouse className="w-8 h-8 text-blue-600" />,
-      title: "Material Movement",
-      description: "Track all material movements and transfers",
-      details: [
-        "Production floor transfers",
-        "Inter-location transfers",
-        "Quality inspection movements",
-        "Return and rejection handling"
-      ]
-    },
-    {
-      icon: <FaClipboardList className="w-8 h-8 text-blue-600" />,
-      title: "Stock Analysis",
-      description: "Analyze inventory patterns and trends",
-      details: [
-        "Consumption analysis",
-        "Stock aging reports",
-        "Turnover ratios",
-        "Value analysis"
-      ]
-    },
-    {
-      icon: <FaBarcode className="w-8 h-8 text-blue-600" />,
-      title: "Stock Verification",
-      description: "Conduct physical stock verification",
-      details: [
-        "Scheduled stock counts",
-        "Random verification",
-        "Variance analysis",
-        "Reconciliation reports"
-      ]
-    }
-  ];
-
-  const processes = [
-    {
-      title: "Stock Receipt",
-      steps: [
-        "Verify delivery documents",
-        "Check material specifications",
-        "Record quality parameters",
-        "Update stock ledger"
-      ]
-    },
-    {
-      title: "Stock Issue",
-      steps: [
-        "Validate issue request",
-        "Check stock availability",
-        "Process material issue",
-        "Update inventory records"
-      ]
-    },
-    {
-      title: "Stock Transfer",
-      steps: [
-        "Initiate transfer request",
-        "Verify source and destination",
-        "Process physical movement",
-        "Update both locations"
-      ]
-    },
-    {
-      title: "Stock Adjustment",
-      steps: [
-        "Identify adjustment need",
-        "Document reason for adjustment",
-        "Process quantity changes",
-        "Update financial records"
-      ]
-    }
-  ];
-
-  const reports = [
-    {
-      title: "Stock Status",
-      items: [
-        "Current stock levels",
-        "Stock value",
-        "Age-wise analysis",
-        "Location-wise summary"
-      ]
-    },
-    {
-      title: "Movement Reports",
-      items: [
-        "Receipt summary",
-        "Issue analysis",
-        "Transfer history",
-        "Adjustment records"
-      ]
-    },
-    {
-      title: "Analysis Reports",
-      items: [
-        "Consumption trends",
-        "Stock turnover",
-        "Value analysis",
-        "Quality metrics"
-      ]
-    }
-  ];
-
   return (
-    <section id="inventory-management" className="px-6 bg-white">
+    <section id="inventory-management" className="px-6 bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.7 }}
-        className="max-w-5xl mx-auto py-12"
+        className="max-w-6xl mx-auto flex flex-col justify-center min-h-[calc(100vh-8rem)]"
       >
-        {/* Hero Section */}
-        <div className="text-center mb-16">
-          <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-6">
-            Inventory Management
-          </h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Comprehensive inventory management system for tracking, analyzing, and optimizing your spinning mill's material resources.
-          </p>
+        {/* Heading */}
+        <h1 className="text-4xl md:text-5xl font-extrabold text-center text-gray-900 dark:text-white mb-8">
+          Managing Inventory Efficiently
+        </h1>
+
+        {/* Intro Paragraph */}
+        <p className="text-lg text-center text-gray-700 dark:text-gray-400 leading-relaxed max-w-2xl mx-auto mb-12">
+          Dhya SPIMS provides a smart and visual system to manage your fiber inventory, ensuring materials are always available and traceable for production needs.
+        </p>
+
+        {/* Features */}
+        <div className="grid md:grid-cols-2 gap-8 mb-12">
+          {inventoryFeatures.map((feature, index) => (
+            <motion.div
+              key={index}
+              whileHover={{ scale: 1.03 }}
+              transition={{ type: "spring", stiffness: 250 }}
+              className="p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-md hover:shadow-lg border border-gray-100 dark:border-gray-700 transition duration-300"
+            >
+              <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-3">
+                {feature.title}
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+                {feature.desc}
+              </p>
+            </motion.div>
+          ))}
         </div>
 
-        {/* Key Features */}
-        <div className="mb-16">
-          <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
-            Key Features
-          </h2>
-          <div className="grid md:grid-cols-2 gap-6">
-            {features.map((feature, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition"
-              >
-                <div className="flex items-start gap-4">
-                  <div className="flex-shrink-0">{feature.icon}</div>
-                  <div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-2">{feature.title}</h3>
-                    <p className="text-gray-600 mb-4">{feature.description}</p>
-                    <ul className="space-y-2">
-                      {feature.details.map((detail, idx) => (
-                        <li key={idx} className="flex items-center gap-2 text-gray-600">
-                          <span className="w-1.5 h-1.5 bg-blue-600 rounded-full"></span>
-                          {detail}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+        {/* CTA */}
+        <div className="text-center text-xl font-semibold text-blue-600 dark:text-blue-400 mb-8">
+          Stay ahead of production needs with live inventory visibility and smart stock control.
         </div>
 
-        {/* Inventory Processes */}
-        <div className="mb-16">
-          <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
-            Inventory Processes
-          </h2>
-          <div className="grid md:grid-cols-2 gap-6">
-            {processes.map((process, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="bg-gray-50 p-6 rounded-xl"
-              >
-                <h3 className="text-xl font-bold text-gray-900 mb-4">{process.title}</h3>
-                <ol className="space-y-3">
-                  {process.steps.map((step, idx) => (
-                    <li key={idx} className="flex items-start gap-3 text-gray-600">
-                      <span className="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-semibold">
-                        {idx + 1}
-                      </span>
-                      {step}
-                    </li>
-                  ))}
-                </ol>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-
-        {/* Reports & Analytics */}
-        <div className="mb-16">
-          <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
-            Reports & Analytics
-          </h2>
-          <div className="grid md:grid-cols-3 gap-6">
-            {reports.map((report, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="bg-white p-6 rounded-xl shadow-md"
-              >
-                <h3 className="text-xl font-bold text-gray-900 mb-4">{report.title}</h3>
-                <ul className="space-y-2">
-                  {report.items.map((item, idx) => (
-                    <li key={idx} className="flex items-center gap-2 text-gray-600">
-                      <span className="w-1.5 h-1.5 bg-blue-600 rounded-full"></span>
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-
-        {/* Best Practices */}
-        <div className="bg-blue-50 p-6 rounded-xl">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Best Practices</h2>
-          <div className="grid md:grid-cols-2 gap-6">
-            <div>
-              <h3 className="font-semibold text-gray-900 mb-3">Stock Management</h3>
-              <ul className="space-y-2 text-gray-700">
-                <li>• Maintain minimum stock levels</li>
-                <li>• Regular stock verification</li>
-                <li>• FIFO/FEFO implementation</li>
-                <li>• Quality-based segregation</li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-semibold text-gray-900 mb-3">Process Optimization</h3>
-              <ul className="space-y-2 text-gray-700">
-                <li>• Standardize movement procedures</li>
-                <li>• Document all transactions</li>
-                <li>• Regular process audits</li>
-                <li>• Train staff on procedures</li>
-              </ul>
-            </div>
-          </div>
-        </div>
+        {/* Prev / Next */}
       </motion.div>
     </section>
   );

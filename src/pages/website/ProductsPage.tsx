@@ -2,7 +2,7 @@
 
 const products = [
   {
-    title: "TexIntelli",
+    title: "SPIMS",
     description: "Smart Production & Inventory Management System for textile industries. Manage orders, production, and inventory seamlessly.",
     link: "/login",  // can change later
   },

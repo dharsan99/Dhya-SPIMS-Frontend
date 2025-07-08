@@ -205,7 +205,7 @@ const FiberStocksPanel = () => {
         stock={paginatedStock}
         onEditClick={setEditingStock}
         onViewLogsClick={(id) => setViewingLogsId(id)}
-        currentUser={currentUser}
+        currentUser={currentUser ? { role: currentUser.role.name } : null}
       />
       <Pagination
         page={page}

@@ -9,13 +9,18 @@ interface AuthState {
     tenant_id: string;
     name: string;
     email: string;
-    role: string;
-    user_roles?: {
-      role?: {
-        name: string;
-        permissions: Record<string, string[]>;
-      };
-    }[];
+    role: {
+      id: string;
+      tenant_id: string;
+      name: string;
+      description: string;
+      permissions: Record<string, string[]>;
+      created_at: string;
+      updated_at: string;
+    };
+    is_active: boolean;
+    created_at: string;
+    updated_at: string;
   } | null;
   hasHydrated: boolean;
   setAuth: (token: string, user: AuthState['user']) => void;
@@ -46,7 +51,7 @@ const useAuthStore = create<AuthState>()(
       hasPermission: (module, permission) => {
         const user = get().user;
         const permissions =
-          user?.user_roles?.[0]?.role?.permissions || {};
+          user?.role?.permissions || {};
         const modulePermissions = permissions[module] || [];
         return modulePermissions.includes(permission);
       },

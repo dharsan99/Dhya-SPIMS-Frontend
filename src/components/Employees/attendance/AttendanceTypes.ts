@@ -1,7 +1,6 @@
-
 import { AttendanceRecord } from '@/types/attendance';
 
-export type ShiftType = 'SHIFT_1' | 'SHIFT_2' | 'SHIFT_3';
+export type ShiftType = 'SHIFT_1' | 'SHIFT_2' | 'SHIFT_3' ;
 
 // ✅ Keep AttendanceStatus as is
 export type AttendanceStatus = 'PRESENT' | 'ABSENT' | 'HALF_DAY';
@@ -45,14 +44,14 @@ export interface AttendanceRow {
     total_hours: number;
     overtime_hours: number;
     status: 'PRESENT' | 'ABSENT' | 'HALF_DAY';
-    shift: ShiftType | 'ABSENT'; // ✅ make it non-optional and union with "ABSENT"
+    shift: ShiftType | 'ABSENT';
 }
 
 // Props for edit mode table
 export interface AttendanceEditModeProps {
     employees: AttendanceRecord[];
     attendance: Record<string, AttendanceRow>;
-    onTimeChange: (id: string, field: 'in_time' | 'out_time' | 'shift', value: string | undefined) => void;
+    onTimeChange: (id: string, field: 'in_time' | 'out_time' | 'shift' | 'status', value: string | undefined) => void;
     onOvertimeChange: (id: string, value: number) => void;
     pageStart: number;
     shift: ShiftType;

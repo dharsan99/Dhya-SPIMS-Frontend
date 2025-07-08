@@ -2,12 +2,18 @@
 import { useThemeStore } from "../hooks/useThemeStore";
 
 const ThemeSelector = () => {
-  useThemeStore();
+  const { theme, setTheme } = useThemeStore();
 
   return (
-    <div className="p-2 rounded border bg-white text-sm">
-      Light Mode
-    </div>
+    <select
+      value={theme}
+      onChange={(e) => setTheme(e.target.value as 'light' | 'dark' | 'auto')}
+      className="p-2 rounded border dark:bg-gray-800 dark:border-gray-600 dark:text-white text-sm"
+    >
+      <option value="auto">Auto</option>
+      <option value="light">Light</option>
+      <option value="dark">Dark</option>
+    </select>
   );
 };
 

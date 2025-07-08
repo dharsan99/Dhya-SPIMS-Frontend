@@ -1,6 +1,7 @@
 // pullable request
 import api from './axios';
 import { Role } from '../types/user';
+import { toast } from 'react-hot-toast';
 
 const endpoint = '/roles';
 
@@ -47,4 +48,9 @@ export const updateRole = (
 };
 
   
-export const deleteRole = (id: string) => api.delete(`${endpoint}?id=${id}`);
+export const deleteRole = (id: string) => {
+  return api.delete(`${endpoint}?id=${id}`)
+    .then(() => {
+      toast.success('Role deleted successfully');
+    });
+};

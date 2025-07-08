@@ -31,7 +31,7 @@ const AppPreferences = () => {
                 name="theme"
                 value={option}
                 checked={selectedTheme === option}
-                onChange={() => setSelectedTheme(option as typeof theme)}
+                onChange={() => setSelectedTheme(option)}
                 className="accent-blue-600 dark:accent-blue-400"
               />
               <span className="capitalize">{option}</span>
