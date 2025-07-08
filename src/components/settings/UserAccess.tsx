@@ -24,6 +24,7 @@ import { Role, User } from '../../types/user';
 import useAuthStore from '../../hooks/auth';
 import { toast } from 'react-hot-toast';
 import { useQuery } from '@tanstack/react-query';
+import InviteModal from './useraccess/InviteModal';
 
 const UserAccess = () => {
   const auth = useAuthStore();
@@ -33,6 +34,7 @@ const UserAccess = () => {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isRoleModalOpen, setIsRoleModalOpen] = useState(false);
   const [isUserModalOpen, setIsUserModalOpen] = useState(false);
+  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
 
   // ✅ Use useQuery to fetch roles
 
@@ -189,14 +191,21 @@ const UserAccess = () => {
 
       {/* 👤 User Management */}
       <section className="bg-white dark:bg-gray-900 p-6 rounded">
-        <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">User Management</h2>
         <UserTable
           users={users.filter((u: any) => u.is_active)}
           roles={roles}
           onSave={handleSaveUser}
           onDelete={handleDeleteUser}
+          onInvite={() => setIsInviteModalOpen(true)}
         />
       </section>
+
+      <InviteModal
+          isOpen={isInviteModalOpen}
+          onClose={() => setIsInviteModalOpen(false)}
+          roles={roles}
+          tenantId={tenantId}
+        />
 
       {/* 🔧 Role Modal */}
       <RoleModal

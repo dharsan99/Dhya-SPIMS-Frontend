@@ -56,7 +56,7 @@ instance.interceptors.response.use(
         }
       } else if (responseData && typeof responseData === 'object') {
         // Try common keys for error messages
-        message = responseData.message || responseData.error || JSON.stringify(responseData);
+        message = responseData.error || JSON.stringify(responseData);
       } else if (error.message) {
         message = error.message;
       }

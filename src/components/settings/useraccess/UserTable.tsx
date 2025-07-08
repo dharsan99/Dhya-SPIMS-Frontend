@@ -11,9 +11,10 @@ interface UserTableProps {
   roles: Role[];
   onSave: (user: Omit<User, 'id'> | User) => void;
   onDelete: (id: string) => void;
+  onInvite?: () => void;
 }
 
-const UserTable = ({ users, roles, onSave, onDelete }: UserTableProps) => {
+const UserTable = ({ users, roles, onSave, onDelete, onInvite }: UserTableProps) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const { page, setPage, rowsPerPage, setRowsPerPage } = usePaginationStore();
@@ -31,10 +32,10 @@ const UserTable = ({ users, roles, onSave, onDelete }: UserTableProps) => {
     return users.slice(startIndex, startIndex + rowsPerPage);
   }, [users, page, rowsPerPage]);
 
-  const handleAdd = () => {
+  /*const handleAdd = () => {
     setSelectedUser(null);
     setModalOpen(true);
-  };
+  };*/
 
   const handleEdit = (user: User) => {
     setSelectedUser(user);
@@ -50,14 +51,17 @@ const UserTable = ({ users, roles, onSave, onDelete }: UserTableProps) => {
     <section className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-lg font-semibold text-blue-700 dark:text-blue-400">Users</h2>
-        {canAdd && (
+        <div className="flex gap-2">
+          {canAdd && onInvite && (
             <button
-              onClick={handleAdd}
-              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+              onClick={onInvite}
+              className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition"
             >
-              Add User
+              Invite User
             </button>
           )}
+          
+        </div>
       </div>
 
       <div className="w-full overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm bg-white dark:bg-gray-900">

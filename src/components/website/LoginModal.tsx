@@ -78,7 +78,7 @@ export default function LoginModal({ setFadeOutPage }: LoginModalProps) {
     }
 
     // Check for super-admin credentials
-    if (email === 'superadmin@dhya.in' && password === '12345') {
+    if (email === 'dharshan@dhya.in' && password === '12345') {
       // Create super-admin user object
       const superAdminUser = {
         token: 'super-admin-token',

@@ -1,42 +1,44 @@
-import { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import WebsiteHeader from '../components/website/WebsiteHeader';
 import WebsiteFooter from '../components/website/WebsiteFooter';
-import { verifyEmail } from '@/api/signup'; // ✅ use from your API module
+import { verifyEmail } from '@/api/signup';
 
 export default function VerifyEmailPage() {
   const [searchParams] = useSearchParams();
-  const [status, setStatus] = useState<'verifying' | 'success' | 'error'>('verifying');
-  const [message, setMessage] = useState('');
+  const token = searchParams.get('token');
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const token = searchParams.get('token');
-    if (!token) {
-      setStatus('error');
-      setMessage('Verification token is missing.');
-      return;
-    }
+  const {
+    data,
+    isLoading,
+    isError,
+    error,
+  } = useQuery({
+    queryKey: ['verify-email', token],
+    queryFn: () => verifyEmail(token!),
+    enabled: !!token,
+    retry: false,
+  });
 
-    const verify = async () => {
-      try {
-        const data = await verifyEmail(token);
-        if (data.success) {
-          setStatus('success');
-          setMessage('Email verified successfully! You can now log in.');
-        } else {
-          setStatus('error');
-          setMessage(data.message || 'Verification failed.');
-        }
-      } catch (error: any) {
-        setStatus('error');
-        setMessage(error?.response?.data?.message || 'Verification failed.');
-      }
-    };
+  let status: 'verifying' | 'success' | 'error' = 'verifying';
+  let message = '';
 
-    verify();
-  }, [searchParams]);
+  if (!token) {
+    status = 'error';
+    message = 'Verification token is missing.';
+  } else if (isLoading) {
+    status = 'verifying';
+    message = 'Verifying your email...';
+  } else if (isError) {
+    status = 'error';
+    // @ts-ignore
+    message = error?.response?.data?.message || 'Verification failed.';
+  } else if (data) {
+    status = 'success';
+    message = data.message || 'Email verified successfully! You can now log in.';
+  }
 
   return (
     <motion.div
@@ -60,7 +62,7 @@ export default function VerifyEmailPage() {
           </h1>
 
           {status === 'verifying' ? (
-            <p className="text-gray-600 dark:text-gray-400 text-center">Verifying your email...</p>
+            <p className="text-gray-600 dark:text-gray-400 text-center">{message}</p>
           ) : (
             <>
               <p
