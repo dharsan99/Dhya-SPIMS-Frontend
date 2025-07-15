@@ -94,9 +94,6 @@ export interface MarkAttendancePayload {
 date: string;
 records: {
   employee_id: string;
-  in_time: string;
-  out_time: string;
-  total_hours: number;
   overtime_hours: number;
   status: AttendanceStatus;
   shift: ShiftType;
@@ -106,8 +103,6 @@ records: {
 export interface SingleAttendancePayload {
 date?: string;
 employee_id: string;
-in_time: string;
-out_time: string;
 overtime_hours: number;
 status: AttendanceStatus;
 shift: ShiftType;

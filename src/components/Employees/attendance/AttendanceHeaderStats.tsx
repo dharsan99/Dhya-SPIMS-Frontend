@@ -20,6 +20,8 @@ interface Props {
 }
 
 const AttendanceHeaderStats: React.FC<Props> = ({ summary, loadingSummary }) => {
+
+  console.log('summary', summary)
   if (loadingSummary || !summary) {
     return (
       <div className="flex justify-center items-center h-24">

@@ -52,6 +52,7 @@ const UserAccess = () => {
   // ✅ Use useQuery to fetch users
   const {
     data: users = [],
+    isLoading: usersLoading,
     refetch: refetchUsers,
   } = useQuery({
     queryKey: ['users', tenantId],
@@ -197,6 +198,7 @@ const UserAccess = () => {
           onSave={handleSaveUser}
           onDelete={handleDeleteUser}
           onInvite={() => setIsInviteModalOpen(true)}
+          loading={usersLoading}
         />
       </section>
 

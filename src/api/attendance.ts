@@ -52,7 +52,7 @@ export const markAttendance = async (payload: any) => {
 
 export const markAttendanceBulk = (payload: any) => {
   console.log(payload);
-  return api.post('/attendance/mark-bulk', payload);
+  return api.put('/attendance/mark-bulk', payload);
 };
 
 

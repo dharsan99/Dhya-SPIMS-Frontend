@@ -1,84 +1,77 @@
 import React, { useState } from 'react';
 import { FiPlus, FiEdit, FiTrash2, FiEye, FiSearch } from 'react-icons/fi';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
+import { fetchSuperAdminTenants } from '../../api/superadmintenants';
+import Pagination from '../../components/Pagination';
+import TenantDetailsModal from '../../components/superadmin/TenantDetailsModal';
+import SuperAdminTenantWizardModal from '../../components/superadmin/SuperAdminTenantWizardModal';
+import { useDebounce } from '../../hooks/useDebounce';
 
 interface Tenant {
   id: string;
   name: string;
-  email: string;
-  status: 'active' | 'inactive' | 'suspended';
-  plan: 'basic' | 'premium' | 'enterprise';
-  users: number;
-  createdAt: string;
-  lastActive: string;
+  email?: string;
+  domain?: string;
+  status?: 'active' | 'inactive' | 'suspended';
+  plan?: 'basic' | 'premium' | 'enterprise' | string;
+  userCount?: number;
+  created_at?: string;
+  lastActive?: string;
+  is_active?: boolean;
 }
 
 const Tenants: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
+  const debouncedSearch = useDebounce(searchQuery, 400); // 300ms debounce
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [page, setPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [detailsModalOpen, setDetailsModalOpen] = useState(false);
+  const [selectedTenantId, setSelectedTenantId] = useState<string | null>(null);
+  const [addModalOpen, setAddModalOpen] = useState(false);
 
-  // Mock data - replace with actual API calls
-  const tenants: Tenant[] = [
-    {
-      id: '1',
-      name: 'ABC Spinning Mills',
-      email: 'admin@abcspinning.com',
-      status: 'active',
-      plan: 'premium',
-      users: 25,
-      createdAt: '2024-01-15',
-      lastActive: '2024-01-20',
-    },
-    {
-      id: '2',
-      name: 'XYZ Textiles',
-      email: 'admin@xyztextiles.com',
-      status: 'active',
-      plan: 'enterprise',
-      users: 50,
-      createdAt: '2024-01-10',
-      lastActive: '2024-01-19',
-    },
-    {
-      id: '3',
-      name: 'DEF Yarn Co.',
-      email: 'admin@defyarn.com',
-      status: 'inactive',
-      plan: 'basic',
-      users: 10,
-      createdAt: '2024-01-05',
-      lastActive: '2024-01-15',
-    },
-  ];
-
-  const filteredTenants = tenants.filter((tenant) => {
-    const matchesSearch = tenant.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         tenant.email.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || tenant.status === statusFilter;
-    return matchesSearch && matchesStatus;
+  // Fetch tenants from API
+  const { data, isLoading } = useQuery<{ tenants: Tenant[]; pagination: any }>({
+    queryKey: ['superadmin-tenants', debouncedSearch, statusFilter, page, rowsPerPage],
+    queryFn: () => fetchSuperAdminTenants({
+      search: debouncedSearch,
+      status: statusFilter,
+      page,
+      limit: rowsPerPage,
+    }),
+    placeholderData: keepPreviousData,
+    retry: false
   });
 
-  const getStatusBadge = (status: string) => {
+  const tenants: Tenant[] = data?.tenants ?? [];
+  const pagination = data?.pagination ?? { currentPage: 1, totalPages: 1, totalItems: 0, itemsPerPage: rowsPerPage };
+
+  const filteredTenants = tenants; // Filtering is now server-side
+
+  const getStatusBadge = (status: string | undefined, is_active?: boolean) => {
+    const statusKey = status || (is_active ? 'active' : 'inactive');
     const statusClasses = {
       active: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
       inactive: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300',
       suspended: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
     };
     return (
-      <span className={`px-2 py-1 text-xs font-medium rounded-full ${statusClasses[status as keyof typeof statusClasses]}`}>
-        {status.charAt(0).toUpperCase() + status.slice(1)}
+      <span className={`px-2 py-1 text-xs font-medium rounded-full ${statusClasses[statusKey as keyof typeof statusClasses] || statusClasses.inactive}`}>
+        {statusKey.charAt(0).toUpperCase() + statusKey.slice(1)}
       </span>
     );
   };
 
-  const getPlanBadge = (plan: string) => {
+  const getPlanBadge = (plan: string | undefined) => {
+    const planKey = plan || 'basic';
     const planClasses = {
       basic: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
       premium: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300',
       enterprise: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300',
     };
     return (
-      <span className={`px-2 py-1 text-xs font-medium rounded-full ${planClasses[plan as keyof typeof planClasses]}`}>
-        {plan.charAt(0).toUpperCase() + plan.slice(1)}
+      <span className={`px-2 py-1 text-xs font-medium rounded-full ${planClasses[planKey as keyof typeof planClasses] || planClasses.basic}`}>
+        {planKey.charAt(0).toUpperCase() + planKey.slice(1)}
       </span>
     );
   };
@@ -95,7 +88,10 @@ const Tenants: React.FC = () => {
             Manage all registered tenants and their subscriptions
           </p>
         </div>
-        <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors">
+        <button
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
+          onClick={() => setAddModalOpen(true)}
+        >
           <FiPlus className="w-4 h-4" />
           Add Tenant
         </button>
@@ -161,58 +157,83 @@ const Tenants: React.FC = () => {
               </tr>
             </thead>
             <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-              {filteredTenants.map((tenant) => (
-                <tr key={tenant.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div>
-                      <div className="text-sm font-medium text-gray-900 dark:text-white">
-                        {tenant.name}
-                      </div>
-                      <div className="text-sm text-gray-500 dark:text-gray-400">
-                        {tenant.email}
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {getStatusBadge(tenant.status)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {getPlanBadge(tenant.plan)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                    {tenant.users}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                    {new Date(tenant.createdAt).toLocaleDateString()}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                    {new Date(tenant.lastActive).toLocaleDateString()}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <div className="flex items-center justify-end gap-2">
-                      <button className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
-                        <FiEye className="w-4 h-4" />
-                      </button>
-                      <button className="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300">
-                        <FiEdit className="w-4 h-4" />
-                      </button>
-                      <button className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
-                        <FiTrash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </td>
+              {isLoading ? (
+                <tr>
+                  <td colSpan={7} className="text-center py-12 text-gray-500 dark:text-gray-400">Loading tenants...</td>
                 </tr>
-              ))}
+              ) : filteredTenants.length > 0 ? (
+                filteredTenants.map((tenant) => (
+                  <tr key={tenant.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div>
+                        <div className="text-sm font-medium text-gray-900 dark:text-white">
+                          {tenant.name || '-'}
+                        </div>
+                        <div className="text-sm text-gray-500 dark:text-gray-400">
+                          {tenant.domain || tenant.email || '-'}
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {getStatusBadge(tenant.status, tenant.is_active)}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {tenant.plan ? getPlanBadge(tenant.plan) : '-'}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                      {tenant.userCount != null ? tenant.userCount : '-'}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                      {tenant.created_at ? new Date(tenant.created_at).toLocaleDateString() : '-'}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                      {tenant.lastActive ? new Date(tenant.lastActive).toLocaleDateString() : '-'}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <div className="flex items-center justify-end gap-2">
+                        <button
+                          className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
+                          onClick={() => {
+                            setSelectedTenantId(tenant.id);
+                            setDetailsModalOpen(true);
+                          }}
+                        >
+                          <FiEye className="w-4 h-4" />
+                        </button>
+                        <button className="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300">
+                          <FiEdit className="w-4 h-4" />
+                        </button>
+                        <button className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
+                          <FiTrash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={7} className="text-center py-12 text-gray-500 dark:text-gray-400">No tenants found matching your criteria.</td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
       </div>
 
-      {filteredTenants.length === 0 && (
-        <div className="text-center py-12">
-          <p className="text-gray-500 dark:text-gray-400">No tenants found matching your criteria.</p>
-        </div>
-      )}
+      <Pagination
+        page={pagination.currentPage || 1}
+        setPage={setPage}
+        rowsPerPage={pagination.itemsPerPage || rowsPerPage}
+        setRowsPerPage={setRowsPerPage}
+        total={pagination.totalItems || 0}
+        options={[5, 10, 20, 50]}
+      />
+      <TenantDetailsModal
+        open={detailsModalOpen}
+        onClose={() => setDetailsModalOpen(false)}
+        tenantId={selectedTenantId}
+      />
+      <SuperAdminTenantWizardModal open={addModalOpen} onClose={() => setAddModalOpen(false)} />
     </div>
   );
 };

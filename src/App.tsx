@@ -37,6 +37,7 @@ import Marketing from './pages/Marketing';
 import ProductionEntryPage from './pages/ProductionEntryPage';
 import SignupPage from './pages/Signup';
 import SubscriptionPlanPage from './pages/SubscriptionPlanPage';
+//import SetupWizard from './components/setup/SetupWizard';
 
 // Super Admin Pages
 import SuperAdminDashboard from './pages/superadmin/Dashboard';
@@ -47,6 +48,7 @@ import ParsingUsage from './pages/superadmin/ParsingUsage';
 import SuperAdminSettings from './pages/superadmin/Settings';
 import VerifyEmailPage from './pages/VerifyEmail';
 import AcceptInvitePage from './pages/AcceptInvite';
+import SuperAdminVerifyEmail from './pages/superadmin/VerifyAdminEmail';
 
 function App() {
   const { setTheme } = useThemeStore();
@@ -102,9 +104,9 @@ function App() {
             <Route path="fibers" element={<Fibers />} />
             <Route path="settings" element={<Settings />} />
             <Route path="employees" element={<Employees />} />
+            <Route path="marketing" element={<Marketing />} />
+            {/*<Route path="setup-wizard" element={<SetupWizard />} />*/}
             <Route path="*" element={<DelayedNotFound />} />
-            <Route path="marketing" element={<Marketing />} /> {/* ✅ Added */}
-
           </Route>
 
           {/* Protected Super Admin */}
@@ -116,6 +118,7 @@ function App() {
             <Route path="billing" element={<Billing />} />
             <Route path="parsing-usage" element={<ParsingUsage />} />
             <Route path="/superadmin/settings" element={<SuperAdminSettings />} />
+            <Route path="verify-email" element={<SuperAdminVerifyEmail />} />
           </Route>
           
           {/* Catch-all - moved to end */}

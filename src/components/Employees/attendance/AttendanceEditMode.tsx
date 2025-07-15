@@ -40,46 +40,36 @@ const AttendanceEditMode: React.FC<
     setIsSubmitting(true);
     try {
       const formattedDate = new Date(date).toISOString().slice(0, 10);
-      const payload: any = {
+      const payload = {
         date: formattedDate,
         records: employees.map((emp) => {
           const att = attendance[emp.employee_id];
-          const isPresent = ['SHIFT_1', 'SHIFT_2', 'SHIFT_3'].includes(att?.shift || '');
-  
+
           if (!att) {
-            throw new Error(`Missing attendance data for employee ${emp.employee.name}`);
+            throw new Error(`Missing attendance data for employee ${emp.employee?.name}`);
           }
-  
-          if (isPresent) {
-            const inTimeString = `${date}T${att.in_time || '00:00'}:00`;
-            const outTimeString = `${date}T${att.out_time || '00:00'}:00`;
-  
+
+          // If status is ABSENT, send shift as null
+          if (att.status === 'ABSENT') {
+            return {
+              employee_id: emp.employee_id,
+              shift: null,
+              status: 'ABSENT',
+              overtime_hours: 0,
+            };
+          } else {
             return {
               employee_id: emp.employee_id,
               shift: att.shift,
               status: att.status,
-              in_time: new Date(inTimeString).toISOString(),
-              out_time: new Date(outTimeString).toISOString(),
               overtime_hours: att.overtime_hours || 0,
-            };
-          } else {
-            // For ABSENT employees
-            const fallbackTime = new Date(`${date}T00:00:00.001Z`).toISOString();
-            return {
-              
-              employee_id: emp.employee_id,
-              shift: 'N/A',
-              status: 'ABSENT',
-              in_time: fallbackTime,
-              out_time: fallbackTime,
-              overtime_hours: 0,
             };
           }
         }),
       };
-  
+
       await markAttendanceBulk(payload);
-  
+
       queryClient.invalidateQueries({ 
         queryKey: ['attendance-summary', rangeMode, date, rangeStart, rangeEnd],
         refetchType: 'all'
@@ -88,7 +78,7 @@ const AttendanceEditMode: React.FC<
         queryKey: ['attendance', rangeMode, rangeStart, rangeEnd],
         refetchType: 'all'
       });
-  
+
       setIsModalOpen(false);
       onSubmitSuccess?.();
     } catch (err) {
@@ -98,6 +88,34 @@ const AttendanceEditMode: React.FC<
       setIsSubmitting(false);
     }
   };
+
+  const handleSingleUpdate = async (empId: string) => {
+    const att = attendance[empId];
+    if (!att || att.status === 'ABSENT') {
+      alert('Cannot update attendance for absent employees.');
+      return;
+    }
+
+    try {
+      const formattedDate = new Date(date).toISOString().slice(0, 10);
+      const payload = {
+        employee_id: empId,
+        shift: att.shift === 'ABSENT' ? 'SHIFT_1' : att.shift,
+        status: att.status,
+        overtime_hours: att.overtime_hours || 0,
+        date: formattedDate,
+      };
+
+      await markSingleAttendance(payload);
+      showSuccess(`Attendance updated for employee.`);
+      queryClient.invalidateQueries({ queryKey: ['attendance', rangeMode, rangeStart, rangeEnd] });
+      queryClient.invalidateQueries({ queryKey: ['attendance-summary', rangeMode, date, rangeStart, rangeEnd] });
+    } catch (error) {
+      console.error('❌ Failed to update single attendance:', error);
+      alert('Failed to update attendance. Please check time fields.');
+    }
+  };
+
 
 
   return (
@@ -133,7 +151,7 @@ const AttendanceEditMode: React.FC<
               return (
                 <tr key={idx} className="border-t dark:border-gray-700 even:bg-gray-50 dark:even:bg-gray-900">
                   <td className="px-3 py-2 text-center">{pageStart + idx + 1}</td>
-                  <td className="px-3 py-2 text-left truncate max-w-[160px]">{emp.name}</td>
+                  <td className="px-3 py-2 text-left truncate max-w-[160px]">{emp?.employee?.name}</td>
                   <td className="px-3 py-2 text-center">
                     <select
                       value={shiftValue}
@@ -172,7 +190,8 @@ const AttendanceEditMode: React.FC<
                         const value = e.target.value === '' ? 0 : +e.target.value;
                         onOvertimeChange(emp.employee_id, value);
                       }}
-                      className="w-20 px-2 py-1 rounded border text-center dark:bg-gray-800 dark:text-white"
+                      disabled={shiftValue === 'ABSENT'}
+                      className="w-20 px-2 py-1 rounded border text-center dark:bg-gray-800 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed"
                     />
                   </td>
                   <td className="px-3 py-2 text-center">{totalHours}</td>
@@ -182,50 +201,9 @@ const AttendanceEditMode: React.FC<
                   </td>
                   <td className="px-3 py-2 text-center">
                     <button
-                      className="px-2 py-1 text-sm bg-green-600 hover:bg-green-700 text-white rounded"
-                      onClick={async () => {
-                        const att = attendance[emp.employee_id];
-                        if (!att || att.status === 'ABSENT') {
-                          alert('Cannot update attendance for absent employees.');
-                          return;
-                        }
-
-                        try {
-                          if (!att.in_time || !att.out_time) {
-                            alert('In time or out time is missing or invalid.');
-                            return;
-                          }
-
-                          const inTimeString = `${date}T${att.in_time}:00`;
-                          const outTimeString = `${date}T${att.out_time}:00`;
-
-                          const inDateTime = new Date(inTimeString);
-                          const outDateTime = new Date(outTimeString);
-
-                          if (isNaN(inDateTime.getTime()) || isNaN(outDateTime.getTime())) {
-                            throw new Error('Invalid date/time format');
-                          }
-
-                          const formattedDate = new Date(date).toISOString().slice(0, 10);
-                          const payload = {
-                            employee_id: emp.employee_id,
-                            in_time: inDateTime.toISOString(),
-                            out_time: outDateTime.toISOString(),
-                            overtime_hours: att.overtime_hours || 0,
-                            status: att.status as 'PRESENT' | 'HALF_DAY' | 'ABSENT',
-                            shift: att.shift === 'ABSENT' ? 'SHIFT_1' : att.shift,
-                            date: formattedDate,
-                          };
-
-                          await markSingleAttendance(payload);
-                          showSuccess(`Attendance updated for ${emp.name}`);
-                          queryClient.invalidateQueries({ queryKey: ['attendance', rangeMode, rangeStart, rangeEnd] });
-                          queryClient.invalidateQueries({ queryKey: ['attendance-summary', rangeMode, date, rangeStart, rangeEnd] });
-                        } catch (error) {
-                          console.error('❌ Failed to update single attendance:', error);
-                          alert('Failed to update attendance. Please check time fields.');
-                        }
-                      }}
+                      className="px-2 py-1 text-sm bg-green-600 hover:bg-green-700 text-white rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                      onClick={() => handleSingleUpdate(emp.employee_id)}
+                      
                     >
                       Update
                     </button>

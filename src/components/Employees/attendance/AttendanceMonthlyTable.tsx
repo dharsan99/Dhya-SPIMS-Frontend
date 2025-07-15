@@ -13,6 +13,7 @@ interface Props {
   total: number; // <- New prop
   onPageChange: (page: number) => void;
   onPageSizeChange: (size: number) => void;
+  loading?: boolean; // <-- Add this
 }
 
 const AttendanceMonthlyTable: React.FC<Props> = ({
@@ -23,9 +24,20 @@ const AttendanceMonthlyTable: React.FC<Props> = ({
   pageSize,
   onPageChange,
   onPageSizeChange,
+  loading = false, // <-- Add this
 }) => {
   
   // Early return if monthDates is not available
+  if (loading) {
+    return (
+      <div className="space-y-4">
+        <div className="w-full p-8 text-center text-gray-500 dark:text-gray-400">
+          Loading month data...
+        </div>
+      </div>
+    );
+  }
+
   if (!monthDates || !Array.isArray(monthDates) || monthDates.length === 0) {
     return (
       <div className="space-y-4">
@@ -84,7 +96,7 @@ const AttendanceMonthlyTable: React.FC<Props> = ({
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-                {attendanceData.map((emp) => (
+                {attendanceData.length ? attendanceData.map((emp: any) => (
                   <tr key={emp.employee_id} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition">
                     <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-300">
                       {emp.employee.token_no || <span className="italic text-gray-400">–</span>}
@@ -96,7 +108,13 @@ const AttendanceMonthlyTable: React.FC<Props> = ({
                       {emp.employee.name}
                     </td>
                   </tr>
-                ))}
+                )) : !loading ? (
+                  <tr>
+                    <td colSpan={2} className="text-center py-6 text-gray-500 italic dark:text-gray-400">
+                      No employees found.
+                    </td>
+                  </tr>
+                ) : null}
               </tbody>
             </table>
           </div>
@@ -114,7 +132,7 @@ const AttendanceMonthlyTable: React.FC<Props> = ({
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-                {attendanceData.map((emp) => (
+                {attendanceData.length ? attendanceData.map((emp: any) => (
                   <tr key={emp.employee_id} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition">
                     {monthDates.map((date) => {
                       const att = attendanceMap[date]?.[emp.employee_id];
@@ -125,7 +143,13 @@ const AttendanceMonthlyTable: React.FC<Props> = ({
                       );
                     })}
                   </tr>
-                ))}
+                )) : !loading ? (
+                  <tr>
+                    <td colSpan={monthDates.length} className="text-center py-6 text-gray-500 italic dark:text-gray-400">
+                      No employees found.
+                    </td>
+                  </tr>
+                ) : null}
               </tbody>
             </table>
           </div>
@@ -142,7 +166,7 @@ const AttendanceMonthlyTable: React.FC<Props> = ({
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-                {attendanceData.map((emp) => {const { workDays, totalHours, totalOvertime, wages } = getEmployeeSummary(emp, attendanceMap, monthDates);
+                {attendanceData.length ? attendanceData.map((emp: any) => {const { workDays, totalHours, totalOvertime, wages } = getEmployeeSummary(emp, attendanceMap, monthDates);
 
                   return (
                     <tr key={emp.employee_id} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition">
@@ -154,7 +178,13 @@ const AttendanceMonthlyTable: React.FC<Props> = ({
                       </td>
                     </tr>
                   );
-                })}
+                }) : !loading ? (
+                  <tr>
+                    <td colSpan={4} className="text-center py-6 text-gray-500 italic dark:text-gray-400">
+                      No employees found.
+                    </td>
+                  </tr>
+                ) : null}
               </tbody>
             </table>
           </div>

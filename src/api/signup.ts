@@ -5,15 +5,19 @@ export const signup = async ({
   name,
   email,
   password,
+  tenantId,
 }: {
   name: string;
   email: string;
   password: string;
+  tenantId: string;
 }) => {
-  const response = await api.post('/signup', {
+  console.log('api')
+  const response = await axios.post('http://192.168.0.2:5001/signup', {
     name,
     email,
     password,
+    tenant_id: tenantId, // 👈 use tenant_id as key
   });
 
   return response.data;
@@ -52,6 +56,29 @@ export const acceptInvite = async ({
     name,
     token,
     password,
+  });
+  return response.data;
+};
+
+export const createTenant = async ({
+  name,
+  domain,
+  address,
+  industry,
+  phone,
+}: {
+  name: string;
+  domain?: string;
+  address?: string;
+  industry?: string;
+  phone?: string;
+}) => {
+  const response = await axios.post('http://192.168.0.2:5001/tenants', {
+    name,
+    domain,
+    address,
+    industry,
+    phone,
   });
   return response.data;
 };

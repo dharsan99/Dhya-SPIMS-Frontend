@@ -11,6 +11,7 @@ interface Props {
   total: number;
   onPageChange: (newPage: number) => void;
   onPageSizeChange: (newSize: number) => void;
+  loading?: boolean; // <-- Add this
 }
 
 const AttendanceWeeklyTable: React.FC<Props> = ({
@@ -21,6 +22,7 @@ const AttendanceWeeklyTable: React.FC<Props> = ({
   pageSize,
   onPageChange,
   onPageSizeChange,
+  loading = false, // <-- Add this
 }) => {
   const rows = Array.isArray(attendanceData) ? attendanceData : [];
 
@@ -50,6 +52,14 @@ const AttendanceWeeklyTable: React.FC<Props> = ({
       return totals;
     }, {} as Record<string, ReturnType<typeof calculateWeeklyTotals>>);
   }, [rows, weekDates]);
+
+  if (loading) {
+    return (
+      <div className="w-full p-8 text-center text-gray-500 dark:text-gray-400">
+        Loading week data...
+      </div>
+    );
+  }
 
   if (weekDates.length === 0) {
     return (
@@ -116,13 +126,13 @@ const AttendanceWeeklyTable: React.FC<Props> = ({
                   </tr>
                 );
               })
-            ) : (
+            ) : !loading ? (
               <tr>
                 <td colSpan={weekDates.length + 7} className="text-center py-6 text-gray-500 italic dark:text-gray-400">
                   No employees found.
                 </td>
               </tr>
-            )}
+            ) : null}
           </tbody>
         </table>
       </div>

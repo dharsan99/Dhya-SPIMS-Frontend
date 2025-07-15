@@ -12,9 +12,10 @@ interface UserTableProps {
   onSave: (user: Omit<User, 'id'> | User) => void;
   onDelete: (id: string) => void;
   onInvite?: () => void;
+  loading?: boolean;
 }
 
-const UserTable = ({ users, roles, onSave, onDelete, onInvite }: UserTableProps) => {
+const UserTable = ({ users, roles, onSave, onDelete, onInvite, loading }: UserTableProps) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const { page, setPage, rowsPerPage, setRowsPerPage } = usePaginationStore();
@@ -78,17 +79,17 @@ const UserTable = ({ users, roles, onSave, onDelete, onInvite }: UserTableProps)
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-            {users.length === 0 ? (
+            {/* Loading spinner row */}
+            {loading ? (
               <tr>
-                <td
-                  colSpan={4}
-                  className="text-center py-6 text-gray-500 italic dark:text-gray-400"
-                >
-                  No users found.
+                <td colSpan={showActions ? 4 : 3} className="text-center py-6 text-gray-800 italic dark:text-gray-400">
+                  <div className="flex justify-center items-center h-24">
+                    <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                  </div>
                 </td>
               </tr>
-            ) : (
-            paginatedUsers.map((user) => (
+            ) : users.length > 0 ? (
+              paginatedUsers.map((user) => (
                 <tr
                   key={user.id}
                   className="hover:bg-gray-50 dark:hover:bg-gray-800 transition"
@@ -132,6 +133,15 @@ const UserTable = ({ users, roles, onSave, onDelete, onInvite }: UserTableProps)
                 )}
                 </tr>
               ))
+            ) : (
+              <tr>
+                <td
+                  colSpan={showActions ? 4 : 3}
+                  className="text-center py-6 text-gray-500 italic dark:text-gray-400"
+                >
+                  No users found.
+                </td>
+              </tr>
             )}
           </tbody>
         </table>

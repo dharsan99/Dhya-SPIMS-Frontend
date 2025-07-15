@@ -3,15 +3,15 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import WebsiteHeader from '../components/website/WebsiteHeader';
 import WebsiteFooter from '@/components/website/WebsiteFooter';
-import { signup } from '@/api/signup';
+import { signup, createTenant } from '@/api/signup';
 import { toast } from 'sonner';
-import axios from 'axios';
 
 export default function SignupPage() {
   const [step, setStep] = useState(1);
-  const [orgData, setOrgData] = useState({ orgName: '', domain: '' });
+  const [orgData, setOrgData] = useState({ orgName: '', domain: '', address: '', industry: '', phone: '' });
   const [userData, setUserData] = useState({ username: '', email: '', password: '' });
   const [loading, setLoading] = useState(false);
+  const [tenantId, setTenantId] = useState<string | null>(null);
   const navigate = useNavigate();
 
   // Step 1: Org submit
@@ -19,10 +19,19 @@ export default function SignupPage() {
     e.preventDefault();
     setLoading(true);
     try {
-      await axios.post('/tenants', {
+      const res = await createTenant({
         name: orgData.orgName,
         domain: orgData.domain || undefined,
+        address: orgData.address || undefined,
+        industry: orgData.industry || undefined,
+        phone: orgData.phone || undefined,
       });
+
+      console.log(res)
+  
+      // ✅ Store tenantId from response
+      setTenantId(res.id); // assuming the backend returns { tenantId: 'xxx' }
+  
       setStep(2);
     } catch (error: any) {
       toast.error(error?.response?.data?.message || 'Failed to create organization.');
@@ -34,13 +43,20 @@ export default function SignupPage() {
   // Step 2: User submit
   const handleUserSubmit = async (e: any) => {
     e.preventDefault();
+    console.log('api running')
+    console.log(tenantId)
     setLoading(true);
     try {
+      if (!tenantId) throw new Error('Missing tenant ID');
+
+      console.log('inside try')
       await signup({
         name: userData.username,
         email: userData.email,
         password: userData.password,
+        tenantId, // 👈 included here
       });
+  
       toast.success('Signup successful. Please check your email to verify your account.');
       navigate('/login');
     } catch (error: any) {
@@ -49,10 +65,7 @@ export default function SignupPage() {
       setLoading(false);
     }
   };
-
-  const handleLoginRedirect = () => {
-    navigate('/login');
-  };
+  
 
   return (
     <motion.div
@@ -98,6 +111,42 @@ export default function SignupPage() {
                   name="domain"
                   value={orgData.domain}
                   onChange={e => setOrgData({ ...orgData, domain: e.target.value })}
+                  className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Address <span className="text-xs text-gray-400">(optional)</span>
+                </label>
+                <input
+                  type="text"
+                  name="address"
+                  value={orgData.address}
+                  onChange={e => setOrgData({ ...orgData, address: e.target.value })}
+                  className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Industry <span className="text-xs text-gray-400">(optional)</span>
+                </label>
+                <input
+                  type="text"
+                  name="industry"
+                  value={orgData.industry}
+                  onChange={e => setOrgData({ ...orgData, industry: e.target.value })}
+                  className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Phone <span className="text-xs text-gray-400">(optional)</span>
+                </label>
+                <input
+                  type="text"
+                  name="phone"
+                  value={orgData.phone}
+                  onChange={e => setOrgData({ ...orgData, phone: e.target.value })}
                   className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white"
                 />
               </div>
@@ -162,7 +211,7 @@ export default function SignupPage() {
           <p className="mt-4 text-sm text-center text-gray-600 dark:text-gray-400">
             Already have an account?{' '}
             <button
-              onClick={handleLoginRedirect}
+              onClick={()=>{}}
               className="text-blue-600 dark:text-blue-400 hover:underline font-semibold"
             >
               Sign In

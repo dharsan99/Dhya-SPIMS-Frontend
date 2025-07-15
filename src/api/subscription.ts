@@ -10,8 +10,10 @@ export const fetchSubscription = async (tenantId: string) => {
   return response.data;
 };
 
-export const fetchUsage = async () => {
-  const response = await api.get('/subscriptions/usage');
+export const fetchUsage = async (tenantId: string) => {
+  const response = await api.get('/subscriptions/usage', {
+    params: { tenantId },
+  });
   return response.data;
 };
 

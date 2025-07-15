@@ -118,6 +118,16 @@ const Dashboard: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
       <div className="p-6">
      
+        {/* What's New / Continue Setup Wizard */}
+        <div className="my-6 flex flex-col items-center">
+          <div className="mb-2 text-lg font-semibold text-blue-700">What's New?</div>
+          <button
+            onClick={() => navigate('/app/setup-wizard')}
+            className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-full transition shadow-md"
+          >
+            Continue Setup Wizard
+          </button>
+        </div>
 
         {/* Summary Cards Section */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">

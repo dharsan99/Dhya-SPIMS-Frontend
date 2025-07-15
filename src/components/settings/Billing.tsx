@@ -29,7 +29,9 @@ const Billing = () => {
 
   const { data: usageData, isLoading: usageLoading } = useQuery({
     queryKey: ['usage'],
-    queryFn: fetchUsage,
+    queryFn: ()=> fetchUsage(tenantId),
+    enabled: !!tenantId,
+
   });
   const usage = usageData?.usage;
 

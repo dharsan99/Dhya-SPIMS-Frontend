@@ -16,7 +16,6 @@ import { useAttendanceDates } from './hooks/useAttendanceDates';
 import { getAllAttendances, getAttendanceInRange, getAttendanceSummary, getDepartments } from '@/api/attendance';
 import { AttendanceRecord } from '@/types/attendance';
 import AttendanceHeaderStats from './AttendanceHeaderStats';
-import { startOfWeek, startOfMonth } from 'date-fns';
 
 
 
@@ -50,12 +49,14 @@ const AttendanceTab = () => {
     },
   });
 
+  console.log('attendance', attendance)
+
   const { data: departments = []} = useQuery({
     queryKey: ['departments'],
     queryFn: getDepartments,
   });
 
-  const normalizeDateForRangeMode = (rangeMode: 'day' | 'week' | 'month', date: string): string => {
+  /*const normalizeDateForRangeMode = (rangeMode: 'day' | 'week' | 'month', date: string): string => {
     const d = new Date(date);
     if (rangeMode === 'week') {
       return format(startOfWeek(d, { weekStartsOn: 1 }), 'yyyy-MM-dd');
@@ -63,7 +64,7 @@ const AttendanceTab = () => {
       return format(startOfMonth(d), 'yyyy-MM-dd');
     }
     return format(d, 'yyyy-MM-dd');
-  };
+  };*/
 
 
 
@@ -98,8 +99,8 @@ const AttendanceTab = () => {
         : 'ABSENT';
 
       initialAttendance[employee_id] = {
-        in_time: in_time ? new Date(in_time).toISOString().slice(11, 16) : '',
-        out_time: out_time ? new Date(out_time).toISOString().slice(11, 16) : '',
+        in_time: in_time && typeof in_time === 'string' && in_time.length >= 5 ? in_time.slice(0, 5) : '',
+        out_time: out_time && typeof out_time === 'string' && out_time.length >= 5 ? out_time.slice(0, 5) : '',
         shift: normalizedShift,
         overtime_hours: overtime_hours || 0,
         total_hours: total_hours || 0,
@@ -136,7 +137,8 @@ const AttendanceTab = () => {
       }
       return Promise.resolve(null);
     },
-    enabled: !!date, // only run if date is available
+    enabled: !!date,
+    retry: false // only run if date is available
   });
 
 
@@ -174,6 +176,21 @@ const AttendanceTab = () => {
   const startIdx = (page - 1) * itemsPerPage;
   const paginatedAttendances = filteredAttendances;
 
+  // Utility to calculate duration in hours between two times, handling overnight shifts
+  function calculateShiftDuration(inTime: string, outTime: string): number {
+    if (!inTime || !outTime) return 0;
+    const [inH, inM] = inTime.split(':').map(Number);
+    const [outH, outM] = outTime.split(':').map(Number);
+    let start = inH * 60 + inM;
+    let end = outH * 60 + outM;
+    // If out time is less than in time, it means overnight shift
+    if (end <= start) {
+      end += 24 * 60;
+    }
+    const duration = (end - start) / 60;
+    return duration > 0 ? parseFloat(duration.toFixed(2)) : 0;
+  }
+
   const handleTimeChange = useCallback((
     id: string,
     field: 'in_time' | 'out_time' | 'shift' | 'status',
@@ -194,7 +211,7 @@ const AttendanceTab = () => {
           const { in_time, out_time } = shiftTimeMap[value as ShiftType];
           updated.in_time = in_time;
           updated.out_time = out_time;
-          updated.total_hours = 8 + (updated.overtime_hours || 0);
+          updated.total_hours = calculateShiftDuration(in_time, out_time) + (updated.overtime_hours || 0);
           updated.status = 'PRESENT';
         } else {
           console.warn(`Invalid shift value: ${value}`);
@@ -202,19 +219,12 @@ const AttendanceTab = () => {
       }
 
       if (field === 'in_time' || field === 'out_time') {
-        const inTime = field === 'in_time' ? value : updated.in_time;
-        const outTime = field === 'out_time' ? value : updated.out_time;
-        let total = 0;
-
-        if (inTime && outTime) {
-          const [inH, inM] = inTime.split(':').map(Number);
-          const [outH, outM] = outTime.split(':').map(Number);
-          total = (outH * 60 + outM - (inH * 60 + inM)) / 60;
-          if (total < 0) total = 0;
-        }
-
-        updated.total_hours = parseFloat(total.toFixed(2));
-        updated.status = total > 0 ? 'PRESENT' : 'ABSENT';
+        const inTime = (field === 'in_time' ? value : updated.in_time) || '';
+        const outTime = (field === 'out_time' ? value : updated.out_time) || '';
+        let duration = calculateShiftDuration(inTime, outTime);
+        if (duration < 0) duration = 0;
+        updated.total_hours = parseFloat((duration + (updated.overtime_hours || 0)).toFixed(2));
+        updated.status = duration > 0 ? 'PRESENT' : 'ABSENT';
       }
 
       if (field === 'status') {
@@ -246,10 +256,11 @@ const AttendanceTab = () => {
   // Handle viewMode reset on range change
   const handleRangeChange = useCallback((mode: 'day' | 'week' | 'month') => {
     setRangeMode(mode);
-    if (mode === 'week') {
-      const normalized = normalizeDateForRangeMode(mode, date);
-      setDate(normalized);
-    }
+    // Removed normalizeDateForRangeMode for 'week' mode
+    // if (mode === 'week') {
+    //   const normalized = normalizeDateForRangeMode(mode, date);
+    //   setDate(normalized);
+    // }
     if (mode !== 'day' && viewMode === 'edit') {
       setViewMode('view');
     }
@@ -318,6 +329,7 @@ const AttendanceTab = () => {
             setItemsPerPage(size);
             setPage(1); // reset to first page
           }}
+          loading={isLoading}
         />
       ) : (
         <AttendanceMonthlyTable
@@ -331,6 +343,7 @@ const AttendanceTab = () => {
           setItemsPerPage(size);
           setPage(1); // reset to first page
         }}
+        loading={isLoading}
       />
       
       )}
