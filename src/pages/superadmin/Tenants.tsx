@@ -1,26 +1,15 @@
-import React, { useState } from 'react';
-import { FiPlus, FiEdit, FiTrash2, FiEye, FiSearch } from 'react-icons/fi';
-import { useQuery, keepPreviousData } from '@tanstack/react-query';
-import { fetchSuperAdminTenants } from '../../api/superadmintenants';
+import { useState } from 'react';
+import { FiPlus, FiEdit, FiEye, FiSearch } from 'react-icons/fi';
+import { useQuery, keepPreviousData, useQueryClient } from '@tanstack/react-query';
+import { fetchSuperAdminTenants, fetchSuperAdminTenantById, updateSuperAdminTenant, FetchSuperAdminTenantsResponse } from '../../api/superadmintenants';
 import Pagination from '../../components/Pagination';
 import TenantDetailsModal from '../../components/superadmin/TenantDetailsModal';
 import SuperAdminTenantWizardModal from '../../components/superadmin/SuperAdminTenantWizardModal';
+import TenantUpdateModal from '../../components/superadmin/TenantUpdateModal';
 import { useDebounce } from '../../hooks/useDebounce';
+import { toast } from 'sonner';
 
-interface Tenant {
-  id: string;
-  name: string;
-  email?: string;
-  domain?: string;
-  status?: 'active' | 'inactive' | 'suspended';
-  plan?: 'basic' | 'premium' | 'enterprise' | string;
-  userCount?: number;
-  created_at?: string;
-  lastActive?: string;
-  is_active?: boolean;
-}
-
-const Tenants: React.FC = () => {
+function Tenants() {
   const [searchQuery, setSearchQuery] = useState('');
   const debouncedSearch = useDebounce(searchQuery, 400); // 300ms debounce
   const [statusFilter, setStatusFilter] = useState<string>('all');
@@ -29,9 +18,12 @@ const Tenants: React.FC = () => {
   const [detailsModalOpen, setDetailsModalOpen] = useState(false);
   const [selectedTenantId, setSelectedTenantId] = useState<string | null>(null);
   const [addModalOpen, setAddModalOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+
+  const queryClient = useQueryClient();
 
   // Fetch tenants from API
-  const { data, isLoading } = useQuery<{ tenants: Tenant[]; pagination: any }>({
+  const { data, isLoading } = useQuery<FetchSuperAdminTenantsResponse>({
     queryKey: ['superadmin-tenants', debouncedSearch, statusFilter, page, rowsPerPage],
     queryFn: () => fetchSuperAdminTenants({
       search: debouncedSearch,
@@ -43,7 +35,18 @@ const Tenants: React.FC = () => {
     retry: false
   });
 
-  const tenants: Tenant[] = data?.tenants ?? [];
+  // Fetch full tenant details for selectedTenantId
+  const { data: selectedTenantDetails, isLoading: isDetailsLoading } = useQuery({
+    queryKey: ['superadmin-tenant-details', selectedTenantId],
+    queryFn: () => selectedTenantId ? fetchSuperAdminTenantById(selectedTenantId) : Promise.resolve(null),
+    enabled: !!selectedTenantId && (detailsModalOpen || editModalOpen),
+    retry: false,
+  });
+
+
+  const tenants = data?.tenants ?? [];
+
+  console.log('tenants', tenants)
   const pagination = data?.pagination ?? { currentPage: 1, totalPages: 1, totalItems: 0, itemsPerPage: rowsPerPage };
 
   const filteredTenants = tenants; // Filtering is now server-side
@@ -74,6 +77,29 @@ const Tenants: React.FC = () => {
         {planKey.charAt(0).toUpperCase() + planKey.slice(1)}
       </span>
     );
+  };
+
+  const handleEditClick = (tenant: any) => {
+    console.log('tenant details', tenant)
+    setSelectedTenantId(tenant.id);
+    setEditModalOpen(true);
+  };
+
+  const handleDetailsClick = (tenant: any) => {
+    setSelectedTenantId(tenant.id);
+    setDetailsModalOpen(true);
+  };
+
+  const handleSave = async (payload: any) => {
+    if (!selectedTenantId) return;
+    const res = await updateSuperAdminTenant(selectedTenantId, payload);
+    setEditModalOpen(false);
+    // Refetch tenants list and details
+    queryClient.invalidateQueries({ queryKey: ['superadmin-tenants'] });
+    queryClient.invalidateQueries({ queryKey: ['superadmin-tenant-details', selectedTenantId] });
+    if (res?.message) {
+      toast.success(res.message);
+    }
   };
 
   return (
@@ -170,7 +196,7 @@ const Tenants: React.FC = () => {
                           {tenant.name || '-'}
                         </div>
                         <div className="text-sm text-gray-500 dark:text-gray-400">
-                          {tenant.domain || tenant.email || '-'}
+                          {tenant.domain || '-'}
                         </div>
                       </div>
                     </td>
@@ -193,18 +219,14 @@ const Tenants: React.FC = () => {
                       <div className="flex items-center justify-end gap-2">
                         <button
                           className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
-                          onClick={() => {
-                            setSelectedTenantId(tenant.id);
-                            setDetailsModalOpen(true);
-                          }}
+                          onClick={() => handleDetailsClick(tenant)}
                         >
                           <FiEye className="w-4 h-4" />
                         </button>
-                        <button className="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300">
+                        <button className="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300"
+                          onClick={() => handleEditClick(tenant)}
+                        >
                           <FiEdit className="w-4 h-4" />
-                        </button>
-                        <button className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
-                          <FiTrash2 className="w-4 h-4" />
                         </button>
                       </div>
                     </td>
@@ -231,11 +253,19 @@ const Tenants: React.FC = () => {
       <TenantDetailsModal
         open={detailsModalOpen}
         onClose={() => setDetailsModalOpen(false)}
-        tenantId={selectedTenantId}
+        tenant={selectedTenantDetails}
+        isLoading={isDetailsLoading}
       />
       <SuperAdminTenantWizardModal open={addModalOpen} onClose={() => setAddModalOpen(false)} />
+      <TenantUpdateModal
+        open={editModalOpen}
+        onClose={() => setEditModalOpen(false)}
+        tenant={selectedTenantDetails}
+        isLoading={isDetailsLoading}
+        onSave={handleSave}
+      />
     </div>
   );
-};
+}
 
 export default Tenants; 

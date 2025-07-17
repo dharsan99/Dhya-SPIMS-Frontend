@@ -10,7 +10,7 @@ interface AttendanceSummary {
   present: number;
   absent: number;
   total_overtime: number;
-  average_shift_hours: number;
+  average_hours: number;
 }
 
 interface Props {
@@ -20,6 +20,8 @@ interface Props {
 }
 
 const AttendanceHeaderStats: React.FC<Props> = ({ summary, loadingSummary }) => {
+
+
 
   console.log('summary', summary)
   if (loadingSummary || !summary) {
@@ -34,7 +36,7 @@ const AttendanceHeaderStats: React.FC<Props> = ({ summary, loadingSummary }) => 
     present,
     absent,
     total_overtime,
-    average_shift_hours,
+    average_hours,
   } = summary;
 
   return (
@@ -49,7 +51,7 @@ const AttendanceHeaderStats: React.FC<Props> = ({ summary, loadingSummary }) => 
       </div>
       <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-4 border-l-4 border-purple-500">
         <p className="text-gray-500 dark:text-gray-300 text-sm">Avg. Shift</p>
-        <p className="text-2xl font-semibold">{average_shift_hours.toFixed(2)} <span className="text-sm">hrs</span></p>
+        <p className="text-2xl font-semibold">{average_hours.toFixed(2)} <span className="text-sm">hrs</span></p>
       </div>
       <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-4 border-l-4 border-red-500">
         <p className="text-gray-500 dark:text-gray-300 text-sm">Absent</p>

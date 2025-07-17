@@ -18,7 +18,7 @@ interface Invoice {
 }
 
 interface InvoiceTableProps {
-  invoices: Invoice[];
+  invoices: any[];
 }
 
 const InvoiceTable: React.FC<InvoiceTableProps> = ({ invoices }) => {

@@ -1,7 +1,7 @@
 import React from 'react';
 import { FiUsers, FiHome, FiActivity, FiTrendingUp } from 'react-icons/fi';
 import { useQuery } from '@tanstack/react-query';
-import { fetchSuperAdminDashboard } from '../../api/superadmin';
+import { DashboardStat, fetchSuperAdminDashboard, fetchSuperAdminSummary, SuperAdminSummary } from '../../api/superadmin';
 
 const iconMap: Record<string, any> = {
   total_tenants: FiHome,
@@ -18,9 +18,14 @@ const colorMap: Record<string, string> = {
 };
 
 const SuperAdminDashboard: React.FC = () => {
-  const { data: stats = [], isLoading } = useQuery({
+  const { data: stats = [], isLoading } = useQuery<DashboardStat[]>({
     queryKey: ['superadmin-dashboard'],
     queryFn: fetchSuperAdminDashboard,
+  });
+
+  const { data: summary, isLoading: isSummaryLoading } = useQuery<SuperAdminSummary>({
+    queryKey: ['superadmin-summary'],
+    queryFn: fetchSuperAdminSummary,
   });
 
   return (
@@ -95,40 +100,30 @@ const SuperAdminDashboard: React.FC = () => {
         </div>
         <div className="p-6">
           <div className="space-y-4">
-            {[
-              {
-                action: 'New tenant registered',
-                tenant: 'ABC Spinning Mills',
-                time: '2 hours ago',
-              },
-              {
-                action: 'System maintenance completed',
-                tenant: 'System',
-                time: '4 hours ago',
-              },
-              {
-                action: 'User permissions updated',
-                tenant: 'XYZ Textiles',
-                time: '6 hours ago',
-              },
-            ].map((activity, index) => (
-              <div
-                key={index}
-                className="flex items-center justify-between py-3 border-b border-gray-100 dark:border-gray-700 last:border-b-0"
-              >
-                <div>
-                  <p className="text-sm font-medium text-gray-900 dark:text-white">
-                    {activity.action}
-                  </p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    {activity.tenant}
-                  </p>
+            {isSummaryLoading ? (
+              <div className="text-center text-gray-500 dark:text-gray-400 py-6">Loading activity...</div>
+            ) : summary?.recentActivities && summary.recentActivities.length > 0 ? (
+              summary.recentActivities.map((activity: any, index: number) => (
+                <div
+                  key={index}
+                  className="flex items-center justify-between py-3 border-b border-gray-100 dark:border-gray-700 last:border-b-0"
+                >
+                  <div>
+                    <p className="text-sm font-medium text-gray-900 dark:text-white">
+                      {activity.details || `${activity.type} ${activity.action}`}
+                    </p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      {activity.type}
+                    </p>
+                  </div>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">
+                    {activity.timestamp ? new Date(activity.timestamp).toLocaleString() : ''}
+                  </span>
                 </div>
-                <span className="text-sm text-gray-500 dark:text-gray-400">
-                  {activity.time}
-                </span>
-              </div>
-            ))}
+              ))
+            ) : (
+              <div className="text-center text-gray-500 dark:text-gray-400 py-6">No recent activity found</div>
+            )}
           </div>
         </div>
       </div>

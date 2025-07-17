@@ -49,6 +49,8 @@ import SuperAdminSettings from './pages/superadmin/Settings';
 import VerifyEmailPage from './pages/VerifyEmail';
 import AcceptInvitePage from './pages/AcceptInvite';
 import SuperAdminVerifyEmail from './pages/superadmin/VerifyAdminEmail';
+import TenantUsers from './pages/superadmin/TenantUsers';
+import AdminAcceptInvitePage from './pages/AdminAcceptInvite';
 
 function App() {
   const { setTheme } = useThemeStore();
@@ -84,6 +86,7 @@ function App() {
           <Route path="/verify-email" element={<VerifyEmailPage />} />
           <Route path="/accept-invite" element={<AcceptInvitePage />} />
           <Route path="/select-plan" element={<SubscriptionPlanPage />} />
+          <Route path="/superadmin/accept-invite" element={<AdminAcceptInvitePage />} />
 
           {/* Protected Dashboard */}
           <Route path="/app" element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
@@ -114,6 +117,7 @@ function App() {
             <Route index element={<Navigate to="dashboard" replace />} />
             <Route path="dashboard" element={<SuperAdminDashboard />} />
             <Route path="tenants" element={<Tenants />} />
+            <Route path="tenant-users" element={<TenantUsers />} />
             <Route path="plans" element={<Plans />} />
             <Route path="billing" element={<Billing />} />
             <Route path="parsing-usage" element={<ParsingUsage />} />

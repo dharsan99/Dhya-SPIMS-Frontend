@@ -15,22 +15,9 @@ import CreateInvoiceModal from '../../components/superadmin/billing/CreateInvoic
 import RevenueChart from '@/components/superadmin/billing/RevenueChart';
 import PaymentHistory from '@/components/superadmin/billing/PaymentHistory';
 import InvoiceTable from '@/components/superadmin/billing/InvoiceTable';
-
-interface Invoice {
-  id: string;
-  tenantName: string;
-  tenantEmail: string;
-  invoiceNumber: string;
-  amount: number;
-  currency: string;
-  status: 'paid' | 'pending' | 'overdue' | 'cancelled';
-  dueDate: string;
-  issueDate: string;
-  paidDate?: string;
-  plan: string;
-  billingCycle: 'monthly' | 'yearly';
-  description: string;
-}
+import Pagination from '../../components/Pagination';
+import { useQuery } from '@tanstack/react-query';
+import { fetchBillingStats, fetchAdminInvoices, InvoicesResponse } from '../../api/billing';
 
 interface Payment {
   id: string;
@@ -49,9 +36,28 @@ const Billing: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [page, setPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+
+  // Fetch billing stats from API
+  const { data: billingStats, isLoading: isBillingStatsLoading, isError: isBillingStatsError } = useQuery({
+    queryKey: ['billing-stats'],
+    queryFn: fetchBillingStats,
+  });
+
+  // Fetch invoices from API for Invoices tab
+  const { data: invoicesData, isLoading: isInvoicesLoading, isError: isInvoicesError } = useQuery<InvoicesResponse>({
+    queryKey: ['admin-invoices', searchQuery, statusFilter, page, rowsPerPage],
+    queryFn: () => fetchAdminInvoices({
+      search: searchQuery,
+      status: statusFilter === 'all' ? undefined : statusFilter,
+      page,
+      limit: rowsPerPage,
+    }),
+  });
 
   // Mock data - replace with actual API calls
-  const invoices: Invoice[] = [
+  const invoices: any[] = [
     {
       id: '1',
       tenantName: 'ABC Spinning Mills',
@@ -209,12 +215,7 @@ const Billing: React.FC = () => {
     }
   ];
 
-  const filteredInvoices = invoices.filter((invoice) => {
-    const matchesSearch = invoice.tenantName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         invoice.invoiceNumber.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || invoice.status === statusFilter;
-    return matchesSearch && matchesStatus;
-  });
+
 
   
 
@@ -247,7 +248,13 @@ const Billing: React.FC = () => {
       </div>
 
       {/* Stats Cards */}
-      <BillingStats invoices={invoices} payments={payments} />
+      {isBillingStatsLoading ? (
+        <div className="text-center py-8 text-gray-500 dark:text-gray-400">Loading billing stats...</div>
+      ) : isBillingStatsError ? (
+        <div className="text-center py-8 text-red-500 dark:text-red-400">Failed to load billing stats.</div>
+      ) : billingStats ? (
+        <BillingStats stats={billingStats.stats} />
+      ) : null}
 
       {/* Tabs */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
@@ -345,7 +352,23 @@ const Billing: React.FC = () => {
                 </div>
               </div>
 
-              <InvoiceTable invoices={filteredInvoices} />
+              {isInvoicesLoading ? (
+                <div className="text-center py-8 text-gray-500 dark:text-gray-400">Loading invoices...</div>
+              ) : isInvoicesError ? (
+                <div className="text-center py-8 text-red-500 dark:text-red-400">Failed to load invoices.</div>
+              ) : (
+                <>
+                  <InvoiceTable invoices={invoicesData?.invoices || []} />
+                  <Pagination
+                    page={invoicesData?.pagination.currentPage || 1}
+                    setPage={setPage}
+                    rowsPerPage={invoicesData?.pagination.itemsPerPage || rowsPerPage}
+                    setRowsPerPage={setRowsPerPage}
+                    total={invoicesData?.pagination.totalItems || 0}
+                    options={[5, 10, 20, 50]}
+                  />
+                </>
+              )}
             </div>
           )}
 
