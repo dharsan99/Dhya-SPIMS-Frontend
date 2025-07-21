@@ -1,5 +1,9 @@
+import { downloadInvoice, sendInvoiceEmail } from '@/api/billing';
+import useAuthStore from '@/hooks/auth';
+import { useMutation } from '@tanstack/react-query';
 import React from 'react';
-import { FiEye, FiEdit, FiTrash2, FiDownload, FiMail, FiDollarSign } from 'react-icons/fi';
+import { toast } from 'sonner';
+import { FiDownload, FiMail, FiDollarSign } from 'react-icons/fi';
 
 interface Invoice {
   id: string;
@@ -22,6 +26,19 @@ interface InvoiceTableProps {
 }
 
 const InvoiceTable: React.FC<InvoiceTableProps> = ({ invoices }) => {
+  const { user } = useAuthStore();
+  const [downloadingId, setDownloadingId] = React.useState<string | null>(null);
+
+  const sendEmailMutation = useMutation({
+    mutationFn: (invoiceNumber: string) => sendInvoiceEmail(invoiceNumber),
+    onSuccess: () => {
+      toast.success('Invoice email sent successfully!');
+    },
+    onError: () => {
+      toast.error('Failed to send invoice email.');
+    },
+  });
+
   const getStatusBadge = (status: string) => {
     const statusClasses = {
       paid: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
@@ -49,7 +66,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({ invoices }) => {
     );
   };
 
-  const handleViewInvoice = (invoice: Invoice) => {
+ /* const handleViewInvoice = (invoice: Invoice) => {
     // Implement view invoice functionality
     console.log('View invoice:', invoice);
   };
@@ -57,21 +74,46 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({ invoices }) => {
   const handleEditInvoice = (invoice: Invoice) => {
     // Implement edit invoice functionality
     console.log('Edit invoice:', invoice);
-  };
-
+  }
   const handleDeleteInvoice = (invoice: Invoice) => {
     // Implement delete invoice functionality
     console.log('Delete invoice:', invoice);
-  };
+  };*/
 
-  const handleDownloadInvoice = (invoice: Invoice) => {
-    // Implement download invoice functionality
-    console.log('Download invoice:', invoice);
+
+  const handleDownloadInvoice = async (invoice: Invoice) => {
+    try {
+      setDownloadingId(invoice.id);
+      // Get the token and tenant_id from your auth context or storage
+      const token = useAuthStore.getState().token ?? '';
+      const tenant_id = user?.tenant_id || ''// adjust as per your data
+  
+      const blob = await downloadInvoice({
+        invoice_number: invoice.invoiceNumber,
+        tenant_id,
+        token,
+      });
+  
+      // Create a link and trigger download
+      const url = window.URL.createObjectURL(new Blob([blob], { type: 'application/pdf' }));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `${invoice.invoiceNumber}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode?.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      toast.success('Invoice Downloaded Sucessfully')
+    } catch (error) {
+      console.error('Failed to download invoice:', error);
+      toast.error('Failed to download invoice');
+    } finally {
+      setDownloadingId(null);
+    }
   };
 
   const handleSendInvoice = (invoice: Invoice) => {
-    // Implement send invoice functionality
-    console.log('Send invoice:', invoice);
+    sendEmailMutation.mutate(invoice.invoiceNumber);
   };
 
   return (
@@ -145,28 +187,44 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({ invoices }) => {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <div className="flex items-center justify-end gap-2">
-                    <button
+                    {/*<button
                       onClick={() => handleViewInvoice(invoice)}
                       className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 p-1"
                       title="View invoice"
                     >
                       <FiEye className="w-4 h-4" />
-                    </button>
+                    </button>*/}
                     <button
                       onClick={() => handleDownloadInvoice(invoice)}
                       className="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300 p-1"
                       title="Download invoice"
+                      disabled={downloadingId === invoice.id}
                     >
-                      <FiDownload className="w-4 h-4" />
+                      {downloadingId === invoice.id ? (
+                        <svg className="animate-spin h-4 w-4 text-green-600" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"/>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+                        </svg>
+                      ) : (
+                        <FiDownload className="w-4 h-4" />
+                      )}
                     </button>
                     <button
                       onClick={() => handleSendInvoice(invoice)}
                       className="text-purple-600 hover:text-purple-900 dark:text-purple-400 dark:hover:text-purple-300 p-1"
                       title="Send invoice"
+                      disabled={sendEmailMutation.isPending && sendEmailMutation.variables === invoice.invoiceNumber}
                     >
-                      <FiMail className="w-4 h-4" />
+                      {sendEmailMutation.isPending && sendEmailMutation.variables === invoice.invoiceNumber ? (
+                        <svg className="animate-spin h-4 w-4 text-purple-600" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"/>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+                        </svg>
+                      ) : (
+                        <FiMail className="w-4 h-4" />
+                      )}
                     </button>
-                    <button
+                   {/*<button
                       onClick={() => handleEditInvoice(invoice)}
                       className="text-yellow-600 hover:text-yellow-900 dark:text-yellow-400 dark:hover:text-yellow-300 p-1"
                       title="Edit invoice"
@@ -179,7 +237,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({ invoices }) => {
                       title="Delete invoice"
                     >
                       <FiTrash2 className="w-4 h-4" />
-                    </button>
+                    </button>*/}
                   </div>
                 </td>
               </tr>

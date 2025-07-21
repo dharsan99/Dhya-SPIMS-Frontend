@@ -50,7 +50,7 @@ export interface FetchTenantUsersResponse {
   pagination: TenantUsersPagination;
 }
 
-export const fetchSuperAdminTenantUsers = async (params: { search?: string; status?: string; tenantId?: string; page?: number; limit?: number } = {}): Promise<FetchTenantUsersResponse> => {
+export const fetchSuperAdminTenantUsers = async (params: { search?: string; status?: string; tenant_id?: string; page?: number; limit?: number } = {}): Promise<FetchTenantUsersResponse> => {
   const response = await api.get('/dashboard/admin/users', { params });
   return response.data.data;
 };

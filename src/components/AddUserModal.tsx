@@ -41,7 +41,9 @@ export default function AddUserModal({
   const [email, setEmail] = useState('');
 
   const tenantOptions = tenants.map(t => ({ value: t.id, label: t.name }));
-  const roleOptions = roles.map(r => ({ value: r.id, label: r.name }));
+  const roleOptions = roles
+    .filter(r => r.name.toLowerCase() !== 'admin' && r.name.toLowerCase() !== 'superadmin')
+    .map(r => ({ value: r.id, label: r.name }));
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

@@ -15,6 +15,7 @@ function TenantUsers() {
   const [searchQuery, setSearchQuery] = useState('');
   const debouncedSearchQuery = useDebounce(searchQuery, 600);
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [tenantFilter, setTenantFilter] = useState<string>('all');
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [addUserOpen, setAddUserOpen] = useState(false);
@@ -23,10 +24,11 @@ function TenantUsers() {
   const queryClient = useQueryClient();
 
   const { data, isLoading } = useQuery<FetchTenantUsersResponse>({
-    queryKey: ['superadmin-tenant-users', debouncedSearchQuery, statusFilter, page, rowsPerPage],
+    queryKey: ['superadmin-tenant-users', debouncedSearchQuery, statusFilter, tenantFilter, page, rowsPerPage],
     queryFn: () => fetchSuperAdminTenantUsers({
-      search: debouncedSearchQuery,
+      ...(debouncedSearchQuery ? { search: debouncedSearchQuery } : {}),
       status: statusFilter === 'all' ? undefined : statusFilter,
+      tenant_id: tenantFilter === 'all' ? undefined : tenantFilter,
       page,
       limit: rowsPerPage,
     }),
@@ -135,6 +137,20 @@ function TenantUsers() {
               <option value="all">All Status</option>
               <option value="active">Active</option>
               <option value="inactive">Inactive</option>
+            </select>
+          </div>
+          <div>
+            <select
+              value={tenantFilter}
+              onChange={(e) => setTenantFilter(e.target.value)}
+              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+            >
+              <option value="all">All Tenants</option>
+              {tenantsQuery.data?.tenants?.map((tenant) => (
+                <option key={tenant.id} value={tenant.id}>
+                  {tenant.name}
+                </option>
+              ))}
             </select>
           </div>
         </div>

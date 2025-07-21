@@ -1,66 +1,23 @@
 import React from 'react';
 import { FiTrendingUp, FiTrendingDown } from 'react-icons/fi';
 
-interface Invoice {
-  id: string;
-  amount: number;
-  status: 'paid' | 'pending' | 'overdue' | 'cancelled';
-  issueDate: string;
-  paidDate?: string;
+export interface RevenueTrend {
+  month: string;
+  revenue: number;
+  invoiceCount: number;
 }
 
-interface RevenueChartProps {
-  invoices: Invoice[];
+export interface RevenueChartProps {
+  revenueTrends: RevenueTrend[];
+  totalRevenue: number;
+  averageMonthlyRevenue: number;
+  totalInvoices: number;
+  changeFromLastMonth: number;
 }
 
-const RevenueChart: React.FC<RevenueChartProps> = ({ invoices }) => {
-  // Calculate monthly revenue for the last 6 months
-  const getMonthlyRevenue = () => {
-    const months = [];
-    
-    // Get the date range from the actual invoice data
-    const invoiceDates = invoices.map(invoice => new Date(invoice.issueDate));
-    const minDate = new Date(Math.min(...invoiceDates.map(d => d.getTime())));
-    
-    // Start from the earliest invoice date and go forward 6 months
-    const startDate = new Date(minDate.getFullYear(), minDate.getMonth(), 1);
-    
-    for (let i = 0; i < 6; i++) {
-      const date = new Date(startDate.getFullYear(), startDate.getMonth() + i, 1);
-      const monthName = date.toLocaleDateString('en-US', { month: 'short' });
-      const year = date.getFullYear();
-      
-      const monthInvoices = invoices.filter(invoice => {
-        const invoiceDate = new Date(invoice.issueDate);
-        return invoiceDate.getMonth() === date.getMonth() && 
-               invoiceDate.getFullYear() === date.getFullYear() &&
-               invoice.status === 'paid';
-      });
-      
-      const revenue = monthInvoices.reduce((sum, invoice) => sum + invoice.amount, 0);
-      
-      months.push({
-        month: monthName,
-        year: year,
-        revenue: revenue,
-        count: monthInvoices.length
-      });
-    }
-    
-    return months;
-  };
-
-  const monthlyData = getMonthlyRevenue();
-  const maxRevenue = Math.max(...monthlyData.map(d => d.revenue));
-  const totalRevenue = monthlyData.reduce((sum, d) => sum + d.revenue, 0);
-  const averageRevenue = totalRevenue / monthlyData.length;
-  
-  // Calculate growth rate
-  const currentMonth = monthlyData[monthlyData.length - 1];
-  const previousMonth = monthlyData[monthlyData.length - 2];
-  const growthRate = previousMonth && previousMonth.revenue > 0 
-    ? ((currentMonth.revenue - previousMonth.revenue) / previousMonth.revenue) * 100 
-    : 0;
+const RevenueChart: React.FC<RevenueChartProps> = ({ revenueTrends, totalRevenue, averageMonthlyRevenue, totalInvoices, changeFromLastMonth }) => {
+  const maxRevenue = Math.max(...revenueTrends.map(d => d.revenue));
+  const growthRate = changeFromLastMonth;
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
@@ -94,16 +51,15 @@ const RevenueChart: React.FC<RevenueChartProps> = ({ invoices }) => {
 
       {/* Chart */}
       <div className="space-y-4">
-        {monthlyData.map((data, index) => {
+        {revenueTrends.map((data, index) => {
           const height = maxRevenue > 0 ? (data.revenue / maxRevenue) * 100 : 0;
-          const isCurrentMonth = index === monthlyData.length - 1;
-          
+          const isCurrentMonth = index === revenueTrends.length - 1;
           return (
-            <div key={`${data.month}-${data.year}`} className="flex items-end space-x-2">
+            <div key={data.month} className="flex items-end space-x-2">
               <div className="flex-1">
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-xs text-gray-600 dark:text-gray-400">
-                    {data.month} {data.year}
+                    {data.month}
                   </span>
                   <span className="text-xs font-medium text-gray-900 dark:text-white">
                     ${data.revenue.toLocaleString()}
@@ -123,7 +79,7 @@ const RevenueChart: React.FC<RevenueChartProps> = ({ invoices }) => {
                   />
                 </div>
                 <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  {data.count} invoices
+                  {data.invoiceCount} invoices
                 </div>
               </div>
             </div>
@@ -136,13 +92,13 @@ const RevenueChart: React.FC<RevenueChartProps> = ({ invoices }) => {
         <div>
           <p className="text-sm text-gray-600 dark:text-gray-400">Average Monthly Revenue</p>
           <p className="text-lg font-semibold text-gray-900 dark:text-white">
-            ${averageRevenue.toLocaleString()}
+            ${averageMonthlyRevenue.toLocaleString()}
           </p>
         </div>
         <div>
           <p className="text-sm text-gray-600 dark:text-gray-400">Total Invoices</p>
           <p className="text-lg font-semibold text-gray-900 dark:text-white">
-            {monthlyData.reduce((sum, d) => sum + d.count, 0)}
+            {totalInvoices}
           </p>
         </div>
       </div>
