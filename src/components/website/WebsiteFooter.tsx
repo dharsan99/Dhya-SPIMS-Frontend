@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { FiMail, FiMapPin } from "react-icons/fi";
 import ThemeSelector from "../ThemeSelector"; // ✅ Import your ThemeSelector here
+import logoImage from '../../assets/dhya_texintelli.png';
 
 const WebsiteFooter = () => {
   const currentYear = new Date().getFullYear();
@@ -12,14 +13,13 @@ const WebsiteFooter = () => {
         {/* Logo + About */}
         <div>
           <Link to="/" className="flex items-center gap-2 mb-4">
-            <span className="text-2xl font-extrabold text-blue-600 dark:text-white">
-              Dhya
-            </span>
-            <span className="text-lg font-semibold text-gray-800 dark:text-gray-300 tracking-wide">
-              SPIMS
-            </span>
+            <img 
+              src={logoImage} 
+              alt="Dhya TexIntelli Logo" 
+              className="h-8 w-auto"
+            />
           </Link>
-          <p className="leading-relaxed max-w-xs text-gray-600 dark:text-gray-400">
+          <p className="leading-relaxed max-w-xs text-gray-600">
             Smart Production & Inventory Management System. Simplify textile operations through technology.
           </p>
         </div>

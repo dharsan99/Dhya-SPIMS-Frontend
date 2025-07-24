@@ -7,6 +7,7 @@ interface AuthState {
   user: {
     id: string;
     tenant_id: string;
+    tenantId: string;
     name: string;
     email: string;
     role: {
@@ -45,7 +46,11 @@ const useAuthStore = create<AuthState>()(
           useTenantStore.getState().setTenantId(user.tenant_id);
         }
       },
-      logout: () => set({ token: null, user: null }),
+      logout: () => {
+        // Clear auth data and tenant data
+        set({ token: null, user: null });
+        useTenantStore.getState().clearTenant();
+      },
       setHasHydrated: (val) => set({ hasHydrated: val }),
 
       hasPermission: (module, permission) => {

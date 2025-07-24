@@ -18,11 +18,22 @@ export interface EmailTemplate {
   
   // ✅ Add this for campaigns
   
-export interface Campaign {
-    recipients: any;
+  export interface Campaign {
     id: string;
     name: string;
     subject: string;
-    recipientsCount: number;
-    createdAt?: string; // ✅ optional
+    bodyHtml: string;
+    recipients: string[];
+    createdAt: string;
+    tenant_id: string;
+    analytics?: {
+      totalEvents: number;
+      sent: number;
+      delivered: number;
+      opened: number;
+      clicked: number;
+      bounced: number;
+      complained: number;
+      uniqueRecipients: number;
+    };
   }

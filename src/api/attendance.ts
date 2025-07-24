@@ -77,7 +77,7 @@ export const getAttendanceSummary = async (params: {
   month?: number;
   year?: number;
 }) => {
-  return  await api.get('/attendance/summary-range', { params }).then((res) => res.data);
+  return  await api.get('/attendance/summary-range', { params }).then((res: any) => res.data);
 };
 
 export const fetchAttendanceByDate = async (date: string) => {

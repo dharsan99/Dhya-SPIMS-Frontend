@@ -2,13 +2,14 @@ import React from 'react';
 import BulkEmailPanel from './BulkEmailPanel';
 import MailingListPanel from './MailingListPanel';
 import TemplatePanel from './TemplatePanel';
-import PotentialBuyersPanel from './PotentialBuyersPanel'; // ✅ import
+import PotentialBuyersPanel from './PotentialBuyersPanel';
+import EmailAnalyticsPanel from './EmailAnalyticsPanel';
+import DirectEmailRecovery from './DirectEmailRecovery';
 
-export type TabKey = 'bulk' | 'lists' | 'templates' | 'potential'; // ✅ updated
+export type TabKey = 'bulk' | 'lists' | 'templates' | 'potential' | 'analytics' | 'recovery';
 
 interface MarketingTabsProps {
   activeTab: TabKey;
-  onTabChange: React.Dispatch<React.SetStateAction<TabKey>>;
 }
 
 const MarketingTabs: React.FC<MarketingTabsProps> = ({ activeTab }) => {
@@ -20,7 +21,11 @@ const MarketingTabs: React.FC<MarketingTabsProps> = ({ activeTab }) => {
     case 'templates':
       return <TemplatePanel />;
     case 'potential':
-      return <PotentialBuyersPanel />; // ✅ added
+      return <PotentialBuyersPanel />;
+    case 'analytics':
+      return <EmailAnalyticsPanel />;
+    case 'recovery':
+      return <DirectEmailRecovery />;
     default:
       return <div className="text-red-500">Invalid Tab</div>;
   }

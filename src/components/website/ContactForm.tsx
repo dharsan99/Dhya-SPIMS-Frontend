@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { toast } from "react-hot-toast";
+import { useOptimizedToast } from '@/hooks/useOptimizedToast';
 
 const ContactForm = () => {
+  const { success, error } = useOptimizedToast();
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -16,33 +17,34 @@ const ContactForm = () => {
     e.preventDefault();
 
     if (!form.name || !form.email || !form.message) {
-      toast.error("❌ Please fill in all fields!");
+      error("❌ Please fill in all fields!");
       return;
     }
 
     // 🔥 You can integrate your email API or backend API here later
-    toast.success("✅ Message sent successfully!");
+    console.log("Submitted Contact Form:", form);
+    success("✅ Message sent successfully!");
 
     // Reset form
     setForm({ name: "", email: "", message: "" });
   };
 
   return (
-    <section className="py-20 bg-gray-50 dark:bg-gray-900">
+    <section className="py-20 bg-gray-50">
       <div className="max-w-4xl mx-auto px-6">
         <div className="text-center mb-10">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-800 dark:text-white mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
             Contact Us
           </h2>
-          <p className="text-gray-600 dark:text-gray-300">
+          <p className="text-gray-600">
             Got a question or project idea? We'd love to hear from you!
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-800 rounded-lg shadow p-8 space-y-6">
+        <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow p-8 space-y-6">
           {/* Name Field */}
           <div>
-            <label className="block mb-1 text-gray-700 dark:text-gray-300 text-sm font-medium">
+            <label className="block mb-1 text-gray-700 text-sm font-medium">
               Name
             </label>
             <input
@@ -50,7 +52,7 @@ const ContactForm = () => {
               name="name"
               value={form.name}
               onChange={handleChange}
-              className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded p-3 focus:ring-2 focus:ring-blue-500"
+              className="w-full border border-gray-300 bg-white text-gray-900 rounded p-3 focus:ring-2 focus:ring-blue-500"
               placeholder="Your Name"
               required
             />
@@ -58,7 +60,7 @@ const ContactForm = () => {
 
           {/* Email Field */}
           <div>
-            <label className="block mb-1 text-gray-700 dark:text-gray-300 text-sm font-medium">
+            <label className="block mb-1 text-gray-700 text-sm font-medium">
               Email
             </label>
             <input
@@ -66,7 +68,7 @@ const ContactForm = () => {
               name="email"
               value={form.email}
               onChange={handleChange}
-              className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded p-3 focus:ring-2 focus:ring-blue-500"
+              className="w-full border border-gray-300 bg-white text-gray-900 rounded p-3 focus:ring-2 focus:ring-blue-500"
               placeholder="you@example.com"
               required
             />
@@ -74,14 +76,14 @@ const ContactForm = () => {
 
           {/* Message Field */}
           <div>
-            <label className="block mb-1 text-gray-700 dark:text-gray-300 text-sm font-medium">
+            <label className="block mb-1 text-gray-700 text-sm font-medium">
               Message
             </label>
             <textarea
               name="message"
               value={form.message}
               onChange={handleChange}
-              className="w-full h-32 resize-none border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded p-3 focus:ring-2 focus:ring-blue-500"
+              className="w-full h-32 resize-none border border-gray-300 bg-white text-gray-900 rounded p-3 focus:ring-2 focus:ring-blue-500"
               placeholder="Type your message..."
               required
             ></textarea>

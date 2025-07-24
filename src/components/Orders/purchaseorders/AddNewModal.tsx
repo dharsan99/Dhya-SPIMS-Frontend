@@ -29,14 +29,14 @@ const AddNewModal: React.FC<Props> = ({ isOpen, onClose, type, onAdd, poData }) 
   useEffect(() => {
     if (isOpen && type === 'buyer' && poData) {
       setFormData({
-        name: poData.supplier_name || '',
+        name: poData.supplierName || '',
         code: '',
-        contact_name: poData.buyer_contact_name || '',
-        contact_phone: poData.buyer_contact_phone || '',
-        email: poData.buyer_email || '',
-        address: poData.buyer_address || '',
-        gst_no: poData.supplier_gst_no || '',
-        pan_no: poData.buyer_pan_no || '',
+        contact_name: poData.buyerContactName || '',
+        contact_phone: poData.buyerContactPhone || '',
+        email: poData.buyerEmail || '',
+        address: poData.buyerAddress || '',
+        gst_no: poData.supplierGstNo || '',
+        pan_no: poData.buyerPanNo || '',
       });
     } else if (isOpen && type === 'shade') {
       // Reset form data for shade
@@ -95,7 +95,7 @@ const AddNewModal: React.FC<Props> = ({ isOpen, onClose, type, onAdd, poData }) 
                 className="w-full px-3 py-2 border rounded-md dark:bg-gray-800 dark:border-gray-600 dark:text-white"
                 placeholder="Enter buyer name"
               />
-              {poData?.supplier_name && (
+              {poData?.supplierName && (
                 <p className="text-xs text-gray-500 mt-1">
                   Prefilled from PO supplier name
                 </p>
@@ -113,7 +113,7 @@ const AddNewModal: React.FC<Props> = ({ isOpen, onClose, type, onAdd, poData }) 
                 className="w-full px-3 py-2 border rounded-md dark:bg-gray-800 dark:border-gray-600 dark:text-white"
                 placeholder="Enter contact name"
               />
-              {poData?.buyer_contact_name && (
+              {poData?.buyerContactName && (
                 <p className="text-xs text-gray-500 mt-1">
                   Prefilled from PO contact person
                 </p>
@@ -131,7 +131,7 @@ const AddNewModal: React.FC<Props> = ({ isOpen, onClose, type, onAdd, poData }) 
                 className="w-full px-3 py-2 border rounded-md dark:bg-gray-800 dark:border-gray-600 dark:text-white"
                 placeholder="Enter contact phone"
               />
-              {poData?.buyer_contact_phone && (
+              {poData?.buyerContactPhone && (
                 <p className="text-xs text-gray-500 mt-1">
                   Prefilled from PO contact phone
                 </p>
@@ -149,7 +149,7 @@ const AddNewModal: React.FC<Props> = ({ isOpen, onClose, type, onAdd, poData }) 
                 className="w-full px-3 py-2 border rounded-md dark:bg-gray-800 dark:border-gray-600 dark:text-white"
                 placeholder="Enter email"
               />
-              {poData?.buyer_email && (
+              {poData?.buyerEmail && (
                 <p className="text-xs text-gray-500 mt-1">
                   Prefilled from PO email
                 </p>
@@ -167,7 +167,7 @@ const AddNewModal: React.FC<Props> = ({ isOpen, onClose, type, onAdd, poData }) 
                 className="w-full px-3 py-2 border rounded-md dark:bg-gray-800 dark:border-gray-600 dark:text-white"
                 placeholder="Enter address"
               />
-              {poData?.buyer_address && (
+              {poData?.buyerAddress && (
                 <p className="text-xs text-gray-500 mt-1">
                   Prefilled from PO buyer address
                 </p>
@@ -185,7 +185,7 @@ const AddNewModal: React.FC<Props> = ({ isOpen, onClose, type, onAdd, poData }) 
                 className="w-full px-3 py-2 border rounded-md dark:bg-gray-800 dark:border-gray-600 dark:text-white"
                 placeholder="Enter GST number"
               />
-              {poData?.supplier_gst_no && (
+              {poData?.supplierGstNo && (
                 <p className="text-xs text-gray-500 mt-1">
                   Prefilled from PO supplier GST
                 </p>
@@ -203,7 +203,7 @@ const AddNewModal: React.FC<Props> = ({ isOpen, onClose, type, onAdd, poData }) 
                 className="w-full px-3 py-2 border rounded-md dark:bg-gray-800 dark:border-gray-600 dark:text-white"
                 placeholder="Enter PAN number"
               />
-              {poData?.buyer_pan_no && (
+              {poData?.buyerPanNo && (
                 <p className="text-xs text-gray-500 mt-1">
                   Prefilled from PO buyer PAN
                 </p>

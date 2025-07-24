@@ -7,6 +7,7 @@ interface Props {
   setRowsPerPage: (r: number) => void;
   total: number;
   options?: number[];
+  isLoading?: boolean;
 }
 
 const Pagination = ({

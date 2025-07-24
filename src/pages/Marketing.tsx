@@ -1,14 +1,16 @@
 import React, { JSX, useState } from 'react';
 import MarketingTabs from '../components/Marketing/MarketingTabs';
-import { FiMail, FiList, FiFileText, FiUserPlus } from 'react-icons/fi';
+import { FiMail, FiList, FiFileText, FiUserPlus, FiBarChart, FiRefreshCw } from 'react-icons/fi';
 
-export type TabKey = 'bulk' | 'lists' | 'templates' | 'potential'; // ✅ added
+export type TabKey = 'bulk' | 'lists' | 'templates' | 'potential' | 'analytics' | 'recovery';
 
 const tabLabels: { key: TabKey; icon: JSX.Element; label: string }[] = [
     { key: 'bulk', icon: <FiMail className="w-4 h-4" />, label: 'Bulk Email' },
     { key: 'lists', icon: <FiList className="w-4 h-4" />, label: 'Mailing Lists' },
     { key: 'templates', icon: <FiFileText className="w-4 h-4" />, label: 'Templates' },
-    { key: 'potential', icon: <FiUserPlus className="w-4 h-4" />, label: 'Potential Buyers' }, // ✅ added
+    { key: 'potential', icon: <FiUserPlus className="w-4 h-4" />, label: 'Potential Buyers' },
+    { key: 'analytics', icon: <FiBarChart className="w-4 h-4" />, label: 'Analytics' },
+    { key: 'recovery', icon: <FiRefreshCw className="w-4 h-4" />, label: 'Email Recovery' },
   ];
 
 const MarketingPage: React.FC = () => {
@@ -20,7 +22,7 @@ const MarketingPage: React.FC = () => {
       <div>
         <h1 className="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-1">Marketing</h1>
         <p className="text-sm text-gray-600 dark:text-gray-400">
-          Manage mailing lists, email templates, and send targeted emails to buyers.
+          Manage mailing lists, email templates, send targeted emails to buyers, and track email performance.
         </p>
       </div>
 
@@ -43,7 +45,7 @@ const MarketingPage: React.FC = () => {
 
       {/* Tab Content */}
       <div className="mt-4">
-        <MarketingTabs activeTab={activeTab} onTabChange={setActiveTab} />
+        <MarketingTabs activeTab={activeTab} />
       </div>
     </div>
   );

@@ -52,6 +52,15 @@ import SuperAdminVerifyEmail from './pages/superadmin/VerifyAdminEmail';
 import TenantUsers from './pages/superadmin/TenantUsers';
 import AdminAcceptInvitePage from './pages/AdminAcceptInvite';
 
+import AIInsightsProvider from './context/AIInsightsContext';
+// Growth Engine imports
+import GrowthEngineDashboard from './pages/GrowthEngine';
+import CompanyPersona from './pages/GrowthEngine/CompanyPersona';
+import BrandDiscovery from './pages/GrowthEngine/BrandDiscovery';
+import PerformanceAnalytics from './pages/GrowthEngine/PerformanceAnalytics';
+import TaskManagement from './pages/GrowthEngine/TaskManagement';
+import CampaignCenter from './pages/CampaignCenter';
+
 function App() {
   const { setTheme } = useThemeStore();
 
@@ -91,7 +100,7 @@ function App() {
           {/* Protected Dashboard */}
           <Route path="/app" element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
             <Route index element={<Navigate to="dashboard" replace />} />
-            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="dashboard" element={<AIInsightsProvider><Dashboard /></AIInsightsProvider>} />
             <Route path="orders" element={<Orders />} />
             <Route path="production">
               <Route index element={<ProductionDashboard />} />
@@ -108,6 +117,15 @@ function App() {
             <Route path="settings" element={<Settings />} />
             <Route path="employees" element={<Employees />} />
             <Route path="marketing" element={<Marketing />} />
+            <Route path="campaigns" element={<CampaignCenter />} />
+            {/* Growth Engine Routes */}
+            <Route path="growth">
+              <Route index element={<GrowthEngineDashboard />} />
+              <Route path="persona" element={<CompanyPersona />} />
+              <Route path="brand-discovery" element={<BrandDiscovery />} />
+              <Route path="analytics" element={<PerformanceAnalytics />} />
+              <Route path="tasks" element={<TaskManagement />} />
+            </Route>
             {/*<Route path="setup-wizard" element={<SetupWizard />} />*/}
             <Route path="*" element={<DelayedNotFound />} />
           </Route>

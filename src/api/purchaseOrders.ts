@@ -21,12 +21,63 @@ export const uploadAndParsePurchaseOrder = async (file: File): Promise<PurchaseO
   }
 };
 
+// Add pagination interface
+export interface PaginationParams {
+  page?: number;
+  limit?: number;
+  search?: string;
+  status?: string;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+}
+
+export interface PaginatedResponse<T> {
+  data: T[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+    hasNext: boolean;
+    hasPrev: boolean;
+  };
+}
+
 /**
- * 📦 Fetch all purchase orders
+ * 📦 Fetch all purchase orders with pagination support
  */
-export const getAllPurchaseOrders = async (): Promise<PurchaseOrder[]> => {
+export const getAllPurchaseOrders = async (params?: PaginationParams): Promise<PaginatedResponse<PurchaseOrder>> => {
   try {
-    const res = await api.get(endpoint);
+    const queryParams = new URLSearchParams();
+    
+    if (params) {
+      if (params.page) queryParams.append('page', params.page.toString());
+      if (params.limit) queryParams.append('limit', params.limit.toString());
+      if (params.search) queryParams.append('search', params.search);
+      if (params.status) queryParams.append('status', params.status);
+      if (params.sortBy) queryParams.append('sortBy', params.sortBy);
+      if (params.sortOrder) queryParams.append('sortOrder', params.sortOrder);
+    }
+
+    const url = queryParams.toString() ? `${endpoint}?${queryParams.toString()}` : endpoint;
+    const res = await api.get(url);
+    
+    // Handle both old format (array) and new format (paginated response)
+    if (Array.isArray(res.data)) {
+      // Legacy format - convert to new format
+      return {
+        data: res.data,
+        pagination: {
+          page: 1,
+          limit: res.data.length,
+          total: res.data.length,
+          totalPages: 1,
+          hasNext: false,
+          hasPrev: false
+        }
+      };
+    }
+    
     return res.data;
   } catch (err: any) {
     throw err;
