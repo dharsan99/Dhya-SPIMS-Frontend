@@ -30,7 +30,7 @@ export default function SignupPage() {
       console.log(res)
   
       // ✅ Store tenantId from response
-      setTenantId(res.id); // assuming the backend returns { tenantId: 'xxx' }
+      setTenantId(res.tenant.id); // assuming the backend returns { tenantId: 'xxx' }
   
       setStep(2);
     } catch (error: any) {

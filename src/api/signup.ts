@@ -13,11 +13,11 @@ export const signup = async ({
   tenantId: string;
 }) => {
   console.log('api')
-  const response = await axios.post('http://192.168.0.2:5001/signup', {
+  const response = await axios.post('http://localhost:5001/signup', {
     name,
     email,
     password,
-    tenant_id: tenantId, // 👈 use tenant_id as key
+    tenantId, // 👈 use tenant_id as key
   });
 
   return response.data;
@@ -25,7 +25,7 @@ export const signup = async ({
 
 
 export const verifyEmail = async (token: string) => {
-    const response = await axios.get(`http://192.168.0.2:5001/verify-email?token=${token}`);
+    const response = await axios.get(`http://localhost:5001/verify-email?token=${token}`);
     return response.data;
   };
 
@@ -73,7 +73,7 @@ export const createTenant = async ({
   industry?: string;
   phone?: string;
 }) => {
-  const response = await axios.post('http://192.168.0.2:5001/tenants', {
+  const response = await axios.post('http://localhost:5001/tenants', {
     name,
     domain,
     address,

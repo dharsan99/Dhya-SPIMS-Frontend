@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 
 
 const instance = axios.create({
-  baseURL: 'http://192.168.0.2:5001',
+  baseURL: 'http://localhost:5001',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -41,8 +41,8 @@ instance.interceptors.response.use(
     const status = error.response?.status;
 
     if (status === 401) {
-      useAuthStore.getState().logout();
-      window.location.href = '/login';
+      // TEMP: Do not logout or redirect to login on 401. Just show the error toast for debugging.
+      toast.error('Unauthorized (401): Your session is invalid or expired. [Debug: No redirect performed]');
     } else {
       let message = 'Something went wrong. Please try again.';
       const responseData = error.response?.data;

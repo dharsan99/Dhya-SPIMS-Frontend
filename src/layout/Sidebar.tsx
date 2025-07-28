@@ -22,7 +22,7 @@ interface NavSection {
 
 const Sidebar = ({ onLinkClick }: { onLinkClick?: () => void }) => {
   const auth = useAuthStore();
-  const email = auth.user?.email || '';
+  //const email = auth.user?.email || '';
   const { collapsed, toggleCollapsed } = useSidebarState();
   const [searchQuery, setSearchQuery] = useState('');
   const [showMorePopup, setShowMorePopup] = useState(false);
@@ -32,9 +32,8 @@ const Sidebar = ({ onLinkClick }: { onLinkClick?: () => void }) => {
 
   const location = useLocation();
 
-  const hasPermission = useAuthStore((state: any) => state.hasPermission);
+  // const hasPermission = useAuthStore((state: any) => state.hasPermission);
 
-  const isOrderUser = email === 'orders@nscspinning.com';
 
   // Navigation sections with improved structure
   const navSections: NavSection[] = [
@@ -97,23 +96,27 @@ const Sidebar = ({ onLinkClick }: { onLinkClick?: () => void }) => {
 
   // Filter sections based on permissions
   const filteredSections = useMemo(() => navSections.filter(section => {
-    if (isOrderUser && section.title === 'Administration') return false;
-    if (section.permission && !hasPermission(section.permission, 'View')) return false;
-    return section.items.some(item => !item.permission || hasPermission(item.permission, 'View'));
-  }), [isOrderUser, hasPermission]);
+    console.log(section)
+    // if (isOrderUser && section.title === 'Administration') return false;
+    // if (section.permission && !hasPermission(section.permission, 'View')) return false;
+    // return section.items.some(item => !item.permission || hasPermission(item.permission, 'View'));
+    return true;
+  }), [/*isOrderUser, hasPermission*/]);
 
   // Filter items within sections
   const processedSections = useMemo(() => filteredSections.map(section => ({
     ...section,
     items: section.items.filter(item => {
-      if (!item.permission) return true;
-      // Special case for Employees permission
-      if (item.permission === 'Employees') {
-        return hasPermission('Employees', 'View Employee');
-      }
-      return hasPermission(item.permission, 'View');
+      console.log(item)
+      // if (!item.permission) return true;
+      // // Special case for Employees permission
+      // if (item.permission === 'Employees') {
+      //   return hasPermission('Employees', 'View Employee');
+      // }
+      // return hasPermission(item.permission, 'View');
+      return true;
     })
-  })), [filteredSections, hasPermission]);
+  })), [filteredSections/*, hasPermission*/]);
 
   // Get all available navigation items
   const allNavItems = useMemo(() => processedSections.flatMap(section => section.items), [processedSections]);

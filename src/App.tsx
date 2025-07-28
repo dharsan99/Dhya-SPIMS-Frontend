@@ -60,6 +60,7 @@ import BrandDiscovery from './pages/GrowthEngine/BrandDiscovery';
 import PerformanceAnalytics from './pages/GrowthEngine/PerformanceAnalytics';
 import TaskManagement from './pages/GrowthEngine/TaskManagement';
 import CampaignCenter from './pages/CampaignCenter';
+import FeaturesPage from './pages/website/FeaturesPage';
 
 function App() {
   const { setTheme } = useThemeStore();
@@ -80,6 +81,7 @@ function App() {
           {/* Website Layout */}
           <Route path="/" element={<WebsiteLayout />}>
             <Route index element={<LandingPage />} />
+            <Route path='features' element={<FeaturesPage />} />
             <Route path="about" element={<AboutPage />} />
             <Route path="contact" element={<ContactPage />} />
             <Route path="docs" element={<DocumentationPage />} />
