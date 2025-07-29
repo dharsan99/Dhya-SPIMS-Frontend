@@ -3,7 +3,7 @@ import { AttendanceRecord } from "@/types/attendance";
 import { format, addDays, addWeeks, startOfWeek, startOfMonth, addMonths } from 'date-fns';
 
 export const buildEmptyRow = (emp: AttendanceRecord): AttendanceRow => ({
-    employee_id: emp.employee_id,
+    employee_id: emp.employeeId,
     in_time: '',
     out_time: '',
     total_hours: 0,
@@ -24,7 +24,7 @@ export const buildAttendanceMap = (
   dates.forEach((d) => {
     map[d] = {};
     employees.forEach((emp) => {
-      map[d][emp.employee_id] = attendance[emp.employee_id] || buildEmptyRow(emp);
+      map[d][emp.employeeId] = attendance[emp.employeeId] || buildEmptyRow(emp);
     });
   });
   return map;
@@ -56,7 +56,7 @@ export const generateMonthRanges = (baseDate: Date) => {
 
 export const calculateWeeklyTotals = (
   emp: {
-    employee_id: string;
+    employeeId: string;
     employee: { shift_rate: string };
     attendance: Record<string, { status: string; total_hours: number; overtime_hours: number }>;
   },

@@ -45,7 +45,7 @@ const AttendanceWeeklyTable: React.FC<Props> = ({
   const weeklyTotals = useMemo(() => {
     return rows.reduce((totals, emp) => {
       totals[emp.employeeId] = calculateWeeklyTotals({
-        employee_id: emp.employeeId,
+        employeeId: emp.employeeId,
         employee: { shift_rate: emp.employee?.shiftRate?.toString() || '0' },
         attendance: emp.attendance || {},
       }, weekDates);
