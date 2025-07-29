@@ -29,7 +29,7 @@ const OrdersTab: React.FC<OrdersTabProps> = ({ orders, onRefresh }) => {
     try {
       const sanitized = {
         ...data,
-        tenant_id: auth.user?.tenant_id || '',
+        tenant_id: auth.user?.tenantId || '',
         created_by: auth.user?.id || '',
         status: data.status === 'dispatched' ? 'completed' : data.status,
       };

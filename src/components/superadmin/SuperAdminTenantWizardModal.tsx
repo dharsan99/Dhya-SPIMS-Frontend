@@ -27,7 +27,7 @@ const SuperAdminTenantWizardModal = ({ open, onClose }: { open: boolean; onClose
   // Step 2: User creation
   const userMutation = useMutation({
     mutationFn: (userData: typeof userForm) =>
-      adminSignup({ ...userData, tenant_id: tenantId! }),
+      adminSignup({ ...userData, tenantId: tenantId! }),
     onSuccess: () => {
       toast.success('Tenant and user created! Invite sent.');
       queryClient.invalidateQueries({ queryKey: ['superadmin-tenants'] });

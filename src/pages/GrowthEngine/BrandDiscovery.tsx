@@ -289,7 +289,7 @@ const CampaignDetailsModal: React.FC<CampaignDetailsModalProps> = ({
   onClose,
   onRefresh,
   onViewSuppliers,
-  isLoadingSuppliers,
+  isLoadingSuppliers, 
   toast
 }) => {
   const getStatusColor = (status: GrowthCampaign['status']) => {

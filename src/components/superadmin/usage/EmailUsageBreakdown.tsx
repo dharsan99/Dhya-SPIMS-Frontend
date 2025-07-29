@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
-import { FiUsers, FiMail, FiTrendingUp, FiAlertTriangle } from 'react-icons/fi';
+import { FiUsers, FiAlertTriangle, FiAlertCircle, FiCheckCircle } from 'react-icons/fi';
 
 export interface TenantEmailUsage {
-  tenant_id: string;
-  tenant_name: string;
-  emails_sent: number;
-  email_limit: number;
-  usage_percentage: number;
-  last_sent_at: string;
+  tenantId: string;
+  tenantName: string;
+  emailsSent: number;
+  emailLimit: number;
+  usagePercentage: number;
+  lastSentAt: string;
 }
 
 interface EmailUsageBreakdownProps {
@@ -15,80 +15,93 @@ interface EmailUsageBreakdownProps {
 }
 
 const EmailUsageBreakdown: React.FC<EmailUsageBreakdownProps> = ({ tenantEmailUsage }) => {
-  const [sortBy, setSortBy] = useState<'usage' | 'name' | 'last_sent'>('usage');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [sortField, setSortField] = useState<'usage' | 'name' | 'lastSent'>('usage');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    });
+    if (!dateString) return 'Never';
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return 'Invalid Date';
+      
+      const now = new Date();
+      const diffTime = Math.abs(now.getTime() - date.getTime());
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      
+      if (diffDays === 1) return 'Today';
+      if (diffDays === 2) return 'Yesterday';
+      if (diffDays <= 7) return `${diffDays - 1} days ago`;
+      if (diffDays <= 30) return `${Math.floor(diffDays / 7)} weeks ago`;
+      if (diffDays <= 365) return `${Math.floor(diffDays / 30)} months ago`;
+      return date.toLocaleDateString();
+    } catch {
+      return 'Invalid Date';
+    }
   };
 
-  const sortedTenants = [...tenantEmailUsage].sort((a, b) => {
-    let comparison = 0;
-    switch (sortBy) {
-      case 'usage':
-        comparison = a.usage_percentage - b.usage_percentage;
-        break;
-      case 'name':
-        comparison = a.tenant_name.localeCompare(b.tenant_name);
-        break;
-      case 'last_sent':
-        comparison = new Date(a.last_sent_at).getTime() - new Date(b.last_sent_at).getTime();
-        break;
-    }
-    return sortOrder === 'asc' ? comparison : -comparison;
-  });
-
-  const handleSort = (field: 'usage' | 'name' | 'last_sent') => {
-    if (sortBy === field) {
-      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+  const handleSort = (field: 'usage' | 'name' | 'lastSent') => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
     } else {
-      setSortBy(field);
-      setSortOrder('desc');
+      setSortField(field);
+      setSortDirection('desc');
     }
   };
 
   const getUsageStatus = (percentage: number) => {
-    if (percentage >= 90) return { color: 'text-red-600 dark:text-red-400', bg: 'bg-red-50 dark:bg-red-900/20', icon: FiAlertTriangle };
-    if (percentage >= 75) return { color: 'text-orange-600 dark:text-orange-400', bg: 'bg-orange-50 dark:bg-orange-900/20', icon: FiTrendingUp };
-    return { color: 'text-green-600 dark:text-green-400', bg: 'bg-green-50 dark:bg-green-900/20', icon: FiMail };
+    if (percentage >= 90) {
+      return {
+        icon: FiAlertTriangle,
+        bg: 'bg-red-100 dark:bg-red-900',
+        color: 'text-red-800 dark:text-red-300'
+      };
+    } else if (percentage >= 75) {
+      return {
+        icon: FiAlertCircle,
+        bg: 'bg-orange-100 dark:bg-orange-900',
+        color: 'text-orange-800 dark:text-orange-300'
+      };
+    } else {
+      return {
+        icon: FiCheckCircle,
+        bg: 'bg-green-100 dark:bg-green-900',
+        color: 'text-green-800 dark:text-green-300'
+      };
+    }
   };
 
-  return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-      <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-        <div className="flex flex-col md:flex-row items-center justify-center md:justify-between gap-4 md:gap-0">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-            Tenant Email Usage Breakdown
-          </h3>
-          <div className="flex items-center gap-2 text-sm">
-            <span className="text-gray-600 dark:text-gray-400">Sort by:</span>
-            <select
-              value={`${sortBy}-${sortOrder}`}
-              onChange={(e) => {
-                const [field, order] = e.target.value.split('-') as ['usage' | 'name' | 'last_sent', 'asc' | 'desc'];
-                setSortBy(field);
-                setSortOrder(order);
-              }}
-              className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-            >
-              <option value="usage-desc">Usage (High to Low)</option>
-              <option value="usage-asc">Usage (Low to High)</option>
-              <option value="name-asc">Name (A-Z)</option>
-              <option value="name-desc">Name (Z-A)</option>
-              <option value="last_sent-desc">Last Sent (Recent)</option>
-              <option value="last_sent-asc">Last Sent (Oldest)</option>
-            </select>
-          </div>
-        </div>
-      </div>
+  const sortedTenants = [...tenantEmailUsage].sort((a, b) => {
+    let aValue: any, bValue: any;
+    
+    switch (sortField) {
+      case 'usage':
+        aValue = a.usagePercentage;
+        bValue = b.usagePercentage;
+        break;
+      case 'name':
+        aValue = a.tenantName.toLowerCase();
+        bValue = b.tenantName.toLowerCase();
+        break;
+      case 'lastSent':
+        aValue = new Date(a.lastSentAt).getTime();
+        bValue = new Date(b.lastSentAt).getTime();
+        break;
+      default:
+        return 0;
+    }
+    
+    if (sortDirection === 'asc') {
+      return aValue > bValue ? 1 : -1;
+    } else {
+      return aValue < bValue ? 1 : -1;
+    }
+  });
 
+  return (
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
       <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead className="bg-gray-50 dark:bg-gray-700">
+        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+          <thead className="bg-gray-50 dark:bg-gray-900">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 Tenant
@@ -104,7 +117,7 @@ const EmailUsageBreakdown: React.FC<EmailUsageBreakdownProps> = ({ tenantEmailUs
               </th>
               <th
                 className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:text-gray-700 dark:hover:text-gray-300"
-                onClick={() => handleSort('last_sent')}
+                onClick={() => handleSort('lastSent')}
               >
                 Last Sent
               </th>
@@ -115,10 +128,10 @@ const EmailUsageBreakdown: React.FC<EmailUsageBreakdownProps> = ({ tenantEmailUs
           </thead>
           <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
             {sortedTenants.map((tenant) => {
-              const status = getUsageStatus(tenant.usage_percentage);
+              const status = getUsageStatus(tenant.usagePercentage);
               const StatusIcon = status.icon;
               return (
-                <tr key={tenant.tenant_id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                <tr key={tenant.tenantId} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <div className="flex-shrink-0 h-10 w-10">
@@ -128,45 +141,45 @@ const EmailUsageBreakdown: React.FC<EmailUsageBreakdownProps> = ({ tenantEmailUs
                       </div>
                       <div className="ml-4">
                         <div className="text-sm font-medium text-gray-900 dark:text-white">
-                          {tenant.tenant_name}
+                          {tenant.tenantName}
                         </div>
                         <div className="text-sm text-gray-500 dark:text-gray-400">
-                          ID: {tenant.tenant_id}
+                          ID: {tenant.tenantId}
                         </div>
                       </div>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                    {tenant.emails_sent.toLocaleString()} / {tenant.email_limit.toLocaleString()}
+                    {tenant.emailsSent.toLocaleString()} / {tenant.emailLimit.toLocaleString()}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <span className="text-sm font-medium text-gray-900 dark:text-white">
-                        {tenant.usage_percentage}%
+                        {tenant.usagePercentage}%
                       </span>
                       <div className="ml-2 flex-shrink-0 w-20">
                         <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                           <div
                             className={`h-2 rounded-full transition-all duration-300 ${
-                              tenant.usage_percentage >= 90
+                              tenant.usagePercentage >= 90
                                 ? 'bg-red-500'
-                                : tenant.usage_percentage >= 75
+                                : tenant.usagePercentage >= 75
                                 ? 'bg-orange-500'
                                 : 'bg-green-500'
                             }`}
-                            style={{ width: `${Math.min(tenant.usage_percentage, 100)}%` }}
+                            style={{ width: `${Math.min(tenant.usagePercentage, 100)}%` }}
                           />
                         </div>
                       </div>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                    {formatDate(tenant.last_sent_at)}
+                    {formatDate(tenant.lastSentAt)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${status.bg} ${status.color}`}>
                       <StatusIcon className="w-3 h-3 mr-1" />
-                      {tenant.usage_percentage >= 90 ? 'Critical' : tenant.usage_percentage >= 75 ? 'Warning' : 'Normal'}
+                      {tenant.usagePercentage >= 90 ? 'Critical' : tenant.usagePercentage >= 75 ? 'Warning' : 'Normal'}
                     </div>
                   </td>
                 </tr>

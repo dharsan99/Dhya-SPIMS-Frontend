@@ -28,7 +28,7 @@ function TenantUsers() {
     queryFn: () => fetchSuperAdminTenantUsers({
       ...(debouncedSearchQuery ? { search: debouncedSearchQuery } : {}),
       status: statusFilter === 'all' ? undefined : statusFilter,
-      tenant_id: tenantFilter === 'all' ? undefined : tenantFilter,
+      tenantId: tenantFilter === 'all' ? undefined : tenantFilter,
       page,
       limit: rowsPerPage,
     }),
@@ -84,15 +84,13 @@ function TenantUsers() {
   const pagination = data?.pagination || { currentPage: 1, totalPages: 1, totalItems: 0, itemsPerPage: rowsPerPage };
 
   const getStatusBadge = (status: boolean) => {
-    const statusKey = status ? 'active' : 'inactive';
-    const statusClasses = {
-      active: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
-      inactive: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300',
-      suspended: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
-    };
-    return (
-      <span className={`px-2 py-1 text-xs font-medium rounded-full ${statusClasses[statusKey as keyof typeof statusClasses] || statusClasses.inactive}`}>
-        {statusKey.charAt(0).toUpperCase() + statusKey.slice(1)}
+    return status ? (
+      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
+        Active
+      </span>
+    ) : (
+      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300">
+        Inactive
       </span>
     );
   };
@@ -201,10 +199,10 @@ function TenantUsers() {
                       <div className="text-sm font-medium text-gray-900 dark:text-white">{user.name}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{user.email}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">{getStatusBadge(user.is_active)}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{getStatusBadge(user.isActive)}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">{user.role?.name || '-'}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{new Date(user.created_at).toLocaleDateString()}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{user.updated_at ? new Date(user.updated_at).toLocaleDateString() : '-'}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{new Date(user.createdAt).toLocaleDateString()}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{user.updatedAt ? new Date(user.updatedAt).toLocaleDateString() : '-'}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex items-center justify-end gap-2">
                         <button className="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300" onClick={() => setEditUser(user)}>
@@ -257,8 +255,8 @@ function TenantUsers() {
       <UpdateUserModal
         open={!!editUser}
         onClose={() => setEditUser(null)}
-        onSubmit={({ name, role_id }) => {
-          if (editUser) updateUserMutation.mutate({ id: editUser.id, name, role_id });
+        onSubmit={({ name, roleId }) => {
+          if (editUser) updateUserMutation.mutate({ id: editUser.id, name, roleId });
         }}
         isLoading={updateUserMutation.isPending}
         roles={rolesQuery.data || []}

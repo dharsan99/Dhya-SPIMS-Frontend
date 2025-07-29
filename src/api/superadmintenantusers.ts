@@ -2,12 +2,12 @@ import api from './axios';
 
 export interface TenantUserRole {
   id: string;
-  tenant_id: string;
+  tenantId: string;
   name: string;
   description: string;
   permissions: Record<string, string[]>;
-  created_at: string;
-  updated_at: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface TenantInfo {
@@ -15,25 +15,25 @@ export interface TenantInfo {
   name: string;
   domain: string;
   plan: string;
-  is_active: boolean;
-  storage_path: string | null;
+  isActive: boolean;
+  storagePath: string | null;
   address: string | null;
   phone: string | null;
   industry: string | null;
-  expires_at: string | null;
-  created_at: string;
-  updated_at: string;
+  expiresAt: string | null;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface TenantUser {
   id: string;
-  tenant_id: string;
+  tenantId: string;
   name: string;
   email: string;
-  is_active: boolean;
-  is_verified: boolean;
-  created_at: string;
-  updated_at: string;
+  isActive: boolean;
+  isVerified: boolean;
+  createdAt: string;
+  updatedAt: string;
   role: TenantUserRole;
   tenants: TenantInfo;
 }
@@ -50,26 +50,26 @@ export interface FetchTenantUsersResponse {
   pagination: TenantUsersPagination;
 }
 
-export const fetchSuperAdminTenantUsers = async (params: { search?: string; status?: string; tenant_id?: string; page?: number; limit?: number } = {}): Promise<FetchTenantUsersResponse> => {
+export const fetchSuperAdminTenantUsers = async (params: { search?: string; status?: string; tenantId?: string; page?: number; limit?: number } = {}): Promise<FetchTenantUsersResponse> => {
   const response = await api.get('/dashboard/admin/users', { params });
   return response.data.data;
 };
 
 export interface InviteTenantUserVars {
   email: string;
-  tenant_id: string;
-  role_id: string;
+  tenantId: string;
+  roleId: string;
 }
 
 export const inviteTenantUser = async ({
   email,
-  tenant_id,
-  role_id,
+  tenantId,
+  roleId,
 }: InviteTenantUserVars): Promise<any> => {
   const response = await api.post('/dashboard/admin/invite-user', {
     email,
-    tenant_id,
-    role_id,
+    tenant_id: tenantId,
+    role_id: roleId,
   });
   return response.data;
 };
@@ -83,10 +83,10 @@ export const adminAcceptInvite = async ({ name, password, token }: { name: strin
   return response.data;
 };
 
-export const updateTenantUser = async ({ id, name, role_id }: { id: string; name: string; role_id: string }): Promise<any> => {
+export const updateTenantUser = async ({ id, name, roleId }: { id: string; name: string; roleId: string }): Promise<any> => {
   const response = await api.put(`/dashboard/admin/users/${id}`, {
     name,
-    role_id,
+    role_id: roleId,
   });
   return response.data;
 };

@@ -24,7 +24,7 @@ const AddProductionPanel: React.FC<AddProductionPanelProps> = ({
 
   const handleFormSubmit = async (formData: any) => {
     try {
-      if (!user?.id || !user?.tenant_id) {
+      if (!user?.id || !user?.tenantId) {
         toast.error('Missing user or tenant info');
         return;
       }
@@ -32,7 +32,7 @@ const AddProductionPanel: React.FC<AddProductionPanelProps> = ({
       const payload = {
         ...formData,
         user_id: user.id,
-        tenant_id: user.tenant_id,
+        tenant_id: user.tenantId,
       };
 
       await createProduction(payload);

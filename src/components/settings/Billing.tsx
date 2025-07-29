@@ -13,7 +13,7 @@ import { fetchSubscription, fetchUsage, fetchBillingHistory } from '@/api/subscr
 
 const Billing = () => {
   const auth = useAuthStore();
-  const tenantId = auth.user?.tenant_id || '';
+  const tenantId = auth.user?.tenantId || '';
 
   const { data, isLoading } = useQuery({
     queryKey: ['subscription', tenantId],

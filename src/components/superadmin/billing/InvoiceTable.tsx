@@ -84,13 +84,13 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({ invoices }) => {
   const handleDownloadInvoice = async (invoice: Invoice) => {
     try {
       setDownloadingId(invoice.id);
-      // Get the token and tenant_id from your auth context or storage
+      // Get the token and tenantId from your auth context or storage
       const token = useAuthStore.getState().token ?? '';
-      const tenant_id = user?.tenant_id || ''// adjust as per your data
+      const tenantId = user?.tenantId || ''// adjust as per your data
   
       const blob = await downloadInvoice({
         invoice_number: invoice.invoiceNumber,
-        tenant_id,
+        tenant_id: tenantId,
         token,
       });
   

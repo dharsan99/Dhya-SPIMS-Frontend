@@ -20,6 +20,17 @@ const AttendanceEditMode: React.FC<
   const [isSubmitting, setIsSubmitting] = useState(false);
   const queryClient = useQueryClient();
 
+  console.log('employees', employees)
+  console.log('attendance', attendance)
+  
+  // Debug: Check if employees have valid employeeId
+  employees.forEach((emp, index) => {
+    console.log(`Employee ${index}:`, {
+      employeeId: emp.employeeId,
+      name: emp.employee?.name,
+      hasAttendance: !!attendance[emp.employeeId]
+    });
+  });
 
   const handleShiftChange = (empId: string, shift: string) => {
     onTimeChange(empId, 'shift', shift as ShiftType | 'ABSENT');
@@ -43,7 +54,7 @@ const AttendanceEditMode: React.FC<
       const payload = {
         date: formattedDate,
         records: employees.map((emp) => {
-          const att = attendance[emp.employee_id];
+          const att = attendance[emp.employeeId];
 
           if (!att) {
             throw new Error(`Missing attendance data for employee ${emp.employee?.name}`);
@@ -52,17 +63,17 @@ const AttendanceEditMode: React.FC<
           // If status is ABSENT, send shift as null
           if (att.status === 'ABSENT') {
             return {
-              employee_id: emp.employee_id,
+              employeeId: emp.employeeId,
               shift: null,
               status: 'ABSENT',
-              overtime_hours: 0,
+              overtimeHours: 0,
             };
           } else {
             return {
-              employee_id: emp.employee_id,
+              employeeId: emp.employeeId,
               shift: att.shift,
               status: att.status,
-              overtime_hours: att.overtime_hours || 0,
+              overtimeHours: att.overtime_hours || 0,
             };
           }
         }),
@@ -99,10 +110,10 @@ const AttendanceEditMode: React.FC<
     try {
       const formattedDate = new Date(date).toISOString().slice(0, 10);
       const payload = {
-        employee_id: empId,
+        employeeId: empId,
         shift: att.shift === 'ABSENT' ? 'SHIFT_1' : att.shift,
         status: att.status,
-        overtime_hours: att.overtime_hours || 0,
+        overtimeHours: att.overtime_hours || 0,
         date: formattedDate,
       };
 
@@ -137,7 +148,7 @@ const AttendanceEditMode: React.FC<
           </thead>
           <tbody>
             {employees.map((emp, idx) => {
-              const att = attendance[emp.employee_id];
+              const att = attendance[emp.employeeId];
               const rawShift = att?.shift;
               const shiftValue = ['SHIFT_1', 'SHIFT_2', 'SHIFT_3'].includes(rawShift || '') ? rawShift : 'ABSENT';
               const statusValue = att?.status || 'ABSENT';
@@ -155,7 +166,7 @@ const AttendanceEditMode: React.FC<
                   <td className="px-3 py-2 text-center">
                     <select
                       value={shiftValue}
-                      onChange={(e) => handleShiftChange(emp.employee_id, e.target.value)}
+                      onChange={(e) => handleShiftChange(emp.employeeId, e.target.value)}
                       className="w-28 px-2 py-1 rounded border text-sm dark:bg-gray-800 dark:text-white"
                     >
                       <option value="ABSENT">Absent</option>
@@ -167,7 +178,7 @@ const AttendanceEditMode: React.FC<
                   <td className="px-3 py-2 text-center">
                     <select
                       value={statusValue}
-                      onChange={(e) => onTimeChange(emp.employee_id, 'status', e.target.value as 'PRESENT' | 'ABSENT' | 'HALF_DAY')}
+                      onChange={(e) => onTimeChange(emp.employeeId, 'status', e.target.value as 'PRESENT' | 'ABSENT' | 'HALF_DAY')}
                       disabled={shiftValue === 'ABSENT'}
                       className="w-28 px-2 py-1 rounded border text-sm dark:bg-gray-800 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed"
                     >
@@ -188,7 +199,7 @@ const AttendanceEditMode: React.FC<
                       value={overtime || ''}
                       onChange={(e) => {
                         const value = e.target.value === '' ? 0 : +e.target.value;
-                        onOvertimeChange(emp.employee_id, value);
+                        onOvertimeChange(emp.employeeId, value);
                       }}
                       disabled={shiftValue === 'ABSENT'}
                       className="w-20 px-2 py-1 rounded border text-center dark:bg-gray-800 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed"
@@ -202,7 +213,7 @@ const AttendanceEditMode: React.FC<
                   <td className="px-3 py-2 text-center">
                     <button
                       className="px-2 py-1 text-sm bg-green-600 hover:bg-green-700 text-white rounded disabled:opacity-50 disabled:cursor-not-allowed"
-                      onClick={() => handleSingleUpdate(emp.employee_id)}
+                      onClick={() => handleSingleUpdate(emp.employeeId)}
                       
                     >
                       Update

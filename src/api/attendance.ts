@@ -58,10 +58,10 @@ export const markAttendanceBulk = (payload: any) => {
 
 
 
-export const markSingleAttendance = async (payload: Omit<SingleAttendancePayload, 'employee_id'> & { employee_id: string }) => {
-  const { employee_id, ...rest } = payload;
+export const markSingleAttendance = async (payload: Omit<SingleAttendancePayload, 'employeeId'> & { employeeId: string }) => {
+  const { employeeId, ...rest } = payload;
 
-  const res = await api.put(`/attendance/${employee_id}`, rest);
+  const res = await api.put(`/attendance/${employeeId}`, rest);
   return res.data;
 };
 

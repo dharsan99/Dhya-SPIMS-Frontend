@@ -13,8 +13,8 @@ interface Role {
 
 interface InviteUserVars {
   email: string;
-  tenant_id: string;
-  role_id: string;
+  tenantId: string;
+  roleId: string;
 }
 
 export default function AddUserModal({
@@ -47,7 +47,7 @@ export default function AddUserModal({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit({ email, tenant_id: tenantId, role_id: roleId });
+    onSubmit({ email, tenantId, roleId });
   };
 
   if (!open) return null;

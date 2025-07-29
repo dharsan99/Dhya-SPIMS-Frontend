@@ -27,22 +27,7 @@ export default function LoginModal({ setFadeOutPage }: LoginModalProps) {
   const mutation = useMutation({
     mutationFn: loginUser,
     onSuccess: (data) => {
-      // Map backend user/role fields to frontend's expected snake_case fields
-      const user = data.user;
-      const mappedUser = {
-        ...user,
-        tenant_id: user.tenantId,
-        is_active: user.isActive,
-        created_at: user.createdAt,
-        updated_at: user.updatedAt,
-        role: {
-          ...user.role,
-          tenant_id: user.role.tenantId,
-          created_at: user.role.createdAt,
-          updated_at: user.role.updatedAt,
-        },
-      };
-      setAuth(data.token, mappedUser);
+      setAuth(data.token, data.user);
 
       // 🎉 Confetti blast
       confetti({

@@ -22,7 +22,7 @@ export const useDynamicLogo = (): UseDynamicLogoReturn => {
   const [hasTenantLogo, setHasTenantLogo] = useState<boolean>(false);
 
   // Get tenant ID from user
-  const tenantId = user?.tenant_id || '';
+  const tenantId = user?.tenantId || '';
 
   // Fetch tenant details including logo
   const { 
@@ -40,7 +40,12 @@ export const useDynamicLogo = (): UseDynamicLogoReturn => {
   useEffect(() => {
     if (tenantData?.data) {
       // Store tenant details in store
-      setTenantDetails(tenantData.data);
+      // Convert from API format (is_active) to store format (isActive)
+      const storeTenantDetails = {
+        ...tenantData.data,
+        isActive: tenantData.data.is_active,
+      };
+      setTenantDetails(storeTenantDetails);
     }
   }, [tenantData, setTenantDetails]);
 

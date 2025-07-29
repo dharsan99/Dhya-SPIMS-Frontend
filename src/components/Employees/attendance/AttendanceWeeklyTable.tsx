@@ -28,15 +28,15 @@ const AttendanceWeeklyTable: React.FC<Props> = ({
 
   const attendanceMap = useMemo(() => {
     const map: Record<string, Record<string, any>> = {};
-    rows.forEach(({ employee_id, employee, attendance }) => {
+    rows.forEach(({ employeeId, employee, attendance }) => {
       if (!attendance) return;
       Object.entries(attendance).forEach(([date, data]) => {
         if (!weekDates.includes(date)) return;
         map[date] ??= {};
-        map[date][employee_id] =
+        map[date][employeeId] =
           typeof data === 'object' && data !== null
-            ? { ...data, employee_id, employee }
-            : { employee_id, employee };
+            ? { ...data, employeeId, employee }
+            : { employeeId, employee };
       });
     });
     return map;
@@ -44,9 +44,9 @@ const AttendanceWeeklyTable: React.FC<Props> = ({
 
   const weeklyTotals = useMemo(() => {
     return rows.reduce((totals, emp) => {
-      totals[emp.employee_id] = calculateWeeklyTotals({
-        employee_id: emp.employee_id,
-        employee: { shift_rate: emp.employee?.shift_rate?.toString() || '0' },
+      totals[emp.employeeId] = calculateWeeklyTotals({
+        employee_id: emp.employeeId,
+        employee: { shift_rate: emp.employee?.shiftRate?.toString() || '0' },
         attendance: emp.attendance || {},
       }, weekDates);
       return totals;
@@ -91,14 +91,14 @@ const AttendanceWeeklyTable: React.FC<Props> = ({
           <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
             {rows.length ? (
               rows.map((emp, idx) => {
-                const empId = emp.employee_id;
-                const { token_no, name } = emp.employee || {};
+                const empId = emp.employeeId;
+                const { tokenNo, name } = emp.employee || {};
                 const totals = weeklyTotals[empId] || { totalHours: 0, totalDays: 0, totalOvertime: 0, wages: 0 };
 
                 return (
                   <tr key={empId || idx} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition">
                     <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-300">
-                      {token_no || <span className="italic text-gray-400">–</span>}
+                      {tokenNo || <span className="italic text-gray-400">–</span>}
                     </td>
                     <td className="px-4 py-3 text-gray-900 dark:text-white max-w-[200px] truncate" title={name}>
                       {name}

@@ -28,7 +28,7 @@ import InviteModal from './useraccess/InviteModal';
 
 const UserAccess = () => {
   const auth = useAuthStore();
-  const tenantId = auth.user?.tenant_id || '';
+  const tenantId = auth.user?.tenantId || '';
 
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);

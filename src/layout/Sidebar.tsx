@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
-import { FiGrid, FiPackage, FiActivity, FiShoppingBag, FiTrendingUp, FiMail, FiFileText, FiUser, FiBarChart, FiLayers, FiMapPin, FiBox, FiTruck, FiUsers, FiClock, FiSettings, FiSearch, FiMoreHorizontal, FiChevronLeft, FiChevronRight, FiLogOut, FiHelpCircle } from 'react-icons/fi';
+import { FiGrid, FiPackage, FiActivity, FiShoppingBag, FiTrendingUp, FiMail, FiFileText, FiUser, FiBarChart, FiLayers, FiMapPin, FiBox, FiTruck, FiUsers, FiSettings, FiSearch, FiMoreHorizontal, FiChevronLeft, FiChevronRight, FiLogOut, FiHelpCircle } from 'react-icons/fi';
 import useAuthStore from '../hooks/auth';
 import { useSidebarState } from '../hooks/useSidebarState';
 import logo from '../assets/dhya_texintelli.png';
@@ -75,7 +75,6 @@ const Sidebar = ({ onLinkClick }: { onLinkClick?: () => void }) => {
       title: 'Human Resources',
       items: [
         { to: '/app/employees', label: 'Employees', Icon: FiUsers, description: 'Employee management', permission: 'Employees' },
-        { to: '/app/attendance', label: 'Attendance', Icon: FiClock, description: 'Time tracking', permission: 'Attendance' },
       ]
     },
     {

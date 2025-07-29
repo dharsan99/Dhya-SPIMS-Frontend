@@ -6,7 +6,7 @@ interface TenantDetails {
   name: string;
   domain?: string;
   plan?: string;
-  is_active: boolean;
+  isActive: boolean;
   logo?: string; // base64 logo data
 }
 
@@ -17,6 +17,8 @@ type TenantStore = {
   setTenantDetails: (details: TenantDetails) => void;
   clearTenant: () => void;
   getTenantLogo: () => string | null;
+  debugTenantInfo: () => void;
+  clearLocalStorageTenant: () => void;
 };
 
 const useTenantStore = create<TenantStore>()(
@@ -24,12 +26,31 @@ const useTenantStore = create<TenantStore>()(
     (set, get) => ({
       tenantId: null,
       tenantDetails: null,
-      setTenantId: (id) => set({ tenantId: id }),
+      setTenantId: (id) => {
+        console.log('TenantStore: Setting tenant ID to:', id);
+        set({ tenantId: id });
+      },
       setTenantDetails: (details) => set({ tenantDetails: details }),
-      clearTenant: () => set({ tenantId: null, tenantDetails: null }),
+      clearTenant: () => {
+        console.log('TenantStore: Clearing tenant data');
+        set({ tenantId: null, tenantDetails: null });
+      },
       getTenantLogo: () => {
         const { tenantDetails } = get();
         return tenantDetails?.logo || null;
+      },
+      debugTenantInfo: () => {
+        const state = get();
+        console.log('TenantStore Debug Info:', {
+          tenantId: state.tenantId,
+          tenantDetails: state.tenantDetails,
+        });
+      },
+      clearLocalStorageTenant: () => {
+        // Clear any conflicting localStorage tenant data
+        localStorage.removeItem('tenantId');
+        localStorage.removeItem('tenant-storage');
+        console.log('TenantStore: Cleared localStorage tenant data');
       },
     }),
     {

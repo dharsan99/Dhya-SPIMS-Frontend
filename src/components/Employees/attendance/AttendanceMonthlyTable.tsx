@@ -55,7 +55,7 @@ const AttendanceMonthlyTable: React.FC<Props> = ({
   // Ensure employees are unique by ID
 
 
-  // Memoized attendance lookup by date and employee_id for fast access
+  // Memoized attendance lookup by date and employeeId for fast access
   const attendanceMap = useMemo(() => {
     const map: Record<string, Record<string, any>> = {};
     
@@ -68,9 +68,9 @@ const AttendanceMonthlyTable: React.FC<Props> = ({
         if (!monthDates.includes(date)) return;
         
         if (!map[date]) map[date] = {};
-        map[date][row.employee_id] = {
+        map[date][row.employeeId] = {
           ...attendanceData,
-          employee_id: row.employee_id,
+          employeeId: row.employeeId,
           employee: row.employee
         };
       });
@@ -97,9 +97,9 @@ const AttendanceMonthlyTable: React.FC<Props> = ({
               </thead>
               <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
                 {attendanceData.length ? attendanceData.map((emp: any) => (
-                  <tr key={emp.employee_id} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition">
+                  <tr key={emp.employeeId} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition">
                     <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-300">
-                      {emp.employee.token_no || <span className="italic text-gray-400">–</span>}
+                      {emp.employee.tokenNo || <span className="italic text-gray-400">–</span>}
                     </td>
                     <td
                       className="px-4 py-3 text-gray-900 dark:text-white max-w-[180px] truncate"
@@ -133,9 +133,9 @@ const AttendanceMonthlyTable: React.FC<Props> = ({
               </thead>
               <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
                 {attendanceData.length ? attendanceData.map((emp: any) => (
-                  <tr key={emp.employee_id} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition">
+                  <tr key={emp.employeeId} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition">
                     {monthDates.map((date) => {
-                      const att = attendanceMap[date]?.[emp.employee_id];
+                      const att = attendanceMap[date]?.[emp.employeeId];
                       return (
                         <td key={date} className="px-4 py-3 text-center">
                           {getStatusBadge(att?.status)}
@@ -169,7 +169,7 @@ const AttendanceMonthlyTable: React.FC<Props> = ({
                 {attendanceData.length ? attendanceData.map((emp: any) => {const { workDays, totalHours, totalOvertime, wages } = getEmployeeSummary(emp, attendanceMap, monthDates);
 
                   return (
-                    <tr key={emp.employee_id} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition">
+                    <tr key={emp.employeeId} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition">
                       <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-300">{workDays}</td>
                       <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-300">{totalOvertime.toFixed(3)}</td>
                       <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-300">{totalHours.toFixed(3)}</td>

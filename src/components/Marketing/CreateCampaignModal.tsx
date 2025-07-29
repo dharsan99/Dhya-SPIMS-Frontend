@@ -17,7 +17,7 @@ interface Props {
 
 const CreateCampaignModal: React.FC<Props> = ({ isOpen, onClose }) => {
   const auth = useAuthStore();
-  const tenantId = auth.user?.tenant_id || '';
+  const tenantId = auth.user?.tenantId || '';
 
   const [selectedListId, setSelectedListId] = useState('');
   const [selectedTemplateId, setSelectedTemplateId] = useState('');

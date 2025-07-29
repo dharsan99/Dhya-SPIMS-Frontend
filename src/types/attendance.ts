@@ -75,19 +75,24 @@ export interface NestedAttendanceRecord {
 }
 
 export interface AttendanceRecord {
-token_no?: string;
-employee_id: string;
-name: string;
-in_time: string;
-out_time: string;
-department: string;
-employee: { name: string; department: string , token_no: string, shift_rate: number};
-date: string; // ISO date string like "2025-06-15T00:00:00.000Z"
-shift: string;
-status: AttendanceStatus | string;
-total_hours: number;
-overtime_hours: number;
-shift_rate?: number;
+  date: string;
+  department: string;
+  employee: {
+    name: string;
+    department: string;
+    tokenNo: string;
+    shiftRate: string;
+  };
+  employeeId: string;
+  name: string;
+  inTime: string;
+  outTime: string;
+  overtimeHours: number;
+  shift: string;
+  shiftRate: string;
+  status: AttendanceStatus | string;
+  tokenNo: string;
+  totalHours: number;
 }
 
 export interface MarkAttendancePayload {
@@ -101,11 +106,11 @@ records: {
 }
 
 export interface SingleAttendancePayload {
-date?: string;
-employee_id: string;
-overtime_hours: number;
-status: AttendanceStatus;
-shift: ShiftType;
+  date?: string;
+  employeeId: string;
+  overtimeHours: number;
+  status: AttendanceStatus;
+  shift: ShiftType;
 }
 
 export const shiftTimeMap: Record<ShiftType, { in_time: string; out_time: string }> = {

@@ -1,16 +1,13 @@
 import React from 'react';
 
 interface AttendanceSummary {
-  summary_type: 'daily' | 'monthly' | 'custom';
-  range: {
-    start: string;
-    end: string;
-  };
-  total_employees: number;
+  totalEmployees: number;
   present: number;
   absent: number;
-  total_overtime: number;
-  average_hours: number;
+  halfDay: number;
+  totalOvertime: number;
+  totalHours: number;
+  averageHours: number;
 }
 
 interface Props {
@@ -21,6 +18,8 @@ interface Props {
 
 const AttendanceHeaderStats: React.FC<Props> = ({ summary, loadingSummary }) => {
 
+
+  console.log('summary', summary)
 
 
   console.log('summary', summary)
@@ -35,8 +34,8 @@ const AttendanceHeaderStats: React.FC<Props> = ({ summary, loadingSummary }) => 
   const {
     present,
     absent,
-    total_overtime,
-    average_hours,
+    totalOvertime,
+    averageHours,
   } = summary;
 
   return (
@@ -47,11 +46,11 @@ const AttendanceHeaderStats: React.FC<Props> = ({ summary, loadingSummary }) => 
       </div>
       <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-4 border-l-4 border-green-500">
         <p className="text-gray-500 dark:text-gray-300 text-sm">Total OT</p>
-        <p className="text-2xl font-semibold">{total_overtime.toFixed(2)} <span className="text-sm">hrs</span></p>
+        <p className="text-2xl font-semibold">{totalOvertime.toFixed(2)} <span className="text-sm">hrs</span></p>
       </div>
       <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-4 border-l-4 border-purple-500">
         <p className="text-gray-500 dark:text-gray-300 text-sm">Avg. Shift</p>
-        <p className="text-2xl font-semibold">{average_hours.toFixed(2)} <span className="text-sm">hrs</span></p>
+        <p className="text-2xl font-semibold">{averageHours.toFixed(2)} <span className="text-sm">hrs</span></p>
       </div>
       <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-4 border-l-4 border-red-500">
         <p className="text-gray-500 dark:text-gray-300 text-sm">Absent</p>

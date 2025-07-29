@@ -28,6 +28,7 @@ export interface SuperAdminSummary {
 }
 
 export const fetchSuperAdminDashboard = async (): Promise<DashboardStat[]> => {
+  console.log('api', api)
   const response = await api.get<DashboardStatsResponse>('/dashboard/admin');
   // console.log('dashboard',response.data)
   return response.data.dashboard_stats;

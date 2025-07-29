@@ -15,15 +15,33 @@ const instance = axios.create({
 instance.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     const token = useAuthStore.getState().token;
+    const user = useAuthStore.getState().user;
     const tenantId = useTenantStore.getState().tenantId;
+
+    console.log('tenantid', tenantId);
+    console.log('user tenantId', user?.tenantId);
 
     if (token) {
       config.headers.set('Authorization', `Bearer ${token}`);
     }
 
-    if (tenantId) {
+    // For superadmin routes, use the superadmin's own tenant ID from JWT token
+    const isSuperAdminRoute = config.url?.includes('/dashboard/admin') || 
+                             config.url?.includes('/admin/') ||
+                             config.url?.includes('/superadmin/');
+    
+    if (isSuperAdminRoute) {
+      // For superadmin routes, use the superadmin's own tenant ID
+      if (user?.tenantId) {
+        config.headers.set('x-tenant-id', user.tenantId);
+        console.log('Superadmin route: Using superadmin tenant ID:', user.tenantId);
+      }
+    } else if (tenantId) {
+      // For regular routes, use the current tenant ID
       config.headers.set('x-tenant-id', tenantId);
+      console.log('Regular route: Using current tenant ID:', tenantId);
     }
+    
     return config;
   },
   (error: unknown) => {

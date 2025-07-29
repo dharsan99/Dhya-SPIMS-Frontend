@@ -18,9 +18,9 @@ export interface Tenant {
   status?: 'active' | 'inactive' | 'suspended' | string;
   plan?: string;
   userCount?: number;
-  is_active?: boolean;
-  created_at?: string;
-  updated_at?: string;
+  isActive?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
   lastActive?: string;
 }
 
@@ -73,13 +73,13 @@ export const createSuperAdminTenant = async (data: { name: string; domain?: stri
   return response.data;
 };
 
-export const adminSignup = async ({ name, email, password, tenant_id }: { name: string; email: string; password: string; tenant_id: string }) => {
-  const response = await api.post('/admin/signup', { name, email, password, tenant_id });
+export const adminSignup = async ({ name, email, password, tenantId }: { name: string; email: string; password: string; tenantId: string }) => {
+  const response = await api.post('/admin/signup', { name, email, password, tenantId });
   return response.data.data;
 };
 
 export const verifyAdminEmail = async (token: string) => {
-  const response = await api.get('http://192.168.0.2:5001/dashboard/admin/verify-mail', { params: { token } });
+  const response = await api.get('http://localhost:5001/dashboard/admin/verify-mail', { params: { token } });
   return response.data;
 };
 

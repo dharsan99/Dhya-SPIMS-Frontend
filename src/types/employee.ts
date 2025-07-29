@@ -12,13 +12,12 @@ export interface Employee {
 
 export interface CreateEmployeeInput {
   name: string;
-  token_no: string;
-  shift_rate: number;
-  aadhar_no: string;
-  bank_acc_1: string;
-  bank_acc_2?: string;
+  aadharNo: string;
+  bankAcc1: string;
+  bankAcc2?: string;
   department?: string;
-  join_date?: string;
+  joinDate?: string;
+  shiftRate: number;
 }
 
 export interface EmployeeAttendanceInput {

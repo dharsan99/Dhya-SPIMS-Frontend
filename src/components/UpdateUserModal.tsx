@@ -8,7 +8,7 @@ interface Role {
 
 interface UpdateUserVars {
   name: string;
-  role_id: string;
+  roleId: string;
 }
 
 export default function UpdateUserModal({
@@ -42,7 +42,7 @@ export default function UpdateUserModal({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit({ name, role_id: roleId });
+    onSubmit({ name, roleId });
   };
 
   if (!open) return null;

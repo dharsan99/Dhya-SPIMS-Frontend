@@ -71,23 +71,31 @@ const AttendanceTab = () => {
 
   const attendances = attendancesData?.data ?? [];
 
+  console.log('attendancesData', attendancesData)
+
   useEffect(() => {
     if (!attendancesData) return;
-  
+
     const allowedStatuses = ['PRESENT', 'ABSENT', 'LEAVE', 'HALF_DAY'] as const;
   
     const initialAttendance: Record<string, AttendanceRow> = {};
     attendancesData?.data?.forEach((record: AttendanceRecord) => {
       const {
-        employee_id,
-        in_time,
-        out_time,
+        employeeId,
+        inTime,
+        outTime,
         shift,
-        overtime_hours,
+        overtimeHours,
         status,
-        total_hours,
+        totalHours,
         department,
       } = record;
+  
+      // Skip records without valid employeeId
+      if (!employeeId) {
+        console.warn('Skipping record with missing employeeId:', record);
+        return;
+      }
   
       const normalizedStatus = typeof status === 'string'
         ? status.toUpperCase()
@@ -98,22 +106,23 @@ const AttendanceTab = () => {
         ? (shift.toUpperCase() as ShiftType)
         : 'ABSENT';
 
-      initialAttendance[employee_id] = {
-        in_time: in_time && typeof in_time === 'string' && in_time.length >= 5 ? in_time.slice(0, 5) : '',
-        out_time: out_time && typeof out_time === 'string' && out_time.length >= 5 ? out_time.slice(0, 5) : '',
+      initialAttendance[employeeId] = {
+        in_time: inTime && typeof inTime === 'string' && inTime.length >= 5 ? inTime.slice(0, 5) : '',
+        out_time: outTime && typeof outTime === 'string' && outTime.length >= 5 ? outTime.slice(0, 5) : '',
         shift: normalizedShift,
-        overtime_hours: overtime_hours || 0,
-        total_hours: total_hours || 0,
+        overtime_hours: overtimeHours || 0,
+        total_hours: totalHours || 0,
         status: allowedStatuses.includes(normalizedStatus as AttendanceStatus)
           ? (normalizedStatus as AttendanceStatus)
           : 'ABSENT',
-        department: department ?? '', // Add this field based on AttendanceRow
-        overtime: overtime_hours || 0, // assuming `overtime` duplicates `overtime_hours`
-        hours: total_hours || 0,       // assuming `hours` duplicates `total_hours`
-        employee_id,
+        department: department ?? '',
+        overtime: overtimeHours || 0,
+        hours: totalHours || 0,
+        employee_id: employeeId,
       };
     });
   
+    console.log('Initial attendance data:', initialAttendance);
     setAttendance(initialAttendance);
   }, [attendancesData]);
 
@@ -161,7 +170,7 @@ const AttendanceTab = () => {
       const q = searchQuery.toLowerCase();
       const matchesSearch =
         name?.toLowerCase().includes(q) ||
-        emp.employee_id?.toLowerCase().includes(q);
+        emp.employeeId?.toLowerCase().includes(q);
   
       return matchesDept && matchesSearch;
     });

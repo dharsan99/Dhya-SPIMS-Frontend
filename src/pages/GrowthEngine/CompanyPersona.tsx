@@ -305,7 +305,7 @@ export const CompanyPersona = () => {
     }
 
     // === DEBUG: Check user and tenantId ===
-    const tenantId = user?.tenantId || user?.tenant_id;
+    const tenantId = user?.tenantId;
     console.log('🔍 [HANDLER] User object:', {
       hasUser: !!user,
       userKeys: user ? Object.keys(user) : 'No user',
@@ -357,7 +357,7 @@ export const CompanyPersona = () => {
     console.log('🔄 [HANDLER] Regenerate button clicked');
     
     // Check if tenantId exists and is valid (support both formats)
-    const tenantId = user?.tenantId || user?.tenant_id;
+    const tenantId = user?.tenantId;
     if (!tenantId) {
       console.error('❌ [HANDLER] Missing tenantId in user object');
       toast.error('Could not identify user tenant. Please log in again.');

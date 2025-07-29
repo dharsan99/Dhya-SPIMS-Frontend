@@ -56,13 +56,13 @@ const TenantDetailsModal: React.FC<TenantDetailsModalProps> = ({ open, onClose, 
             <div className="flex flex-col justify-center items-center md:flex-row md:items-center  md:justify-between md:gap-4 mb-2">
               <p className="text-2xl  md:text-3xl font-semibold text-blue-700 dark:text-blue-300">{tenant.name || placeholder}</p>
               <div className="flex gap-2 mt-2 md:mt-0">
-                {getStatusBadge(tenant.is_active)}
+                {getStatusBadge(tenant.isActive)}
                 {getPlanBadge(tenant.plan)}
               </div>
             </div>
             <div className='flex flex-col items-center justify-center w-full md:items-start'>
             <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">{tenant.domain || placeholder}</div>
-            <div className="text-xs text-gray-400">Created: {tenant.created_at ? new Date(tenant.created_at).toLocaleDateString() : placeholder}</div>
+            <div className="text-xs text-gray-400">Created: {tenant.createdAt ? new Date(tenant.createdAt).toLocaleDateString() : placeholder}</div>
             </div>
           </div>
 

@@ -35,6 +35,8 @@ function Tenants() {
     retry: false
   });
 
+  console.log('data', data)
+
   // Fetch full tenant details for selectedTenantId
   const { data: selectedTenantDetails, isLoading: isDetailsLoading } = useQuery({
     queryKey: ['superadmin-tenant-details', selectedTenantId],
@@ -51,8 +53,8 @@ function Tenants() {
 
   const filteredTenants = tenants; // Filtering is now server-side
 
-  const getStatusBadge = (status: string | undefined, is_active?: boolean) => {
-    const statusKey = status || (is_active ? 'active' : 'inactive');
+  const getStatusBadge = (status: string | undefined, isActive?: boolean) => {
+    const statusKey = status || (isActive ? 'active' : 'inactive');
     const statusClasses = {
       active: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
       inactive: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300',
@@ -201,7 +203,7 @@ function Tenants() {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      {getStatusBadge(tenant.status, tenant.is_active)}
+                      {getStatusBadge(tenant.status, tenant.isActive)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       {tenant.plan ? getPlanBadge(tenant.plan) : '-'}
@@ -210,7 +212,7 @@ function Tenants() {
                       {tenant.userCount != null ? tenant.userCount : '-'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                      {tenant.created_at ? new Date(tenant.created_at).toLocaleDateString() : '-'}
+                      {tenant.createdAt ? new Date(tenant.createdAt).toLocaleDateString() : '-'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                       {tenant.lastActive ? new Date(tenant.lastActive).toLocaleDateString() : '-'}
