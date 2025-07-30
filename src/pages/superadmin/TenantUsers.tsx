@@ -23,6 +23,8 @@ function TenantUsers() {
   const [deletingUserId, setDeletingUserId] = useState<string | null>(null);
   const queryClient = useQueryClient();
 
+
+
   const { data, isLoading } = useQuery<FetchTenantUsersResponse>({
     queryKey: ['superadmin-tenant-users', debouncedSearchQuery, statusFilter, tenantFilter, page, rowsPerPage],
     queryFn: () => fetchSuperAdminTenantUsers({
@@ -33,6 +35,8 @@ function TenantUsers() {
       limit: rowsPerPage,
     }),
   });
+
+  console.log('tenantusers', data)
 
   const tenantsQuery = useQuery({
     queryKey: ['superadmin-tenants'],
@@ -194,7 +198,7 @@ function TenantUsers() {
               ) : users.length > 0 ? (
                 users.map((user) => (
                   <tr key={user.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">{user.tenants?.name || '-'}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">{user.tenant?.name || '-'}</td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900 dark:text-white">{user.name}</div>
                     </td>

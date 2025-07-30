@@ -28,6 +28,7 @@ export interface TenantInfo {
 export interface TenantUser {
   id: string;
   tenantId: string;
+  tenant: TenantInfo;
   name: string;
   email: string;
   isActive: boolean;
@@ -59,17 +60,20 @@ export interface InviteTenantUserVars {
   email: string;
   tenantId: string;
   roleId: string;
+  isSuperadmin?: boolean;
 }
 
 export const inviteTenantUser = async ({
   email,
   tenantId,
   roleId,
+  isSuperadmin = true,
 }: InviteTenantUserVars): Promise<any> => {
   const response = await api.post('/dashboard/admin/invite-user', {
     email,
-    tenant_id: tenantId,
-    role_id: roleId,
+    tenantId,
+    roleId,
+    isSuperadmin,
   });
   return response.data;
 };

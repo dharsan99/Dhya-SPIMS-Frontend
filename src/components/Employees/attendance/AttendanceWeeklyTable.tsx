@@ -46,7 +46,7 @@ const AttendanceWeeklyTable: React.FC<Props> = ({
     return rows.reduce((totals, emp) => {
       totals[emp.employeeId] = calculateWeeklyTotals({
         employeeId: emp.employeeId,
-        employee: { shift_rate: emp.employee?.shiftRate?.toString() || '0' },
+        employee: { shiftRate: emp.employee?.shiftRate?.toString() || '0' },
         attendance: emp.attendance || {},
       }, weekDates);
       return totals;

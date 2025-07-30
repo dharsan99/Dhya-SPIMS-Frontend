@@ -57,8 +57,8 @@ export const generateMonthRanges = (baseDate: Date) => {
 export const calculateWeeklyTotals = (
   emp: {
     employeeId: string;
-    employee: { shift_rate: string };
-    attendance: Record<string, { status: string; total_hours: number; overtime_hours: number }>;
+    employee: { shiftRate: string };
+    attendance: Record<string, { status: string; totalHours: number; overtimeHours: number }>;
   },
   weekDates: string[]
 ) => {
@@ -80,14 +80,13 @@ export const calculateWeeklyTotals = (
     const att = emp.attendance?.[date];
 
     if (att && att.status !== 'ABSENT') {
-
-      totalHours += att.total_hours || 0;
-      totalOvertime += att.overtime_hours || 0;
+      totalHours += att.totalHours || 0;
+      totalOvertime += att.overtimeHours || 0;
       totalDays += att.status === 'PRESENT' ? 1 : att.status === 'HALF_DAY' ? 0.5 : 0;
     } 
   });
 
-  const shiftRate = parseFloat(emp.employee?.shift_rate || '0');
+  const shiftRate = parseFloat(emp.employee?.shiftRate || '0');
   const hourlyRate = shiftRate / 8;
   const wages = parseFloat((totalHours * hourlyRate).toFixed(2));
 
@@ -114,15 +113,15 @@ export const formatINR = (value: number) =>
     let totalOvertime = 0;
   
     monthDates.forEach((date: any) => {
-      const att = attendanceMap[date]?.[emp.employee_id];
+      const att = attendanceMap[date]?.[emp.employeeId];
       if (att && ['PRESENT', 'HALF_DAY'].includes(att.status)) {
-        totalHours += att.total_hours || 0;
-        totalOvertime += att.overtime_hours || 0;
+        totalHours += att.totalHours || 0;
+        totalOvertime += att.overtimeHours || 0;
         workDays += att.status === 'PRESENT' ? 1 : 0.5;
       }
     });
   
-    const hourlyRate = Number(emp.employee.shift_rate || 0) / 8;
+    const hourlyRate = Number(emp.employee.shiftRate || 0) / 8;
     const wages = parseFloat((hourlyRate * totalHours).toFixed(2));
   
     return { workDays, totalHours, totalOvertime, wages };

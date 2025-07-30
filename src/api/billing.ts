@@ -164,6 +164,6 @@ export interface RecentPayment {
 }
 
 export const fetchRecentPayments = async (): Promise<RecentPayment[]> => {
-  const response = await api.get('/billing/recent-payments');
+  const response = await api.get('/billing/recent-activity');
   return response.data;
 };

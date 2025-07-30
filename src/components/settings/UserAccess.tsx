@@ -96,7 +96,7 @@ const UserAccess = () => {
         await createRole({
           name: data.name,
           permissions: data.permissions,
-          tenant_id: tenantId,
+          tenantId: tenantId,
           description,
         });
         toast.success('Role created successfully');

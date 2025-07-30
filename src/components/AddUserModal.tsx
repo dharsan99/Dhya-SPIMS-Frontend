@@ -15,6 +15,7 @@ interface InviteUserVars {
   email: string;
   tenantId: string;
   roleId: string;
+  isSuperadmin?: boolean;
 }
 
 export default function AddUserModal({
@@ -47,7 +48,7 @@ export default function AddUserModal({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit({ email, tenantId, roleId });
+    onSubmit({ email, tenantId, roleId, isSuperadmin: true });
   };
 
   if (!open) return null;

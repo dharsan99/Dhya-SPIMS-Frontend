@@ -34,12 +34,12 @@ const EmployeeModal: React.FC<EmployeeModalProps> = ({ isOpen, onClose, onSave, 
       // Convert from Employee format to CreateEmployeeInput format
       setFormData({
         name: initialData.name,
-        aadharNo: initialData.aadhar_no,
-        bankAcc1: initialData.bank_acc_1,
-        bankAcc2: initialData.bank_acc_2 ?? '',
+        aadharNo: initialData.aadharNo,
+        bankAcc1: initialData.bankAcc1,
+        bankAcc2: initialData.bankAcc2 ?? '',
         department: initialData.department ?? '',
-        joinDate: initialData.join_date ?? '',
-        shiftRate: initialData.shift_rate,
+        joinDate: initialData.joinDate ?? '',
+        shiftRate: Number(initialData.shiftRate),
       });
     } else {
       setFormData({

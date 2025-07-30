@@ -29,6 +29,7 @@ const Employees = () => {
     queryFn: getAllEmployees,
   });
 
+  console.log('employees', employees)
   
 
 
@@ -43,12 +44,12 @@ const Employees = () => {
         // For updates, we need to convert back to the old format since the API might still expect it
         const updateData = {
           name: data.name,
-          aadhar_no: data.aadharNo,
-          bank_acc_1: data.bankAcc1,
-          bank_acc_2: data.bankAcc2,
+          aadharNo: data.aadharNo,
+          bankAcc1: data.bankAcc1,
+          bankAcc2: data.bankAcc2,
           department: data.department,
-          join_date: data.joinDate,
-          shift_rate: data.shiftRate,
+          joinDate: data.joinDate,
+          shiftRate: data.shiftRate,
         };
         await updateEmployee(id, updateData);
         toast.success('Employee updated successfully');

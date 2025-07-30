@@ -49,7 +49,8 @@ export default function AdminAcceptInvitePage() {
     setIsSubmitting(true);
     try {
       const data = await adminAcceptInvite({ name, token, password });
-      if (data.user_id) {
+      console.log('data', data)
+      if (data) {
         setStatus('success');
         setMessage(data.message || 'Account created successfully! You can now log in.');
         toast.success(data.message || 'Account created successfully!');
