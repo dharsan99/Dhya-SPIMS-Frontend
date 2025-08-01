@@ -40,7 +40,7 @@ export const updateTenant = (
 ) => api.put(`${endpoint}/${id}`, data);
 
 export const getTenantDetails = async (id: string): Promise<{ data: TenantDetails }> => {
-  return api.get(`${endpoint}/${id}/details`);
+  return api.get(`${endpoint}/${id}`);
 };
 
 export const updateTenantLogo = (id: string, logoBase64: string) => 

@@ -92,6 +92,38 @@ const TimeframeSelector: React.FC<TimeframeSelectorProps> = ({ timeframe, onTime
   );
 };
 
+// Generate metrics array based on dashboard data
+const generateMetrics = (dashboardData: AnalyticsDashboardResponse) => [
+  {
+    title: "Total Campaigns",
+    value: dashboardData.overview.totalCampaigns,
+    icon: <Target size={20} />,
+    color: "blue" as const,
+    subtitle: `${dashboardData.recentActivity.campaignsCreated} created recently`
+  },
+  {
+    title: "Active Contacts",
+    value: dashboardData.overview.activeContacts,
+    icon: <Users size={20} />,
+    color: "green" as const,
+    subtitle: `${dashboardData.recentActivity.contactsAcquired} acquired recently`
+  },
+  {
+    title: "Emails Sent",
+    value: dashboardData.performance.emailsSent,
+    icon: <Mail size={20} />,
+    color: "purple" as const,
+    subtitle: `${dashboardData.recentActivity.emailsGenerated} generated recently`
+  },
+  {
+    title: "Reply Rate",
+    value: `${dashboardData.performance.replyRate}%`,
+    icon: <MessageSquare size={20} />,
+    color: "orange" as const,
+    subtitle: `${dashboardData.performance.emailsReplied} replies received`
+  }
+];
+
 const PerformanceAnalytics: React.FC = () => {
   const [dashboardData, setDashboardData] = useState<AnalyticsDashboardResponse | null>(null);
   const [, setCampaignData] = useState<CampaignAnalyticsResponse | null>(null);
@@ -172,44 +204,23 @@ const PerformanceAnalytics: React.FC = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Performance Analytics</h1>
-          <p className="text-gray-600 mt-2">Track campaign performance and growth metrics with detailed analytics</p>
+          <p className="text-gray-600 mt-2 max-w-[30px] flex-wrap">Track campaign performance and growth metrics with detailed analytics</p>
         </div>
         <TimeframeSelector timeframe={timeframe} onTimeframeChange={setTimeframe} />
       </div>
 
       {/* Key Metrics Overview */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <MetricCard
-          title="Total Campaigns"
-          value={dashboardData.overview.totalCampaigns}
-          icon={<Target size={20} />}
-          color="blue"
-          subtitle={`${dashboardData.recentActivity.campaignsCreated} created recently`}
-        />
-        
-        <MetricCard
-          title="Active Contacts"
-          value={dashboardData.overview.activeContacts}
-          icon={<Users size={20} />}
-          color="green"
-          subtitle={`${dashboardData.recentActivity.contactsAcquired} acquired recently`}
-        />
-        
-        <MetricCard
-          title="Emails Sent"
-          value={dashboardData.performance.emailsSent}
-          icon={<Mail size={20} />}
-          color="purple"
-          subtitle={`${dashboardData.recentActivity.emailsGenerated} generated recently`}
-        />
-        
-        <MetricCard
-          title="Reply Rate"
-          value={`${dashboardData.performance.replyRate}%`}
-          icon={<MessageSquare size={20} />}
-          color="orange"
-          subtitle={`${dashboardData.performance.emailsReplied} replies received`}
-        />
+        {generateMetrics(dashboardData).map((metric, index) => (
+          <MetricCard
+            key={index}
+            title={metric.title}
+            value={metric.value}
+            icon={metric.icon}
+            color={metric.color}
+            subtitle={metric.subtitle}
+          />
+        ))}
       </div>
 
       {/* Performance Metrics */}

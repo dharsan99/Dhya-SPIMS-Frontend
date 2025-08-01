@@ -24,6 +24,9 @@ const RoleModal = ({ isOpen, onClose, onSave, roleToEdit }: RoleModalProps) => {
   });
 
   useEffect(() => {
+    console.log('RoleModal - roleToEdit:', roleToEdit);
+    console.log('RoleModal - isOpen:', isOpen);
+    
     if (roleToEdit && allFeatures) {
       setName(roleToEdit.name);
       const grouped: Record<string, string[]> = {};
@@ -53,6 +56,8 @@ const RoleModal = ({ isOpen, onClose, onSave, roleToEdit }: RoleModalProps) => {
     e.preventDefault();
     const trimmedName = name.trim();
     if (!trimmedName) return;
+
+    console.log('role', roleToEdit)
 
     onSave({ id: roleToEdit?.id, name: trimmedName, permissions });
     onClose();

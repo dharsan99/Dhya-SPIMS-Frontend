@@ -101,7 +101,7 @@ const UserTable = ({ users, roles, onSave, onDelete, onInvite, loading }: UserTa
                     {user.email}
                   </td>
                   <td className="px-4 py-3 text-gray-700 dark:text-gray-300">
-                    {user.role?.name || <span className="italic text-gray-400">–</span>}
+                    {user?.role?.name || <span className="italic text-gray-400">–</span>}
                   </td>
                   {showActions && (
                   <td className="px-4 py-3 text-center">

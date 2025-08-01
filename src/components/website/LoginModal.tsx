@@ -170,9 +170,12 @@ export default function LoginModal({ setFadeOutPage }: LoginModalProps) {
 
               {/* Forgot Password */}
               <div className="text-right mt-2">
-                <a href="#" className="text-sm text-blue-600 hover:underline dark:text-blue-400">
+                <button
+                  onClick={() => window.location.href = '/forgot-password'}
+                  className="text-sm text-blue-600 hover:underline dark:text-blue-400"
+                >
                   Forgot password?
-                </a>
+                </button>
               </div>
             </div>
 

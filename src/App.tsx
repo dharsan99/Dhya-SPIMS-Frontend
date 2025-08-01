@@ -37,6 +37,8 @@ import Marketing from './pages/Marketing';
 import ProductionEntryPage from './pages/ProductionEntryPage';
 import SignupPage from './pages/Signup';
 import SubscriptionPlanPage from './pages/SubscriptionPlanPage';
+import ForgotPasswordPage from './pages/ForgotPassword';
+import ResetPasswordPage from './pages/ResetPassword';
 //import SetupWizard from './components/setup/SetupWizard';
 
 // Super Admin Pages
@@ -94,6 +96,8 @@ function App() {
           {/* Login */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/verify-email" element={<VerifyEmailPage />} />
           <Route path="/accept-invite" element={<AcceptInvitePage />} />
           <Route path="/select-plan" element={<SubscriptionPlanPage />} />

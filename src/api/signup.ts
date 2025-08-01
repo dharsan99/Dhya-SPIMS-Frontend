@@ -32,14 +32,14 @@ export const verifyEmail = async (token: string) => {
 
   export const sendInvite = async ({
     email,
-    role_id,
-    tenant_id,
+    roleId,
+    tenantId,
   }: {
     email: string;
-    role_id: string;
-    tenant_id: string;
+    roleId: string;
+    tenantId: string;
   }) => {
-    const res = await api.post('/auth/invite', { email, role_id, tenant_id });
+    const res = await api.post('/auth/invite', { email, roleId, tenantId });
     return res.data;
   };
 

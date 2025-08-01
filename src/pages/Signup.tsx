@@ -211,7 +211,7 @@ export default function SignupPage() {
           <p className="mt-4 text-sm text-center text-gray-600 dark:text-gray-400">
             Already have an account?{' '}
             <button
-              onClick={()=>{}}
+              onClick={() => navigate('/login')}
               className="text-blue-600 dark:text-blue-400 hover:underline font-semibold"
             >
               Sign In

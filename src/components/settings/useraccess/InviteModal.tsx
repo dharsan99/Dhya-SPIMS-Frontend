@@ -26,7 +26,7 @@ const InviteModal = ({ isOpen, onClose, roles, tenantId }: InviteModalProps) => 
     }
     setIsLoading(true);
     try {
-      await sendInvite({ email, role_id: roleId, tenant_id: tenantId });
+      await sendInvite({ email,  roleId, tenantId });
       toast.success('Invitation sent!');
       setEmail('');
       setRoleId('');
