@@ -104,13 +104,13 @@ const MetricCard = ({
             {title}
           </h3>
           <div className="flex items-baseline gap-2">
-            <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
-              {loading ? (
-                <div className="animate-pulse bg-gray-300 dark:bg-gray-600 h-8 w-20 rounded"></div>
-              ) : (
-                value
-              )}
-            </p>
+            {loading ? (
+              <div className="animate-pulse bg-gray-300 dark:bg-gray-600 h-8 w-20 rounded"></div>
+            ) : (
+              <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
+                {value}
+              </p>
+            )}
             {trend !== undefined && (
               <div className={`flex items-center gap-1 text-sm ${
                 trend > 0 ? 'text-green-600 dark:text-green-400' : 

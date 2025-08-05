@@ -18,7 +18,7 @@ import OrderFormModal, { OrderFormData } from '../components/OrderFormModal';
 import { createOrder } from '../api/orders';
 
 const Orders = () => {
-  const [tab, setTab] = useState<'Purchase Order' | 'Sales Order' | 'buyer' | 'Analytics'>('Purchase Order');
+  const [tab, setTab] = useState<'Purchase Order' | 'Sales Order' | 'Buyer' | 'Analytics'>('Purchase Order');
   const [orders, setOrders] = useState<Order[]>([]);
   const [, setBuyers] = useState<Buyer[]>([]);
   const [, setLoading] = useState(true);
@@ -84,7 +84,7 @@ const Orders = () => {
   useEffect(() => {
     if (tab === 'Sales Order') {
       fetchOrders();
-    } else if (tab === 'buyer') {
+    } else if (tab === 'Buyer') {
       fetchBuyers();
     } else if (tab === 'Analytics') {
       // Fetch both types of orders for analytics
@@ -277,7 +277,7 @@ const Orders = () => {
           <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
             <div className="px-6 py-4">
               <TabHeader
-                tabs={['Purchase Order', 'Sales Order', 'buyer', 'Analytics'] as const}
+                tabs={['Purchase Order', 'Sales Order', 'Buyer', 'Analytics'] as const}
                 activeTab={tab}
                 setActiveTab={setTab}
               />
@@ -374,7 +374,42 @@ const Orders = () => {
                   )}
                 </AnimatePresence>
               </div>
-            ) : (
+            ) : tab === 'Buyer' ? (
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+                      Buyers Management
+                    </h1>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      Manage your buyers and their information
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+                  <div className="text-center py-8">
+                    <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <svg className="w-8 h-8 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                      </svg>
+                    </div>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                      Buyers Management
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-400 mb-4">
+                      This feature is coming soon. You'll be able to manage buyers, view their details, and track their orders.
+                    </p>
+                    <button
+                      onClick={() => toast('Buyers management feature coming soon!')}
+                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    >
+                      Coming Soon
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ) : tab === 'Analytics' ? (
               <div className="space-y-6">
                 <div className="flex items-center justify-between">
                   <div>
@@ -421,7 +456,7 @@ const Orders = () => {
                   </div>
                 </div>
               </div>
-            )}
+            ) : null}
           </div>
         </div>
       )}

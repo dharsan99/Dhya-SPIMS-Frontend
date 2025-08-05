@@ -1127,6 +1127,14 @@ export const getGrowthTasks = async (params?: {
       message: error.message,
       responseData: error.response?.data
     });
+    
+    // If the endpoint doesn't exist (404), throw a specific error
+    if (error.response?.status === 404) {
+      const apiError = new Error('Growth API not available');
+      (apiError as any).code = 'GROWTH_API_NOT_AVAILABLE';
+      throw apiError;
+    }
+    
     throw error;
   }
 };

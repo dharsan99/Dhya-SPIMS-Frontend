@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
-import { FiGrid, FiPackage, FiActivity, FiShoppingBag, FiTrendingUp, FiMail, FiFileText, FiUser, FiBarChart, FiLayers, FiMapPin, FiBox, FiTruck, FiUsers, FiSettings, FiSearch, FiMoreHorizontal, FiChevronLeft, FiChevronRight, FiLogOut, FiHelpCircle } from 'react-icons/fi';
+import { FiGrid, FiPackage, FiActivity, FiTrendingUp, FiMail, FiFileText, FiUser, FiBarChart, FiLayers, FiMapPin, FiBox, FiTruck, FiUsers, FiSettings, FiSearch, FiMoreHorizontal, FiChevronLeft, FiChevronRight, FiLogOut, FiHelpCircle } from 'react-icons/fi';
 import useAuthStore from '../hooks/auth';
 import { useSidebarState } from '../hooks/useSidebarState';
 import logo from '../assets/dhya_texintelli.png';
@@ -48,7 +48,6 @@ const Sidebar = ({ onLinkClick }: { onLinkClick?: () => void }) => {
       items: [
         { to: '/app/orders', label: 'Orders', Icon: FiPackage, description: 'Manage customer orders', permission: 'Orders' },
         { to: '/app/production', label: 'Production', Icon: FiActivity, description: 'Production workflows', permission: 'Production' },
-        { to: '/app/buyers', label: 'Buyers', Icon: FiShoppingBag, description: 'Customer management', permission: 'Buyers' },
       ]
     },
     {
