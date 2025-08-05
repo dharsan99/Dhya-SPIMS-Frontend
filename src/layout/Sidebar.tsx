@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
-import { FiGrid, FiPackage, FiActivity, FiTrendingUp, FiMail, FiFileText, FiUser, FiBarChart, FiLayers, FiMapPin, FiBox, FiTruck, FiUsers, FiSettings, FiSearch, FiMoreHorizontal, FiChevronLeft, FiChevronRight, FiLogOut, FiHelpCircle } from 'react-icons/fi';
+import { FiGrid, FiPackage, FiActivity, FiTrendingUp, FiMail, FiFileText, FiUser, FiBarChart, FiLayers, FiMapPin, FiTruck, FiUsers, FiSettings, FiSearch, FiMoreHorizontal, FiChevronLeft, FiChevronRight, FiLogOut, FiHelpCircle } from 'react-icons/fi';
 import useAuthStore from '../hooks/auth';
 import { useSidebarState } from '../hooks/useSidebarState';
 import logo from '../assets/dhya_texintelli.png';
@@ -66,7 +66,6 @@ const Sidebar = ({ onLinkClick }: { onLinkClick?: () => void }) => {
       items: [
         { to: '/app/fibers', label: 'Fibres', Icon: FiLayers, description: 'Fiber inventory', permission: 'Fibres' },
         { to: '/app/shades', label: 'Shades', Icon: FiMapPin, description: 'Color management', permission: 'Shades' },
-        { to: '/app/stocks', label: 'Stocks', Icon: FiBox, description: 'Stock management', permission: 'Stocks' },
         { to: '/app/suppliers', label: 'Suppliers', Icon: FiTruck, description: 'Supplier management', permission: 'Suppliers' },
       ]
     },
