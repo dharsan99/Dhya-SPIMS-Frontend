@@ -13,7 +13,7 @@ export const signup = async ({
   tenantId: string;
 }) => {
   console.log('api')
-  const response = await axios.post('http://localhost:5001/signup', {
+  const response = await axios.post('https://dhya-spims-backend.onrender.com/signup', {
     name,
     email,
     password,
@@ -25,7 +25,7 @@ export const signup = async ({
 
 
 export const verifyEmail = async (token: string) => {
-    const response = await axios.get(`http://localhost:5001/verify-email?token=${token}`);
+    const response = await axios.get(`https://dhya-spims-backend.onrender.com/verify-email?token=${token}`);
     return response.data;
   };
 
@@ -73,7 +73,7 @@ export const createTenant = async ({
   industry?: string;
   phone?: string;
 }) => {
-  const response = await axios.post('http://localhost:5001/tenants', {
+  const response = await axios.post('https://dhya-spims-backend.onrender.com/tenants', {
     name,
     domain,
     address,
