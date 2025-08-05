@@ -6,21 +6,23 @@ interface AuthState {
   token: string | null;
   user: {
     id: string;
-    tenant_id: string;
+    tenantId: string;
     name: string;
     email: string;
     role: {
       id: string;
-      tenant_id: string;
+      tenantId: string;
       name: string;
       description: string;
       permissions: Record<string, string[]>;
-      created_at: string;
-      updated_at: string;
+      createdAt: string;
+      updatedAt: string;
     };
-    is_active: boolean;
-    created_at: string;
-    updated_at: string;
+    isActive: boolean;
+    isVerified: boolean;
+    verificationToken: string | null;
+    createdAt: string;
+    updatedAt: string;
   } | null;
   hasHydrated: boolean;
   setAuth: (token: string, user: AuthState['user']) => void;
@@ -40,12 +42,22 @@ const useAuthStore = create<AuthState>()(
       setAuth: (token, user) => {
         set({ token, user });
       
-        // ✅ Sync tenantId into tenant store
-        if (user?.tenant_id) {
-          useTenantStore.getState().setTenantId(user.tenant_id);
+        // ✅ Sync tenantId into tenant store and clear any conflicting data
+        if (user?.tenantId) {
+          // Clear any existing tenant data and localStorage conflicts
+          useTenantStore.getState().clearTenant();
+          useTenantStore.getState().clearLocalStorageTenant();
+          // Set the correct tenant ID from JWT token
+          useTenantStore.getState().setTenantId(user.tenantId);
+          console.log('Auth: Set tenant ID from JWT token:', user.tenantId);
         }
       },
-      logout: () => set({ token: null, user: null }),
+      logout: () => {
+        // Clear auth data and tenant data
+        set({ token: null, user: null });
+        useTenantStore.getState().clearTenant();
+        useTenantStore.getState().clearLocalStorageTenant();
+      },
       setHasHydrated: (val) => set({ hasHydrated: val }),
 
       hasPermission: (module, permission) => {
@@ -59,7 +71,14 @@ const useAuthStore = create<AuthState>()(
     {
       name: 'auth-storage',
       onRehydrateStorage: () => (state) => {
-        if (state) state.setHasHydrated(true);
+        if (state) {
+          state.setHasHydrated(true);
+          // Ensure tenant ID is synced after rehydration
+          if (state.user?.tenantId) {
+            useTenantStore.getState().setTenantId(state.user.tenantId);
+            console.log('Auth rehydration: Set tenant ID:', state.user.tenantId);
+          }
+        }
       },
       partialize: (state) => ({
         token: state.token,

@@ -17,7 +17,16 @@ export default function LoginPage() {
     navigate('/signup');
   };
 
-  const handleDashboardAccess = () => navigate('/app/dashboard');
+  const handleDashboardAccess = () => {
+    if (token) {
+      const user = useAuthStore.getState().user;
+      if (user?.role?.name?.toLowerCase() === 'superadmin') {
+        navigate('/superadmin/dashboard');
+      } else {
+        navigate('/app/dashboard');
+      }
+    }
+  };
   return (
     <motion.div
       initial={{ opacity: 0 }}

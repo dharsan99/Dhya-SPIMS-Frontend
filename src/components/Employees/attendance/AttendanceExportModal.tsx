@@ -70,7 +70,7 @@ const AttendanceExportModal: React.FC<AttendanceExportModalProps> = ({
     for (const d of dates) {
       const map = attendanceMap[d] || {};
       for (const emp of employees) {
-        const row = map[emp.employee_id];
+        const row = map[emp.employeeId];
         switch (row?.status) {
           case 'PRESENT': present++; break;
           case 'HALF_DAY': halfDay++; break;
@@ -102,9 +102,9 @@ const AttendanceExportModal: React.FC<AttendanceExportModalProps> = ({
   const handleXLSXExport = () => {
     const header = ['T.No', 'Employee', ...dates.map(d => d)];
     const data = employees.map(emp => [
-      emp?.employee?.token_no || emp.token_no,
+      emp?.employee?.tokenNo || emp.tokenNo,
       emp.employee?.name || emp.name,
-      ...dates.map(d => getStatusLabel(attendanceMap[d]?.[emp.employee_id]?.status))
+      ...dates.map(d => getStatusLabel(attendanceMap[d]?.[emp.employeeId]?.status))
     ]);
 
 
@@ -159,11 +159,11 @@ const AttendanceExportModal: React.FC<AttendanceExportModalProps> = ({
                 </thead>
                 <tbody>
                   {employees.map((emp, i) => (
-                    <tr key={emp.employee_id} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                      <td className="px-3 py-2 border text-center">{emp.employee?.token_no || emp.token_no}</td>
+                    <tr key={emp.employeeId} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                      <td className="px-3 py-2 border text-center">{emp.employee?.tokenNo || emp.tokenNo}</td>
                       <td className="px-3 py-2 border truncate max-w-[200px]">{emp.employee?.name || emp.name}</td>
                       {dates.map((d) => {
-                        const att = attendanceMap[d]?.[emp.employee_id];
+                        const att = attendanceMap[d]?.[emp.employeeId];
                         return (
                           <td key={d} className="px-3 py-2 border text-center">
                             {getStatusLabel(att?.status)}

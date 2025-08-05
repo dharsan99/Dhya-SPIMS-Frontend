@@ -1,29 +1,32 @@
-import { Link, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import logoImage from '../../assets/dhya_texintelli.png';
 
 const WebsiteHeader = () => {
-  const { pathname } = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  
+  // Use window.location instead of useLocation for now
+  const pathname = window.location.pathname;
 
   const navLinks = [
     { label: "Home", path: "/" },
+    { label: "Features", path: "/features" },
     { label: "About", path: "/about" },
     { label: "Contact", path: "/contact" },
   ];
 
   return (
-    <header className="bg-white/70 dark:bg-gray-900/70 backdrop-blur-md shadow-md sticky top-0 z-50">
+    <header className="bg-white/70 backdrop-blur-md shadow-md sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
 
         {/* Logo */}
         <Link to="/" className="flex items-center space-x-2">
-          <span className="text-2xl font-extrabold text-blue-600 dark:text-white">
-            Dhya
-          </span>
-          <span className="text-lg font-semibold text-gray-800 dark:text-gray-300 tracking-wide">
-            SPIMS
-          </span>
+          <img 
+            src={logoImage} 
+            alt="Dhya TexIntelli Logo" 
+            className="h-14 w-auto"
+          />
         </Link>
 
         {/* Desktop Menu */}
@@ -34,8 +37,8 @@ const WebsiteHeader = () => {
                 to={link.path}
                 className={`text-sm font-semibold ${
                   pathname === link.path
-                    ? "text-blue-600 dark:text-blue-400"
-                    : "text-gray-700 dark:text-gray-300"
+                    ? "text-blue-600"
+                    : "text-gray-700 hover:text-blue-600"
                 } transition`}
               >
                 {link.label}
@@ -62,7 +65,7 @@ const WebsiteHeader = () => {
         {/* Mobile Hamburger */}
         <button
           onClick={() => setIsMenuOpen(!isMenuOpen)}
-          className="md:hidden p-2 rounded-md text-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="md:hidden p-2 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
           aria-label="Toggle Menu"
         >
           {/* Hamburger or X icon */}
@@ -90,9 +93,9 @@ const WebsiteHeader = () => {
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="md:hidden bg-white/90 dark:bg-gray-900/90 backdrop-blur-md shadow-md overflow-hidden"
+            className="md:hidden bg-white/90 backdrop-blur-md shadow-md overflow-hidden"
           >
-            <div className="flex flex-col gap-6 py-6 px-6 text-center text-sm font-semibold text-gray-700 dark:text-gray-300">
+            <div className="flex flex-col gap-6 py-6 px-6 text-center text-sm font-semibold text-gray-700">
               {navLinks.map((link) => (
                 <Link
                   key={link.path}

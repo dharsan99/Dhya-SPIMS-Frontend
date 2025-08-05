@@ -26,6 +26,14 @@ export const getMailingListById = async (id: string): Promise<MailingList> => {
 };
 
 /**
+ * ✅ Get contacts for a specific mailing list from Resend
+ */
+export const getMailingListContacts = async (id: string) => {
+  const res = await api.get(`${endpoint}/${id}/contacts`);
+  return res.data;
+};
+
+/**
  * ✅ Create new mailing list
  */
 export const createMailingList = (data: CreateMailingListDto) => {
@@ -35,7 +43,16 @@ export const createMailingList = (data: CreateMailingListDto) => {
 /**
  * ✅ Update existing mailing list
  */
-export const updateMailingList = (id: string, data: { name: string; buyerIds: string[] }) => {
+export const updateMailingList = (id: string, data: { 
+  name: string; 
+  buyerIds?: string[];
+  recipients?: Array<{
+    name: string;
+    email: string;
+    company: string;
+    source: 'buyer' | 'potential';
+  }>;
+}) => {
     return api.put(`${endpoint}/${id}`, data);
   };
 

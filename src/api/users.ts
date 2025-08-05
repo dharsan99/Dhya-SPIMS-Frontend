@@ -2,12 +2,12 @@ import api from './axios';
 
 const endpoint = '/users';
 export interface CreateUserPayload {
-  tenant_id: string;
+  tenantId: string;
   name: string;
   email: string;
   password: string;
-  role_id: string;
-  is_active?: boolean;
+  roleId: string;
+  isActive?: boolean;
 }
 export const createUser = async (data: CreateUserPayload): Promise<any> => {
   console.log('data',data);
@@ -17,9 +17,9 @@ export const createUser = async (data: CreateUserPayload): Promise<any> => {
 };
 // Get all users
 export const getAllUsers = async (tenantId?: string) => {
-  const params = tenantId ? { tenant_id: tenantId } : {};
+  const params = tenantId ? { tenantId: tenantId } : {};
   const res = await api.get(endpoint, { params });
-  return res.data.data; // returns only the array
+  return res.data.users; // Changed from res.data.data to res.data.users
 };
 
 // Get a specific user by ID
@@ -36,8 +36,8 @@ export const updateUser = (
     name: string;
     email: string;
     password: string;
-    role_id: string;
-    is_active: boolean;
+    roleId: string;
+    isActive: boolean;
   }>
 ) => api.put(`${endpoint}/${id}`, data);
 

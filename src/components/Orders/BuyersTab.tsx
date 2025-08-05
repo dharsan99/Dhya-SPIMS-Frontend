@@ -87,7 +87,7 @@ interface BuyersTabProps {
             if (!auth.user) return;
             const payload = {
               ...formData,
-              tenant_id: auth.user.tenant_id,
+              tenant_id: auth.user.tenantId,
               created_by: auth.user.id,
             };
             if (editingBuyer?.id) {

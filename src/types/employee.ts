@@ -1,24 +1,25 @@
 export interface Employee {
   id: string;
   name: string;
-  token_no: string;
-  shift_rate: number;
-  aadhar_no: string;
-  bank_acc_1: string;
-  bank_acc_2?: string;
+  tokenNo: string;
+  shiftRate: number | string;
+  aadharNo: string;
+  bankAcc1: string;
+  bankAcc2?: string;
   department?: string;
-  join_date?: string;
+  joinDate?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface CreateEmployeeInput {
   name: string;
-  token_no: string;
-  shift_rate: number;
-  aadhar_no: string;
-  bank_acc_1: string;
-  bank_acc_2?: string;
+  aadharNo: string;
+  bankAcc1: string;
+  bankAcc2?: string;
   department?: string;
-  join_date?: string;
+  joinDate?: string;
+  shiftRate: number;
 }
 
 export interface EmployeeAttendanceInput {

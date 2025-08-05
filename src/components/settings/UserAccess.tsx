@@ -28,7 +28,7 @@ import InviteModal from './useraccess/InviteModal';
 
 const UserAccess = () => {
   const auth = useAuthStore();
-  const tenantId = auth.user?.tenant_id || '';
+  const tenantId = auth.user?.tenantId || '';
 
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
@@ -37,6 +37,8 @@ const UserAccess = () => {
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
 
   // ✅ Use useQuery to fetch roles
+
+  console.log('log', isRoleModalOpen)
 
   const {
     data: roles = [],
@@ -52,6 +54,7 @@ const UserAccess = () => {
   // ✅ Use useQuery to fetch users
   const {
     data: users = [],
+    isLoading: usersLoading,
     refetch: refetchUsers,
   } = useQuery({
     queryKey: ['users', tenantId],
@@ -82,20 +85,22 @@ const UserAccess = () => {
           description: data.name,
         });
         toast.success('Role updated successfully');
+
+        console.log('auth', auth)
   
         if (auth.user?.id) {
           const res = await getUserById(auth.user.id);
 
           console.log('res',res.data);
         
-          auth.setAuth(auth.token!, res.data);
+          auth.setAuth(auth.token!, res.data.user); // Changed from res.data to res.data.user
         }
   
       } else {
         await createRole({
           name: data.name,
           permissions: data.permissions,
-          tenant_id: tenantId,
+          tenantId: tenantId,
           description,
         });
         toast.success('Role created successfully');
@@ -130,8 +135,8 @@ const UserAccess = () => {
         await updateUser(user.id, {
           name: user.name,
           email: user.email,
-          is_active: user.is_active ?? true,
-          role_id: user.role_id,
+          isActive: user.is_active ?? true,
+          roleId: user.role_id,
         });
         toast.success('User updated successfully');
       } else {
@@ -139,9 +144,9 @@ const UserAccess = () => {
           name: user.name,
           email: user.email,
           password: user.password ?? '',
-          tenant_id: tenantId,
-          role_id: user.role_id,
-          is_active: user.is_active ?? true,
+          tenantId: tenantId,
+          roleId: user.role_id,
+          isActive: user.is_active ?? true,
         });
         toast.success('User created successfully');
       }
@@ -192,11 +197,12 @@ const UserAccess = () => {
       {/* 👤 User Management */}
       <section className="bg-white dark:bg-gray-900 p-6 rounded">
         <UserTable
-          users={users.filter((u: any) => u.is_active)}
+          users={users.filter((u: any) => u.isActive)}
           roles={roles}
           onSave={handleSaveUser}
           onDelete={handleDeleteUser}
           onInvite={() => setIsInviteModalOpen(true)}
+          loading={usersLoading}
         />
       </section>
 

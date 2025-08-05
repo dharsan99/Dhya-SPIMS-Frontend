@@ -1,118 +1,156 @@
-import React, { useState } from 'react';
-import { MagnifyingGlassIcon, XMarkIcon } from '@heroicons/react/24/outline';
-import { DashboardCard } from './DashboardCard';
+import React from 'react';
+import {
+  ChartBarIcon,
+  DocumentChartBarIcon,
+  Cog6ToothIcon,
+  SparklesIcon,
+  ClockIcon as ClockIconSolid
+} from '@heroicons/react/24/outline';
 
 interface DashboardHeaderProps {
-  onSearch: (query: string) => void;
-  onFilterChange: (filters: string[]) => void;
-  summaryData: {
-    totalOrders: number;
-    productionToday: number;
-    pendingDeliveries: number;
-    lowStockItems: number;
-  };
-  loading?: boolean;
+  isMobile: boolean;
+  mobileViewMode: 'dashboard' | 'reports' | 'settings';
+  handleMobileViewChange: (view: 'dashboard' | 'reports' | 'settings') => void;
+  isRealTimeEnabled: boolean;
+  setIsRealTimeEnabled: (enabled: boolean) => void;
+  autoRefreshInterval: number;
+  setAutoRefreshInterval: (interval: number) => void;
+  lastUpdateTime: Date;
+  showAiInsights: boolean;
+  setShowAiInsights: (show: boolean) => void;
+  isReportingPanelOpen: boolean;
+  toggleReportingPanel: () => void;
+  isCustomizing: boolean;
+  toggleCustomization: () => void;
 }
 
 export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
-  onSearch,
-  onFilterChange,
-  summaryData,
-  loading = false,
-}) => {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [activeFilters, setActiveFilters] = useState<string[]>([]);
+  isMobile,
+  mobileViewMode,
+  handleMobileViewChange,
+  isRealTimeEnabled,
+  setIsRealTimeEnabled,
+  autoRefreshInterval,
+  setAutoRefreshInterval,
+  lastUpdateTime,
+  showAiInsights,
+  setShowAiInsights,
 
-  const filterOptions = [
-    { id: 'orders', label: 'Orders' },
-    { id: 'production', label: 'Production' },
-    { id: 'deliveries', label: 'Deliveries' },
-    { id: 'stock', label: 'Low Stock' },
-  ];
-
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const query = e.target.value;
-    setSearchQuery(query);
-    onSearch(query);
-  };
-
-  const toggleFilter = (filterId: string) => {
-    const newFilters = activeFilters.includes(filterId)
-      ? activeFilters.filter(f => f !== filterId)
-      : [...activeFilters, filterId];
-    setActiveFilters(newFilters);
-    onFilterChange(newFilters);
-  };
-
-  return (
-    <div className="sticky top-0 z-10 bg-white dark:bg-gray-900 shadow-sm pb-4">
-      {/* Search and Filters */}
-      <div className="flex flex-col sm:flex-row items-center gap-4 mb-6 py-2">
-        <div className="relative flex-1 min-w-0 w-full">
-          <input
-            type="text"
-            placeholder="Search orders, production, deliveries..."
-            value={searchQuery}
-            onChange={handleSearch}
-            className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          />
-          <MagnifyingGlassIcon className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
-          {searchQuery && (
+  toggleReportingPanel,
+  isCustomizing,
+  toggleCustomization
+}) => (
+  <div className="mb-6">
+    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+          Strategic Dashboard
+        </h1>
+        <p className="text-gray-600 dark:text-gray-400 mt-1">
+          Real-time insights for strategic decision making
+        </p>
+      </div>
+      {/* All Dashboard Controls */}
+      <div className="flex flex-wrap items-center gap-3">
+        {/* Mobile View Toggle - Only show on mobile */}
+        {isMobile && (
+          <div className="flex items-center gap-2 bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
             <button
-              onClick={() => {
-                setSearchQuery('');
-                onSearch('');
-              }}
-              className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600"
+              onClick={() => handleMobileViewChange('dashboard')}
+              className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                mobileViewMode === 'dashboard'
+                  ? 'bg-blue-600 text-white'
+                  : 'text-gray-600 dark:text-gray-400'
+              }`}
             >
-              <XMarkIcon className="h-5 w-5" />
+              <ChartBarIcon className="w-4 h-4" />
             </button>
+            <button
+              onClick={() => handleMobileViewChange('reports')}
+              className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                mobileViewMode === 'reports'
+                  ? 'bg-blue-600 text-white'
+                  : 'text-gray-600 dark:text-gray-400'
+              }`}
+            >
+              <DocumentChartBarIcon className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => handleMobileViewChange('settings')}
+              className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                mobileViewMode === 'settings'
+                  ? 'bg-blue-600 text-white'
+                  : 'text-gray-600 dark:text-gray-400'
+              }`}
+            >
+              <Cog6ToothIcon className="w-4 h-4" />
+            </button>
+          </div>
+        )}
+        {/* Real-time Toggle */}
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setIsRealTimeEnabled(!isRealTimeEnabled)}
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+              isRealTimeEnabled
+                ? 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400'
+                : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400'
+            }`}
+          >
+            <ClockIconSolid className={`w-4 h-4 ${isRealTimeEnabled ? 'animate-pulse' : ''}`} />
+            {isMobile ? (isRealTimeEnabled ? 'Live' : 'Manual') : (isRealTimeEnabled ? 'Live' : 'Manual')}
+          </button>
+          {isRealTimeEnabled && (
+            <select
+              value={autoRefreshInterval}
+              onChange={(e) => setAutoRefreshInterval(Number(e.target.value))}
+              className="px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300"
+            >
+              <option value={15000}>15s</option>
+              <option value={30000}>30s</option>
+              <option value={60000}>1m</option>
+              <option value={300000}>5m</option>
+            </select>
           )}
         </div>
-        <div className="flex flex-nowrap gap-3 items-center min-h-[40px]">
-          {filterOptions.map(filter => (
-            <button
-              key={filter.id}
-              onClick={() => toggleFilter(filter.id)}
-              className={`px-3 py-1 rounded-full text-sm font-medium transition-colors
-                ${activeFilters.includes(filter.id)
-                  ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300'
-                  : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300'
-                }`}
-            >
-              {filter.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 items-center py-2">
-        <DashboardCard
-          title="Total Orders"
-          value={summaryData.totalOrders}
-          loading={loading}
-          color="blue"
-        />
-        <DashboardCard
-          title="Production Today"
-          value={`${summaryData.productionToday} kg`}
-          loading={loading}
-          color="green"
-        />
-        <DashboardCard
-          title="Pending Deliveries"
-          value={summaryData.pendingDeliveries}
-          loading={loading}
-          color="yellow"
-        />
-        <DashboardCard
-          title="Low Stock Items"
-          value={summaryData.lowStockItems}
-          loading={loading}
-          color="red"
-        />
+        {/* Last Update Time */}
+        {isRealTimeEnabled && (
+          <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
+            <ClockIconSolid className="w-3 h-3" />
+            {isMobile ? 'Updated' : `Last: ${lastUpdateTime.toLocaleTimeString()}`}
+          </div>
+        )}
+        {/* AI Insights Toggle Button */}
+        <button
+          onClick={() => setShowAiInsights(!showAiInsights)}
+          className={`px-3 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
+            showAiInsights
+              ? 'bg-purple-600 hover:bg-purple-700 text-white shadow-lg hover:shadow-xl'
+              : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
+          }`}
+        >
+          <SparklesIcon className="w-4 h-4" />
+          {showAiInsights ? 'Hide AI Insights' : 'Show AI Insights'}
+        </button>
+        {/* Reporting Button */}
+        <button
+          onClick={toggleReportingPanel}
+          className="flex items-center gap-2 px-3 py-2 bg-purple-100 text-purple-700 dark:bg-purple-900/20 dark:text-purple-400 rounded-lg text-sm font-medium hover:bg-purple-200 dark:hover:bg-purple-900/30 transition-colors"
+        >
+          <DocumentChartBarIcon className="w-4 h-4" />
+          {isMobile ? 'Reports' : 'Reports'}
+        </button>
+        {/* Customization Button */}
+        <button
+          onClick={toggleCustomization}
+          className={`flex items-center gap-2 px-3 py-2 bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400 rounded-lg text-sm font-medium hover:bg-blue-200 dark:hover:bg-blue-900/30 transition-colors ${
+            isCustomizing ? 'ring-2 ring-blue-400' : ''
+          }`}
+        >
+          <Cog6ToothIcon className="w-4 h-4" />
+          {isMobile ? 'Customize' : 'Customize'}
+        </button>
       </div>
     </div>
-  );
-}; 
+  </div>
+); 

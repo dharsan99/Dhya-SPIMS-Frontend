@@ -259,8 +259,10 @@ const Shades = () => {
           handleUpdate({
             ...shade,
             id: shade.id,
-            raw_cotton_compositions: Array.isArray(shade.raw_cotton_compositions)
-              ? shade.raw_cotton_compositions
+            raw_cotton_compositions: shade.raw_cotton_compositions
+              ? Array.isArray(shade.raw_cotton_compositions)
+                ? shade.raw_cotton_compositions
+                : [shade.raw_cotton_compositions]
               : [],
           })
         }

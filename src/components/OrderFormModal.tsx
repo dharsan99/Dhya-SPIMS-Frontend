@@ -34,7 +34,7 @@ const OrderFormModal: React.FC<Props> = ({ isOpen, onClose, onSubmit, initialDat
   const [form, setForm] = useState<OrderFormData>({
     buyer_id: '',
     shade_id: '',
-    tenant_id: auth?.tenant_id || '',
+    tenant_id: auth?.tenantId || '',
     quantity_kg: 0,
     delivery_date: '',
     order_date: '',
@@ -57,7 +57,7 @@ const OrderFormModal: React.FC<Props> = ({ isOpen, onClose, onSubmit, initialDat
       initialData ?? {
         buyer_id: '',
         shade_id: '',
-        tenant_id: auth?.tenant_id || '',
+        tenant_id: auth?.tenantId || '',
         quantity_kg: 0,
         order_date: defaultOrderDate,
         delivery_date: defaultDeliveryDate,

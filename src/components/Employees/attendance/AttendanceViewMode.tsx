@@ -17,7 +17,7 @@ const AttendanceViewMode: React.FC<AttendanceViewModeProps & { date: string }> =
   loading
 }) => {
 
-  console.log(employees);
+  console.log('employees', employees);
 
 
   if (loading) {
@@ -50,7 +50,7 @@ const AttendanceViewMode: React.FC<AttendanceViewModeProps & { date: string }> =
           {employees.length > 0 ? (
             employees.map((emp, idx) => {
               const status = emp?.status || 'ABSENT';
-              const overtime = emp?.overtime_hours || 0;
+              const overtime = emp?.overtimeHours || 0;
               const rawShiftKey = emp?.shift?.toUpperCase() ?? 'ABSENT';
               const shift = shiftMap[rawShiftKey as keyof typeof shiftMap] ?? shiftMap['ABSENT'];
               
@@ -58,7 +58,7 @@ const AttendanceViewMode: React.FC<AttendanceViewModeProps & { date: string }> =
               const baseHours = status === 'PRESENT' ? 8 : status === 'HALF_DAY' ? 4 : 0;
               const totalHours = baseHours + overtime;
               const workDays = status === 'PRESENT' ? 1 : status === 'HALF_DAY' ? 0.5 : 0;
-              const wageRate = Number(emp.shift_rate) ?? 0;
+              const wageRate = Number(emp.employee?.shiftRate) ?? 0;
               const wages = (totalHours / 8) * wageRate;
 
               return (
@@ -67,13 +67,13 @@ const AttendanceViewMode: React.FC<AttendanceViewModeProps & { date: string }> =
                   className="hover:bg-gray-50 dark:hover:bg-gray-800 transition"
                 >
                   <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-300">
-                    {emp.token_no || <span className="italic text-gray-400">–</span>}
+                    {emp.employee?.tokenNo || <span className="italic text-gray-400">–</span>}
                   </td>
                   <td
                     className="px-4 py-3 text-gray-900 dark:text-white max-w-[200px] truncate"
-                    title={emp.name}
+                    title={emp.employee?.name}
                   >
-                    {emp.name}
+                    {emp.employee?.name}
                   </td>
                   <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-300">
                     {shift?.label}

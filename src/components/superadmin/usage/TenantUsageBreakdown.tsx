@@ -23,13 +23,13 @@ const TenantUsageBreakdown: React.FC<TenantUsageBreakdownProps> = ({ tenantUsage
     
     switch (sortBy) {
       case 'usage':
-        comparison = a.usage_percentage - b.usage_percentage;
+        comparison = a.usagePercentage - b.usagePercentage;
         break;
       case 'name':
-        comparison = a.tenant_name.localeCompare(b.tenant_name);
+        comparison = a.tenantName.localeCompare(b.tenantName);
         break;
       case 'last_parsed':
-        comparison = new Date(a.last_parsed_at).getTime() - new Date(b.last_parsed_at).getTime();
+        comparison = new Date(a.lastParsedAt).getTime() - new Date(b.lastParsedAt).getTime();
         break;
     }
     
@@ -112,11 +112,11 @@ const TenantUsageBreakdown: React.FC<TenantUsageBreakdownProps> = ({ tenantUsage
           </thead>
           <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
             {sortedTenants.map((tenant) => {
-              const status = getUsageStatus(tenant.usage_percentage);
+              const status = getUsageStatus(tenant.usagePercentage);
               const StatusIcon = status.icon;
               
               return (
-                <tr key={tenant.tenant_id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                <tr key={tenant.tenantId} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <div className="flex-shrink-0 h-10 w-10">
@@ -126,10 +126,10 @@ const TenantUsageBreakdown: React.FC<TenantUsageBreakdownProps> = ({ tenantUsage
                       </div>
                       <div className="ml-4">
                         <div className="text-sm font-medium text-gray-900 dark:text-white">
-                          {tenant.tenant_name}
+                          {tenant.tenantName}
                         </div>
                         <div className="text-sm text-gray-500 dark:text-gray-400">
-                          ID: {tenant.tenant_id}
+                          ID: {tenant.tenantId}
                         </div>
                       </div>
                     </div>
@@ -138,38 +138,38 @@ const TenantUsageBreakdown: React.FC<TenantUsageBreakdownProps> = ({ tenantUsage
                     <div className="flex items-center">
                       <div className="flex-shrink-0 w-16">
                         <span className="text-sm font-medium text-gray-900 dark:text-white">
-                          {tenant.usage_percentage}%
+                          {tenant.usagePercentage}%
                         </span>
                       </div>
                       <div className="ml-2 flex-shrink-0 w-20">
                         <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                           <div 
                             className={`h-2 rounded-full transition-all duration-300 ${
-                              tenant.usage_percentage >= 90 
+                              tenant.usagePercentage >= 90 
                                 ? 'bg-red-500' 
-                                : tenant.usage_percentage >= 75 
+                                : tenant.usagePercentage >= 75 
                                 ? 'bg-orange-500' 
                                 : 'bg-green-500'
                             }`}
-                            style={{ width: `${Math.min(tenant.usage_percentage, 100)}%` }}
+                            style={{ width: `${Math.min(tenant.usagePercentage, 100)}%` }}
                           />
                         </div>
                       </div>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                    {tenant.orders_parsed.toLocaleString()}
+                    {tenant.ordersParsed.toLocaleString()}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                    {tenant.parsing_limit.toLocaleString()}
+                    {tenant.parsingLimit.toLocaleString()}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                    {formatDate(tenant.last_parsed_at)}
+                    {formatDate(tenant.lastParsedAt)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${status.bg} ${status.color}`}>
                       <StatusIcon className="w-3 h-3 mr-1" />
-                      {tenant.usage_percentage >= 90 ? 'Critical' : tenant.usage_percentage >= 75 ? 'Warning' : 'Normal'}
+                      {tenant.usagePercentage >= 90 ? 'Critical' : tenant.usagePercentage >= 75 ? 'Warning' : 'Normal'}
                     </div>
                   </td>
                 </tr>

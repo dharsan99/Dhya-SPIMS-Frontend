@@ -1,6 +1,6 @@
 // pullable request
 import api from './axios';
-import { Employee } from '../types/employee';
+import { Employee, CreateEmployeeInput } from '../types/employee';
 
 const endpoint = '/employees';
 
@@ -20,7 +20,7 @@ export const getEmployeeById = async (id: string): Promise<Employee> => {
 /**
  * ✅ Create new employee
  */
-export const createEmployee = (data: Omit<Employee, 'id'>) => {
+export const createEmployee = (data: CreateEmployeeInput) => {
   return api.post(endpoint, data);
 };
 
@@ -35,5 +35,5 @@ export const updateEmployee = (id: string, data: Partial<Omit<Employee, 'id'>>) 
  * ✅ Delete employee
  */
 export const deleteEmployee = (id: string) => {
-  return api.delete(`${endpoint}/${id}`);
+  return api.delete(endpoint + '/' + id);
 };

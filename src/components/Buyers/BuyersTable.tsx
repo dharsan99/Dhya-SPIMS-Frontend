@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Buyer } from '../../types/buyer';
 import Pagination from '../Pagination';
+import SwipeableTable, { SwipeableColumn } from '../SwipeableTable';
+import { useMediaQuery } from 'react-responsive';
 
 interface BuyersTableProps {
   buyers: Buyer[];
@@ -11,6 +13,7 @@ interface BuyersTableProps {
 const BuyersTable: React.FC<BuyersTableProps> = ({ buyers, onEdit, onDelete }) => {
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const isMobile = useMediaQuery({ maxWidth: 640 });
 
   useEffect(() => {
     setPage(1);
@@ -21,6 +24,69 @@ const BuyersTable: React.FC<BuyersTableProps> = ({ buyers, onEdit, onDelete }) =
     return buyers.slice(start, start + rowsPerPage);
   }, [buyers, page, rowsPerPage]);
 
+  // Define columns for SwipeableTable
+  const columns: SwipeableColumn<Buyer>[] = [
+    {
+      key: 'name',
+      label: 'Name',
+      sortable: true,
+      mobilePriority: true,
+      render: (buyer) => (
+        <span className="font-medium text-blue-700 dark:text-blue-400">
+          {buyer.name}
+        </span>
+      ),
+    },
+    {
+      key: 'contact',
+      label: 'Contact',
+      mobilePriority: true,
+      render: (buyer) => buyer.contact || <span className="italic text-gray-400">—</span>,
+    },
+    {
+      key: 'email',
+      label: 'Email',
+      mobilePriority: true,
+      render: (buyer) => buyer.email || <span className="italic text-gray-400">—</span>,
+    },
+    {
+      key: 'address',
+      label: 'Address',
+      mobilePriority: false,
+      render: (buyer) => buyer.address || <span className="italic text-gray-400">—</span>,
+    },
+  ];
+
+  // Use SwipeableTable for mobile, regular table for desktop
+  if (isMobile) {
+    return (
+      <div className="space-y-4">
+        <SwipeableTable
+          data={paginatedBuyers}
+          columns={columns}
+          searchKeys={['name', 'contact', 'email']}
+          itemsPerPage={rowsPerPage}
+          emptyMessage="No buyers found."
+          onEdit={onEdit}
+          onDelete={(buyer) => onDelete(buyer.id)}
+          getRowId={(buyer) => buyer.id}
+        />
+        
+        {buyers.length > rowsPerPage && (
+          <Pagination
+            page={page}
+            setPage={setPage}
+            rowsPerPage={rowsPerPage}
+            setRowsPerPage={setRowsPerPage}
+            total={buyers.length}
+            options={[5, 10, 20, 50]}
+          />
+        )}
+      </div>
+    );
+  }
+
+  // Desktop table view
   return (
     <div className="space-y-4">
       <div className="overflow-x-auto rounded shadow border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">

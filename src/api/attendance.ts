@@ -52,16 +52,16 @@ export const markAttendance = async (payload: any) => {
 
 export const markAttendanceBulk = (payload: any) => {
   console.log(payload);
-  return api.post('/attendance/mark-bulk', payload);
+  return api.put('/attendance/mark-bulk', payload);
 };
 
 
 
 
-export const markSingleAttendance = async (payload: Omit<SingleAttendancePayload, 'employee_id'> & { employee_id: string }) => {
-  const { employee_id, ...rest } = payload;
+export const markSingleAttendance = async (payload: Omit<SingleAttendancePayload, 'employeeId'> & { employeeId: string }) => {
+  const { employeeId, ...rest } = payload;
 
-  const res = await api.put(`/attendance/${employee_id}`, rest);
+  const res = await api.put(`/attendance/${employeeId}`, rest);
   return res.data;
 };
 
@@ -77,7 +77,7 @@ export const getAttendanceSummary = async (params: {
   month?: number;
   year?: number;
 }) => {
-  return  await api.get('/attendance/summary-range', { params }).then((res) => res.data);
+  return  await api.get('/attendance/summary-range', { params }).then((res: any) => res.data);
 };
 
 export const fetchAttendanceByDate = async (date: string) => {

@@ -60,7 +60,7 @@ const FibreModal = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (isRawCotton) {
+    if (!fibreToEdit && isRawCotton) {
       toast.error('RAW Cotton fibres are added during realisation only.');
       return;
     }

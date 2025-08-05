@@ -23,7 +23,7 @@ const YarnModal = ({
 }: YarnModalProps) => {
   const { user } = useAuthStore(); // assumes user object with tenant_id
   const [formData, setFormData] = useState<YarnForm>({
-    tenant_id: user?.tenant_id || '',
+    tenant_id: user?.tenantId || '',
     yarn_type_id: '',
     blend_id: '',
     count_range: '',
@@ -37,7 +37,7 @@ const YarnModal = ({
       setFormData(initialData);
     } else {
       setFormData({
-        tenant_id: user?.tenant_id || '',
+        tenant_id: user?.tenantId || '',
         yarn_type_id: '',
         blend_id: '',
         count_range: '',
@@ -46,7 +46,7 @@ const YarnModal = ({
         status: 'active',
       });
     }
-  }, [initialData, user?.tenant_id]);
+  }, [initialData, user?.tenantId]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>

@@ -55,7 +55,7 @@ const computeSummaryMap = (
     let wd = 0, ot = 0, th = 0;
 
     for (const date of dates) {
-      const att = attendanceMap[date]?.[emp.employee_id];
+      const att = attendanceMap[date]?.[emp.employeeId];
       if (!att) continue;
 
       if (att.status === 'PRESENT') wd += 1;
@@ -72,10 +72,10 @@ const computeSummaryMap = (
 
   
 
-    const hourlyRate = (emp.shift_rate ?? 0) / 8;
+    const hourlyRate = (Number(emp.shiftRate) || 0) / 8;
     const wages = wd === 0 && ot === 0 ? 0 : parseFloat((hourlyRate * th).toFixed(2));
 
-    summaryMap[emp.employee_id] = { wd, ot, th, wages };
+    summaryMap[emp.employeeId] = { wd, ot, th, wages };
   }
 
   return summaryMap;
@@ -121,13 +121,13 @@ export const generateAttendancePDF = (props: {
   };
 
   const body = employees.map(emp => {
-    const summary = summaryMap[emp.employee_id] || { wd: 0, ot: 0, th: 0, wages: 0 };
-    const tokenNo = emp?.employee?.token_no ?? emp?.token_no ?? ''; // Fallback logic
+    const summary = summaryMap[emp.employeeId] || { wd: 0, ot: 0, th: 0, wages: 0 };
+    const tokenNo = emp?.employee?.tokenNo ?? emp?.tokenNo ?? ''; // Fallback logic
   
     return [
       tokenNo,
       emp.name ?? '',
-      ...dates.map(date => getStatusLabel(attendanceMap[date]?.[emp.employee_id]?.status, displayMode) ?? '-'),
+      ...dates.map(date => getStatusLabel(attendanceMap[date]?.[emp.employeeId]?.status, displayMode) ?? '-'),
       summary.wd,
       summary.ot,
       summary.th,

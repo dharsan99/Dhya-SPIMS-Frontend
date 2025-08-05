@@ -41,21 +41,21 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({ employees, onEdit, onDele
                 }`}
               >
                 <td className="px-4 py-2 font-medium text-gray-800 dark:text-gray-100">{emp.name}</td>
-                <td className="px-4 py-2 text-gray-700 dark:text-gray-300">{emp.token_no}</td>
+                <td className="px-4 py-2 text-gray-700 dark:text-gray-300">{emp.tokenNo}</td>
                 <td className="px-4 py-2 text-right text-green-600 dark:text-green-400 font-semibold">
-                  ₹{emp.shift_rate.toLocaleString()}
+                  ₹{Number(emp.shiftRate).toLocaleString()}
                 </td>
-                <td className="px-4 py-2">{emp.aadhar_no}</td>
-                <td className="px-4 py-2">{emp.bank_acc_1}</td>
+                <td className="px-4 py-2">{emp.aadharNo}</td>
+                <td className="px-4 py-2">{emp.bankAcc1}</td>
                 <td className="px-4 py-2">
-                  {emp.bank_acc_2 || <span className="italic text-gray-400">—</span>}
+                  {emp.bankAcc2 || <span className="italic text-gray-400">—</span>}
                 </td>
                 <td className="px-4 py-2">
                   {emp.department || <span className="italic text-gray-400">—</span>}
                 </td>
                 <td className="px-4 py-2">
-                  {emp.join_date ? (
-                    new Date(emp.join_date).toLocaleDateString('en-GB')
+                  {emp.joinDate ? (
+                    new Date(emp.joinDate).toLocaleDateString('en-GB')
                   ) : (
                     <span className="italic text-gray-400">Not Provided</span>
                   )}

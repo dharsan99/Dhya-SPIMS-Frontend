@@ -37,6 +37,9 @@ import Marketing from './pages/Marketing';
 import ProductionEntryPage from './pages/ProductionEntryPage';
 import SignupPage from './pages/Signup';
 import SubscriptionPlanPage from './pages/SubscriptionPlanPage';
+import ForgotPasswordPage from './pages/ForgotPassword';
+import ResetPasswordPage from './pages/ResetPassword';
+//import SetupWizard from './components/setup/SetupWizard';
 
 // Super Admin Pages
 import SuperAdminDashboard from './pages/superadmin/Dashboard';
@@ -47,6 +50,19 @@ import ParsingUsage from './pages/superadmin/ParsingUsage';
 import SuperAdminSettings from './pages/superadmin/Settings';
 import VerifyEmailPage from './pages/VerifyEmail';
 import AcceptInvitePage from './pages/AcceptInvite';
+import SuperAdminVerifyEmail from './pages/superadmin/VerifyAdminEmail';
+import TenantUsers from './pages/superadmin/TenantUsers';
+import AdminAcceptInvitePage from './pages/AdminAcceptInvite';
+
+import AIInsightsProvider from './context/AIInsightsContext';
+// Growth Engine imports
+import GrowthEngineDashboard from './pages/GrowthEngine';
+import CompanyPersona from './pages/GrowthEngine/CompanyPersona';
+import BrandDiscovery from './pages/GrowthEngine/BrandDiscovery';
+import PerformanceAnalytics from './pages/GrowthEngine/PerformanceAnalytics';
+import TaskManagement from './pages/GrowthEngine/TaskManagement';
+import CampaignCenter from './pages/CampaignCenter';
+import FeaturesPage from './pages/website/FeaturesPage';
 
 function App() {
   const { setTheme } = useThemeStore();
@@ -67,6 +83,7 @@ function App() {
           {/* Website Layout */}
           <Route path="/" element={<WebsiteLayout />}>
             <Route index element={<LandingPage />} />
+            <Route path='features' element={<FeaturesPage />} />
             <Route path="about" element={<AboutPage />} />
             <Route path="contact" element={<ContactPage />} />
             <Route path="docs" element={<DocumentationPage />} />
@@ -79,14 +96,17 @@ function App() {
           {/* Login */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/verify-email" element={<VerifyEmailPage />} />
           <Route path="/accept-invite" element={<AcceptInvitePage />} />
           <Route path="/select-plan" element={<SubscriptionPlanPage />} />
+          <Route path="/superadmin/accept-invite" element={<AdminAcceptInvitePage />} />
 
           {/* Protected Dashboard */}
           <Route path="/app" element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
             <Route index element={<Navigate to="dashboard" replace />} />
-            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="dashboard" element={<AIInsightsProvider><Dashboard /></AIInsightsProvider>} />
             <Route path="orders" element={<Orders />} />
             <Route path="production">
               <Route index element={<ProductionDashboard />} />
@@ -102,9 +122,18 @@ function App() {
             <Route path="fibers" element={<Fibers />} />
             <Route path="settings" element={<Settings />} />
             <Route path="employees" element={<Employees />} />
+            <Route path="marketing" element={<Marketing />} />
+            <Route path="campaigns" element={<CampaignCenter />} />
+            {/* Growth Engine Routes */}
+            <Route path="growth">
+              <Route index element={<GrowthEngineDashboard />} />
+              <Route path="persona" element={<CompanyPersona />} />
+              <Route path="brand-discovery" element={<BrandDiscovery />} />
+              <Route path="analytics" element={<PerformanceAnalytics />} />
+              <Route path="tasks" element={<TaskManagement />} />
+            </Route>
+            {/*<Route path="setup-wizard" element={<SetupWizard />} />*/}
             <Route path="*" element={<DelayedNotFound />} />
-            <Route path="marketing" element={<Marketing />} /> {/* ✅ Added */}
-
           </Route>
 
           {/* Protected Super Admin */}
@@ -112,10 +141,12 @@ function App() {
             <Route index element={<Navigate to="dashboard" replace />} />
             <Route path="dashboard" element={<SuperAdminDashboard />} />
             <Route path="tenants" element={<Tenants />} />
+            <Route path="tenant-users" element={<TenantUsers />} />
             <Route path="plans" element={<Plans />} />
             <Route path="billing" element={<Billing />} />
             <Route path="parsing-usage" element={<ParsingUsage />} />
             <Route path="/superadmin/settings" element={<SuperAdminSettings />} />
+            <Route path="verify-email" element={<SuperAdminVerifyEmail />} />
           </Route>
           
           {/* Catch-all - moved to end */}

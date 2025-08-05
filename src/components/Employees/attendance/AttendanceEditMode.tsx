@@ -20,6 +20,17 @@ const AttendanceEditMode: React.FC<
   const [isSubmitting, setIsSubmitting] = useState(false);
   const queryClient = useQueryClient();
 
+  console.log('employees', employees)
+  console.log('attendance', attendance)
+  
+  // Debug: Check if employees have valid employeeId
+  employees.forEach((emp, index) => {
+    console.log(`Employee ${index}:`, {
+      employeeId: emp.employeeId,
+      name: emp.employee?.name,
+      hasAttendance: !!attendance[emp.employeeId]
+    });
+  });
 
   const handleShiftChange = (empId: string, shift: string) => {
     onTimeChange(empId, 'shift', shift as ShiftType | 'ABSENT');
@@ -40,46 +51,36 @@ const AttendanceEditMode: React.FC<
     setIsSubmitting(true);
     try {
       const formattedDate = new Date(date).toISOString().slice(0, 10);
-      const payload: any = {
+      const payload = {
         date: formattedDate,
         records: employees.map((emp) => {
-          const att = attendance[emp.employee_id];
-          const isPresent = ['SHIFT_1', 'SHIFT_2', 'SHIFT_3'].includes(att?.shift || '');
-  
+          const att = attendance[emp.employeeId];
+
           if (!att) {
-            throw new Error(`Missing attendance data for employee ${emp.employee.name}`);
+            throw new Error(`Missing attendance data for employee ${emp.employee?.name}`);
           }
-  
-          if (isPresent) {
-            const inTimeString = `${date}T${att.in_time || '00:00'}:00`;
-            const outTimeString = `${date}T${att.out_time || '00:00'}:00`;
-  
+
+          // If status is ABSENT, send shift as null
+          if (att.status === 'ABSENT') {
             return {
-              employee_id: emp.employee_id,
-              shift: att.shift,
-              status: att.status,
-              in_time: new Date(inTimeString).toISOString(),
-              out_time: new Date(outTimeString).toISOString(),
-              overtime_hours: att.overtime_hours || 0,
+              employeeId: emp.employeeId,
+              shift: null,
+              status: 'ABSENT',
+              overtimeHours: 0,
             };
           } else {
-            // For ABSENT employees
-            const fallbackTime = new Date(`${date}T00:00:00.001Z`).toISOString();
             return {
-              
-              employee_id: emp.employee_id,
-              shift: 'N/A',
-              status: 'ABSENT',
-              in_time: fallbackTime,
-              out_time: fallbackTime,
-              overtime_hours: 0,
+              employeeId: emp.employeeId,
+              shift: att.shift,
+              status: att.status,
+              overtimeHours: att.overtime_hours || 0,
             };
           }
         }),
       };
-  
+
       await markAttendanceBulk(payload);
-  
+
       queryClient.invalidateQueries({ 
         queryKey: ['attendance-summary', rangeMode, date, rangeStart, rangeEnd],
         refetchType: 'all'
@@ -88,7 +89,7 @@ const AttendanceEditMode: React.FC<
         queryKey: ['attendance', rangeMode, rangeStart, rangeEnd],
         refetchType: 'all'
       });
-  
+
       setIsModalOpen(false);
       onSubmitSuccess?.();
     } catch (err) {
@@ -98,6 +99,34 @@ const AttendanceEditMode: React.FC<
       setIsSubmitting(false);
     }
   };
+
+  const handleSingleUpdate = async (empId: string) => {
+    const att = attendance[empId];
+    if (!att || att.status === 'ABSENT') {
+      alert('Cannot update attendance for absent employees.');
+      return;
+    }
+
+    try {
+      const formattedDate = new Date(date).toISOString().slice(0, 10);
+      const payload = {
+        employeeId: empId,
+        shift: att.shift === 'ABSENT' ? 'SHIFT_1' : att.shift,
+        status: att.status,
+        overtimeHours: att.overtime_hours || 0,
+        date: formattedDate,
+      };
+
+      await markSingleAttendance(payload);
+      showSuccess(`Attendance updated for employee.`);
+      queryClient.invalidateQueries({ queryKey: ['attendance', rangeMode, rangeStart, rangeEnd] });
+      queryClient.invalidateQueries({ queryKey: ['attendance-summary', rangeMode, date, rangeStart, rangeEnd] });
+    } catch (error) {
+      console.error('❌ Failed to update single attendance:', error);
+      alert('Failed to update attendance. Please check time fields.');
+    }
+  };
+
 
 
   return (
@@ -119,7 +148,7 @@ const AttendanceEditMode: React.FC<
           </thead>
           <tbody>
             {employees.map((emp, idx) => {
-              const att = attendance[emp.employee_id];
+              const att = attendance[emp.employeeId];
               const rawShift = att?.shift;
               const shiftValue = ['SHIFT_1', 'SHIFT_2', 'SHIFT_3'].includes(rawShift || '') ? rawShift : 'ABSENT';
               const statusValue = att?.status || 'ABSENT';
@@ -133,11 +162,11 @@ const AttendanceEditMode: React.FC<
               return (
                 <tr key={idx} className="border-t dark:border-gray-700 even:bg-gray-50 dark:even:bg-gray-900">
                   <td className="px-3 py-2 text-center">{pageStart + idx + 1}</td>
-                  <td className="px-3 py-2 text-left truncate max-w-[160px]">{emp.name}</td>
+                  <td className="px-3 py-2 text-left truncate max-w-[160px]">{emp?.employee?.name}</td>
                   <td className="px-3 py-2 text-center">
                     <select
                       value={shiftValue}
-                      onChange={(e) => handleShiftChange(emp.employee_id, e.target.value)}
+                      onChange={(e) => handleShiftChange(emp.employeeId, e.target.value)}
                       className="w-28 px-2 py-1 rounded border text-sm dark:bg-gray-800 dark:text-white"
                     >
                       <option value="ABSENT">Absent</option>
@@ -149,7 +178,7 @@ const AttendanceEditMode: React.FC<
                   <td className="px-3 py-2 text-center">
                     <select
                       value={statusValue}
-                      onChange={(e) => onTimeChange(emp.employee_id, 'status', e.target.value as 'PRESENT' | 'ABSENT' | 'HALF_DAY')}
+                      onChange={(e) => onTimeChange(emp.employeeId, 'status', e.target.value as 'PRESENT' | 'ABSENT' | 'HALF_DAY')}
                       disabled={shiftValue === 'ABSENT'}
                       className="w-28 px-2 py-1 rounded border text-sm dark:bg-gray-800 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed"
                     >
@@ -170,9 +199,10 @@ const AttendanceEditMode: React.FC<
                       value={overtime || ''}
                       onChange={(e) => {
                         const value = e.target.value === '' ? 0 : +e.target.value;
-                        onOvertimeChange(emp.employee_id, value);
+                        onOvertimeChange(emp.employeeId, value);
                       }}
-                      className="w-20 px-2 py-1 rounded border text-center dark:bg-gray-800 dark:text-white"
+                      disabled={shiftValue === 'ABSENT'}
+                      className="w-20 px-2 py-1 rounded border text-center dark:bg-gray-800 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed"
                     />
                   </td>
                   <td className="px-3 py-2 text-center">{totalHours}</td>
@@ -182,50 +212,9 @@ const AttendanceEditMode: React.FC<
                   </td>
                   <td className="px-3 py-2 text-center">
                     <button
-                      className="px-2 py-1 text-sm bg-green-600 hover:bg-green-700 text-white rounded"
-                      onClick={async () => {
-                        const att = attendance[emp.employee_id];
-                        if (!att || att.status === 'ABSENT') {
-                          alert('Cannot update attendance for absent employees.');
-                          return;
-                        }
-
-                        try {
-                          if (!att.in_time || !att.out_time) {
-                            alert('In time or out time is missing or invalid.');
-                            return;
-                          }
-
-                          const inTimeString = `${date}T${att.in_time}:00`;
-                          const outTimeString = `${date}T${att.out_time}:00`;
-
-                          const inDateTime = new Date(inTimeString);
-                          const outDateTime = new Date(outTimeString);
-
-                          if (isNaN(inDateTime.getTime()) || isNaN(outDateTime.getTime())) {
-                            throw new Error('Invalid date/time format');
-                          }
-
-                          const formattedDate = new Date(date).toISOString().slice(0, 10);
-                          const payload = {
-                            employee_id: emp.employee_id,
-                            in_time: inDateTime.toISOString(),
-                            out_time: outDateTime.toISOString(),
-                            overtime_hours: att.overtime_hours || 0,
-                            status: att.status as 'PRESENT' | 'HALF_DAY' | 'ABSENT',
-                            shift: att.shift === 'ABSENT' ? 'SHIFT_1' : att.shift,
-                            date: formattedDate,
-                          };
-
-                          await markSingleAttendance(payload);
-                          showSuccess(`Attendance updated for ${emp.name}`);
-                          queryClient.invalidateQueries({ queryKey: ['attendance', rangeMode, rangeStart, rangeEnd] });
-                          queryClient.invalidateQueries({ queryKey: ['attendance-summary', rangeMode, date, rangeStart, rangeEnd] });
-                        } catch (error) {
-                          console.error('❌ Failed to update single attendance:', error);
-                          alert('Failed to update attendance. Please check time fields.');
-                        }
-                      }}
+                      className="px-2 py-1 text-sm bg-green-600 hover:bg-green-700 text-white rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                      onClick={() => handleSingleUpdate(emp.employeeId)}
+                      
                     >
                       Update
                     </button>

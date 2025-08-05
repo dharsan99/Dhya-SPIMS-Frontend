@@ -60,7 +60,7 @@ const ParsingUsagePanel: React.FC<ParsingUsagePanelProps> = ({ stats, metrics })
                 Total Orders Parsed
               </p>
               <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">
-                {stats.total_orders_parsed.toLocaleString()}
+                {stats.totalOrdersParsed.toLocaleString()}
               </p>
             </div>
             <div className="p-3 rounded-full bg-blue-500 text-white">
@@ -71,13 +71,13 @@ const ParsingUsagePanel: React.FC<ParsingUsagePanelProps> = ({ stats, metrics })
             <div className="flex items-center justify-between text-sm">
               <span className="text-gray-600 dark:text-gray-400">Usage</span>
               <span className="font-semibold text-blue-600 dark:text-blue-400">
-                {stats.parsing_usage_percentage}%
+                {stats.parsingUsagePercentage}%
               </span>
             </div>
             <div className="mt-2 w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
               <div 
                 className="bg-blue-500 h-2 rounded-full transition-all duration-300"
-                style={{ width: `${Math.min(stats.parsing_usage_percentage, 100)}%` }}
+                style={{ width: `${Math.min(stats.parsingUsagePercentage, 100)}%` }}
               />
             </div>
           </div>
@@ -91,7 +91,7 @@ const ParsingUsagePanel: React.FC<ParsingUsagePanelProps> = ({ stats, metrics })
                 Success Rate
               </p>
               <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">
-                {stats.success_rate}%
+                {stats.successRate}%
               </p>
             </div>
             <div className="p-3 rounded-full bg-green-500 text-white">
@@ -101,11 +101,11 @@ const ParsingUsagePanel: React.FC<ParsingUsagePanelProps> = ({ stats, metrics })
           <div className="mt-4 flex items-center gap-4 text-sm">
             <div className="flex items-center gap-1 text-green-600 dark:text-green-400">
               <FiCheckCircle className="w-4 h-4" />
-              <span>{stats.successful_parses}</span>
+              <span>{stats.successfulParses}</span>
             </div>
             <div className="flex items-center gap-1 text-red-600 dark:text-red-400">
               <FiXCircle className="w-4 h-4" />
-              <span>{stats.failed_parses}</span>
+              <span>{stats.failedParses}</span>
             </div>
           </div>
         </div>
@@ -118,7 +118,7 @@ const ParsingUsagePanel: React.FC<ParsingUsagePanelProps> = ({ stats, metrics })
                 Avg Processing Time
               </p>
               <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">
-                {formatTime(stats.average_processing_time)}
+                {formatTime(stats.averageProcessingTime)}
               </p>
             </div>
             <div className="p-3 rounded-full bg-purple-500 text-white">
@@ -126,7 +126,7 @@ const ParsingUsagePanel: React.FC<ParsingUsagePanelProps> = ({ stats, metrics })
             </div>
           </div>
           <div className="mt-4 text-sm text-gray-600 dark:text-gray-400">
-            Last parsed: {formatDate(stats.last_parsed_at)}
+            Last parsed: {formatDate(stats.lastParsedAt)}
           </div>
         </div>
 
@@ -138,7 +138,7 @@ const ParsingUsagePanel: React.FC<ParsingUsagePanelProps> = ({ stats, metrics })
                 Parsing Limit
               </p>
               <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">
-                {stats.parsing_limit.toLocaleString()}
+                {stats.parsingLimit.toLocaleString()}
               </p>
             </div>
             <div className="p-3 rounded-full bg-orange-500 text-white">
@@ -159,25 +159,25 @@ const ParsingUsagePanel: React.FC<ParsingUsagePanelProps> = ({ stats, metrics })
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
           <div className="text-center">
             <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-              {metrics.total_files_processed.toLocaleString()}
+              {metrics.totalFilesProcessed.toLocaleString()}
             </div>
             <div className="text-sm text-gray-600 dark:text-gray-400">Total Files</div>
           </div>
           <div className="text-center">
             <div className="text-2xl font-bold text-green-600 dark:text-green-400">
-              {metrics.pdf_files.toLocaleString()}
+              {metrics.pdfFiles.toLocaleString()}
             </div>
             <div className="text-sm text-gray-600 dark:text-gray-400">PDF Files</div>
           </div>
           <div className="text-center">
             <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
-              {metrics.image_files.toLocaleString()}
+              {metrics.imageFiles.toLocaleString()}
             </div>
             <div className="text-sm text-gray-600 dark:text-gray-400">Image Files</div>
           </div>
           <div className="text-center">
             <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">
-              {formatFileSize(metrics.average_file_size)}
+              {formatFileSize(metrics.averageFileSize)}
             </div>
             <div className="text-sm text-gray-600 dark:text-gray-400">Avg File Size</div>
           </div>
@@ -189,7 +189,7 @@ const ParsingUsagePanel: React.FC<ParsingUsagePanelProps> = ({ stats, metrics })
               <span className="font-medium text-gray-900 dark:text-white">OCR Usage</span>
             </div>
             <div className="text-2xl font-bold text-gray-900 dark:text-white">
-              {metrics.ocr_usage_count.toLocaleString()}
+              {metrics.ocrUsageCount.toLocaleString()}
             </div>
             <div className="text-sm text-gray-600 dark:text-gray-400">
               Image-based extractions
@@ -201,7 +201,7 @@ const ParsingUsagePanel: React.FC<ParsingUsagePanelProps> = ({ stats, metrics })
               <span className="font-medium text-gray-900 dark:text-white">Direct Extraction</span>
             </div>
             <div className="text-2xl font-bold text-gray-900 dark:text-white bg-gray-300">
-              {metrics.direct_text_extraction_count.toLocaleString()}
+              {metrics.directTextExtractionCount.toLocaleString()}
             </div>
             <div className="text-sm text-gray-600 dark:text-gray-400">
               Text-based PDFs
@@ -213,7 +213,7 @@ const ParsingUsagePanel: React.FC<ParsingUsagePanelProps> = ({ stats, metrics })
               <span className="font-medium text-gray-900 dark:text-white">Total Processing Time</span>
             </div>
             <div className="text-2xl font-bold text-gray-900 dark:text-white">
-              {formatTime(metrics.total_processing_time)}
+              {formatTime(metrics.totalProcessingTime)}
             </div>
             <div className="text-sm text-gray-600 dark:text-gray-400">
               Cumulative time
@@ -228,7 +228,7 @@ const ParsingUsagePanel: React.FC<ParsingUsagePanelProps> = ({ stats, metrics })
           Monthly Parsing Trends
         </h3>
         <div className="space-y-3">
-          {stats.monthly_parses.slice(-6).map((monthData, index) => (
+          {stats.monthlyParses.slice(-6).map((monthData, index) => (
             <div key={index} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
               <div className="flex items-center gap-3">
                 <span className="font-medium text-gray-900 dark:text-white min-w-[80px]">
@@ -236,16 +236,16 @@ const ParsingUsagePanel: React.FC<ParsingUsagePanelProps> = ({ stats, metrics })
                 </span>
                 <div className="flex items-center gap-4 text-sm">
                   <span className="text-green-600 dark:text-green-400">
-                    ✓ {monthData.successful_parses}
+                    ✓ {monthData.successfulParses}
                   </span>
                   <span className="text-red-600 dark:text-red-400">
-                    ✗ {monthData.failed_parses}
+                    ✗ {monthData.failedParses}
                   </span>
                 </div>
               </div>
               <div className="text-right">
                 <div className="font-semibold text-gray-900 dark:text-white">
-                  {monthData.total_parses}
+                  {monthData.totalParses}
                 </div>
                 <div className="text-sm text-gray-600 dark:text-gray-400">
                   Total

@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 
 
 const instance = axios.create({
-  baseURL: 'http://192.168.0.2:5001',
+  baseURL: 'http://localhost:5001',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -15,15 +15,33 @@ const instance = axios.create({
 instance.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     const token = useAuthStore.getState().token;
+    const user = useAuthStore.getState().user;
     const tenantId = useTenantStore.getState().tenantId;
+
+    console.log('tenantid', tenantId);
+    console.log('user tenantId', user?.tenantId);
 
     if (token) {
       config.headers.set('Authorization', `Bearer ${token}`);
     }
 
-    if (tenantId) {
+    // For superadmin routes, use the superadmin's own tenant ID from JWT token
+    const isSuperAdminRoute = config.url?.includes('/dashboard/admin') || 
+                             config.url?.includes('/admin/') ||
+                             config.url?.includes('/superadmin/');
+    
+    if (isSuperAdminRoute) {
+      // For superadmin routes, use the superadmin's own tenant ID
+      if (user?.tenantId) {
+        config.headers.set('x-tenant-id', user.tenantId);
+        console.log('Superadmin route: Using superadmin tenant ID:', user.tenantId);
+      }
+    } else if (tenantId) {
+      // For regular routes, use the current tenant ID
       config.headers.set('x-tenant-id', tenantId);
+      console.log('Regular route: Using current tenant ID:', tenantId);
     }
+    
     return config;
   },
   (error: unknown) => {
@@ -41,8 +59,8 @@ instance.interceptors.response.use(
     const status = error.response?.status;
 
     if (status === 401) {
-      useAuthStore.getState().logout();
-      window.location.href = '/login';
+      // TEMP: Do not logout or redirect to login on 401. Just show the error toast for debugging.
+      toast.error('Unauthorized (401): Your session is invalid or expired. [Debug: No redirect performed]');
     } else {
       let message = 'Something went wrong. Please try again.';
       const responseData = error.response?.data;

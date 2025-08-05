@@ -68,6 +68,7 @@ export interface DashboardData {
 }
 
 export const fetchDashboardData = async (): Promise<DashboardSummary> => {
-  const response = await axios.get<DashboardSummary>('/api/dashboard/summary');
+  const response = await axios.get<DashboardSummary>('/dashboard/summary');
+  console.log('response',response.data);
   return response.data;
 }; 

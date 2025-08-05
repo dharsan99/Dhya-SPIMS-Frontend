@@ -24,11 +24,7 @@ function TabHeader<T extends string>({
               : 'border-transparent text-gray-600 dark:text-gray-300 hover:text-blue-600'
           )}
         >
-          {tab === 'Purchase Order'
-            ? 'Purchase Order'
-            : tab === 'Sales Order'
-            ? 'Sales Order'
-            : 'Buyers'}
+          {tab}
         </button>
       ))}
     </div>

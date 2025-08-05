@@ -19,21 +19,21 @@ export interface FibreTransferReceiveInput {
 
 // ✅ Fetch all transfers
 export const getAllFibreTransfers = async (): Promise<FibreTransfer[]> => {
-  const response = await api.get('/fibreTransfers');
+  const response = await api.get('/fibre-transfers');
   return response.data;
 };
 
 // ✅ Fetch only pending supplier transfers
 
 export const getPendingSupplierTransfers = async (): Promise<FibreTransfer[]> => {
-    const response = await api.get('/fibreTransfers?status=pending');
+    const response = await api.get('/fibre-transfers?status=pending');
     return response.data; // Now it’s typed as FibreTransfer[]
   };
 // ✅ Create a new transfer
 export const createFibreTransfer = async (
   data: FibreTransferInput
 ): Promise<FibreTransfer> => {
-  const response = await api.post('/fibreTransfers', data);
+  const response = await api.post('/fibre-transfers', data);
   return response.data;
 };
 
@@ -42,10 +42,10 @@ export const updateFibreTransferReceive = async (
   id: string,
   data: FibreTransferReceiveInput
 ): Promise<FibreTransfer> => {
-  const response = await api.put(`/fibreTransfers/${id}/receive`, data);
+  const response = await api.put(`/fibre-transfers/${id}/receive`, data);
   return response.data;
 };
 export const updateFibreTransfer = async (id: string, data: Partial<FibreTransfer>): Promise<FibreTransfer> => {
-    const res = await api.put(`/fibreTransfers/${id}`, data);
+    const res = await api.put(`/fibre-transfers/${id}`, data);
     return res.data;
   };

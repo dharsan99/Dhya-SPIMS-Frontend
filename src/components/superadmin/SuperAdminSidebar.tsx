@@ -85,6 +85,7 @@ const SuperAdminSidebar = ({ onLinkClick }: { onLinkClick?: () => void }) => {
           <div className="flex flex-col gap-1">
             {createNavLink('/superadmin/dashboard', 'Dashboard', FiGrid)}
             {createNavLink('/superadmin/tenants', 'Tenants', FiUsers)}
+            {createNavLink('/superadmin/tenant-users', 'Tenant Users', FiUsers)}
             {createNavLink('/superadmin/plans', 'Plans', FiDollarSign)}
             {createNavLink('/superadmin/billing', 'Billing', FiCreditCard)}
             {createNavLink('/superadmin/parsing-usage', 'Parsing Usage', FiBarChart)}

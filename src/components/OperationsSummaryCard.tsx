@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { ChartBarIcon, UserGroupIcon, CurrencyRupeeIcon, TruckIcon, Cog6ToothIcon, ShoppingBagIcon } from '@heroicons/react/24/outline';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ChartBarIcon, UserGroupIcon, TruckIcon, Cog6ToothIcon, ShoppingBagIcon, ArrowTrendingUpIcon } from '@heroicons/react/24/outline';
 import OrdersSummaryModal from './OperationsSummaryModals/OrdersSummaryModal';
 import ProductionSummaryModal from './OperationsSummaryModals/ProductionSummaryModal';
 import InventorySummaryModal from './OperationsSummaryModals/InventorySummaryModal';
@@ -17,259 +18,325 @@ const OperationsSummaryCard: React.FC<OperationsSummaryCardProps> = ({ summary }
 
   if (!summary) {
     return (
-      <div className="w-full flex items-center justify-center py-12">
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="w-full flex items-center justify-center py-12"
+      >
+        <div className="text-center">
+          <div className="w-16 h-16 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+            <ChartBarIcon className="w-8 h-8 text-gray-400" />
+          </div>
         <span className="text-gray-500 dark:text-gray-300 text-lg">Loading summary...</span>
       </div>
+      </motion.div>
     );
   }
 
+  const sections = [
+    {
+      id: 'orders',
+      title: 'Orders',
+      icon: <ShoppingBagIcon className="w-6 h-6" />,
+      color: 'yellow',
+      value: summary.orders.totalOrders,
+      subtitle: 'Total Orders',
+      metrics: [
+        { label: 'Pending', value: summary.orders.statusBreakdown.pending, color: 'yellow' },
+        { label: 'In Progress', value: summary.orders.statusBreakdown.in_progress, color: 'blue' },
+        { label: 'Completed', value: summary.orders.statusBreakdown.completed, color: 'green' },
+        { label: 'Dispatched', value: summary.orders.statusBreakdown.dispatched, color: 'gray' },
+      ],
+      alerts: [
+        { label: 'Pending', value: summary.orders.pendingOrders, color: 'yellow' },
+        { label: 'Overdue', value: summary.orders.overdueOrders, color: 'red' },
+      ],
+      details: summary.orders.topBuyers?.slice(0, 2).map(buyer => ({
+        label: buyer.name,
+        value: `${buyer.order_count} orders / ${buyer.total_quantity} kg`
+      })) || []
+    },
+    {
+      id: 'production',
+      title: 'Production',
+      icon: <TruckIcon className="w-6 h-6" />,
+      color: 'green',
+      value: `${summary.production.totalProduction} kg`,
+      subtitle: 'Total Production',
+      metrics: [
+        { label: 'Carding', value: `${summary.production.sectionProduction.carding} kg`, color: 'green' },
+        { label: 'Drawing', value: `${summary.production.sectionProduction.drawing} kg`, color: 'blue' },
+        { label: 'Framing', value: `${summary.production.sectionProduction.framing} kg`, color: 'purple' },
+        { label: 'Simplex', value: `${summary.production.sectionProduction.simplex} kg`, color: 'yellow' },
+        { label: 'Spinning', value: `${summary.production.sectionProduction.spinning} kg`, color: 'indigo' },
+        { label: 'Autoconer', value: `${summary.production.sectionProduction.autoconer} kg`, color: 'pink' },
+      ],
+      alerts: [
+        { label: 'Avg Efficiency', value: `${summary.production.machineMetrics[0]?.efficiency.average.toFixed(1)}%`, color: 'gray' },
+        { label: 'Production Days', value: summary.production.productionDays, color: 'gray' },
+        { label: 'Total Machines', value: summary.machines?.totalMachines, color: 'gray' },
+      ],
+      details: [
+        { label: 'Quality Issues', value: summary.production.machineMetrics[0]?.quality_issues, color: 'green' },
+        { label: 'Downtime', value: summary.production.machineMetrics[0]?.downtime_incidents, color: 'red' },
+      ]
+    },
+    {
+      id: 'inventory',
+      title: 'Inventory',
+      icon: <ShoppingBagIcon className="w-6 h-6" />,
+      color: 'blue',
+      value: `${summary.inventory?.lowStockItems} items`,
+      subtitle: 'Low Stock Items',
+      metrics: [
+        { label: 'Low Stock', value: summary.inventory?.lowStockItems, color: 'red' },
+        { label: 'Pending Shortages', value: summary.inventory?.pendingFiberShortages, color: 'yellow' },
+      ],
+      alerts: [],
+      details: []
+    },
+    {
+      id: 'workforce',
+      title: 'Workforce',
+      icon: <UserGroupIcon className="w-6 h-6" />,
+      color: 'purple',
+      value: `${summary.workforce?.totalEmployees} workers`,
+      subtitle: 'Total Employees',
+      metrics: [
+        { label: 'Attendance Rate', value: `${summary.workforce?.attendanceRateToday}%`, color: 'green' },
+        { label: 'Overtime', value: `${summary.workforce?.attendanceOvertimeToday}%`, color: 'blue' },
+      ],
+      alerts: [],
+      details: []
+    },
+    {
+      id: 'machines',
+      title: 'Machines',
+      icon: <Cog6ToothIcon className="w-6 h-6" />,
+      color: 'gray',
+      value: `${summary.machines?.runningMachines} running`,
+      subtitle: 'Active Machines',
+      metrics: [
+        { label: 'Running', value: summary.machines?.runningMachines, color: 'green' },
+        { label: 'Idle', value: summary.machines?.idleMachines, color: 'yellow' },
+        { label: 'Maintenance', value: summary.machines?.maintenanceMachines, color: 'red' },
+      ],
+      alerts: [],
+      details: []
+    }
+  ];
+
+  const colorClasses = {
+    yellow: 'bg-gradient-to-br from-yellow-50 to-yellow-100 border-yellow-200 text-yellow-800 dark:from-yellow-900/20 dark:to-yellow-800/20 dark:border-yellow-700 dark:text-yellow-300',
+    green: 'bg-gradient-to-br from-green-50 to-green-100 border-green-200 text-green-800 dark:from-green-900/20 dark:to-green-800/20 dark:border-green-700 dark:text-green-300',
+    blue: 'bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 text-blue-800 dark:from-blue-900/20 dark:to-blue-800/20 dark:border-blue-700 dark:text-blue-300',
+    purple: 'bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 text-purple-800 dark:from-purple-900/20 dark:to-purple-800/20 dark:border-purple-700 dark:text-purple-300',
+    gray: 'bg-gradient-to-br from-gray-50 to-gray-100 border-gray-200 text-gray-800 dark:from-gray-900/20 dark:to-gray-800/20 dark:border-gray-700 dark:text-gray-300',
+    red: 'bg-gradient-to-br from-red-50 to-red-100 border-red-200 text-red-800 dark:from-red-900/20 dark:to-red-800/20 dark:border-red-700 dark:text-red-300',
+    indigo: 'bg-gradient-to-br from-indigo-50 to-indigo-100 border-indigo-200 text-indigo-800 dark:from-indigo-900/20 dark:to-indigo-800/20 dark:border-indigo-700 dark:text-indigo-300',
+    pink: 'bg-gradient-to-br from-pink-50 to-pink-100 border-pink-200 text-pink-800 dark:from-pink-900/20 dark:to-pink-800/20 dark:border-pink-700 dark:text-pink-300',
+  };
+
+  const iconColorClasses = {
+    yellow: 'text-yellow-600 dark:text-yellow-400',
+    green: 'text-green-600 dark:text-green-400',
+    blue: 'text-blue-600 dark:text-blue-400',
+    purple: 'text-purple-600 dark:text-purple-400',
+    gray: 'text-gray-600 dark:text-gray-400',
+    red: 'text-red-600 dark:text-red-400',
+    indigo: 'text-indigo-600 dark:text-indigo-400',
+    pink: 'text-pink-600 dark:text-pink-400',
+  };
+
   return (
-    <div className="max-w-4xl mx-auto bg-white dark:bg-gray-900 rounded-xl shadow-lg p-8 border border-gray-100 dark:border-gray-800 mb-12">
-      <h2 className="text-2xl font-bold mb-6 flex items-center gap-2 text-gray-900 dark:text-white">
-        <ChartBarIcon className="w-7 h-7 text-blue-500" /> Operations Summary
-      </h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
-        {/* Orders Section */}
-        <div
-          className="rounded-lg border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-5 shadow-sm flex flex-col gap-4 min-w-[220px] cursor-pointer"
-          tabIndex={0}
-          aria-label="View Orders Details"
-          onClick={() => setModalSection('orders')}
-        >
-          <div className="flex items-center gap-2">
-            <ShoppingBagIcon className="w-5 h-5 text-yellow-500" />
-            <span className="font-semibold text-lg text-gray-900 dark:text-white">Orders</span>
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="max-w-7xl mx-auto bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 p-8 mb-12 relative overflow-hidden"
+    >
+      {/* Background Pattern */}
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-50/30 to-indigo-50/30 dark:from-blue-900/10 dark:to-indigo-900/10" />
+      
+      <div className="relative z-10">
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h2 className="text-2xl font-bold mb-2 flex items-center gap-3 text-gray-900 dark:text-white">
+              <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center">
+                <ChartBarIcon className="w-6 h-6 text-white" />
           </div>
-          <div className="text-3xl font-bold text-gray-900 dark:text-white">{summary.orders.totalOrders}</div>
-          <div className="flex gap-2 flex-wrap">
-            <span className="bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded text-xs font-medium">
-              Pending: {summary.orders.statusBreakdown.pending}
-            </span>
-            <span className="bg-blue-100 text-blue-800 px-2 py-0.5 rounded text-xs font-medium">
-              In Progress: {summary.orders.statusBreakdown.in_progress}
-            </span>
-            <span className="bg-green-100 text-green-800 px-2 py-0.5 rounded text-xs font-medium">
-              Completed: {summary.orders.statusBreakdown.completed}
-            </span>
-            <span className="bg-gray-100 text-gray-800 px-2 py-0.5 rounded text-xs font-medium">
-              Dispatched: {summary.orders.statusBreakdown.dispatched}
-            </span>
+              Operations Summary
+            </h2>
+            <p className="text-gray-600 dark:text-gray-400">
+              Comprehensive overview of your production facility performance
+            </p>
           </div>
-          <div className="flex gap-4 mt-1">
-            <span className="bg-yellow-50 text-yellow-700 px-2 py-0.5 rounded text-xs font-medium">
-              Pending: {summary.orders.pendingOrders}
-            </span>
-            <span className="bg-red-50 text-red-700 px-2 py-0.5 rounded text-xs font-medium">
-              Overdue: {summary.orders.overdueOrders}
-            </span>
-          </div>
-          <div className="mt-2">
-            <ul className="space-y-1">
-              {summary.orders.topBuyers?.slice(0, 2).map((buyer, idx) => (
-                <li key={buyer.buyer_id || `${buyer.name}-${idx}`} className="flex justify-between text-sm">
-                  <span className="truncate max-w-[120px]">
-                    {buyer.name.length > 15 ? buyer.name.slice(0, 15) + '…' : buyer.name}
-                  </span>
-                  <span className="text-gray-700 dark:text-gray-200 ml-2 whitespace-nowrap">
-                    {buyer.order_count} orders / {buyer.total_quantity} kg
-                  </span>
-                </li>
-              ))}
-            </ul>
+          <div className="text-right">
+            <p className="text-sm text-gray-500 dark:text-gray-400">Last Updated</p>
+            <p className="text-lg font-semibold text-gray-900 dark:text-white">
+              {new Date().toLocaleTimeString('en-US', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                hour12: true 
+              })}
+            </p>
           </div>
         </div>
 
-        {/* Production Section */}
-        <div
-          className="rounded-lg border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-5 shadow-sm flex flex-col gap-4 min-w-[220px] cursor-pointer"
-          tabIndex={0}
-          aria-label="View Production Details"
-          onClick={() => setModalSection('production')}
-        >
-          <div className="flex items-center gap-2">
-            <TruckIcon className="w-5 h-5 text-green-500" />
-            <span className="font-semibold text-lg text-gray-900 dark:text-white">Production</span>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {sections.map((section, index) => (
+            <motion.div
+              key={section.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1 }}
+              whileHover={{ 
+                scale: 1.02, 
+                y: -2,
+                transition: { duration: 0.2 }
+              }}
+              className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm hover:shadow-lg transition-all duration-200 cursor-pointer group"
+              onClick={() => setModalSection(section.id as any)}
+            >
+              {/* Header */}
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${iconColorClasses[section.color as keyof typeof iconColorClasses]}`}>
+                    {section.icon}
           </div>
-          <div className="text-3xl font-bold text-gray-900 dark:text-white">{summary.production.totalProduction} kg</div>
-          
-          {/* Section Production Overview */}
-          <div className="flex gap-2 flex-wrap">
-            <span className="bg-green-100 text-green-800 px-2 py-0.5 rounded text-xs font-medium">
-              Carding: {summary.production.sectionProduction.carding} kg
-            </span>
-            <span className="bg-blue-100 text-blue-800 px-2 py-0.5 rounded text-xs font-medium">
-              Drawing: {summary.production.sectionProduction.drawing} kg
-            </span>
-            <span className="bg-purple-100 text-purple-800 px-2 py-0.5 rounded text-xs font-medium">
-              Framing: {summary.production.sectionProduction.framing} kg
-            </span>
-            <span className="bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded text-xs font-medium">
-              Simplex: {summary.production.sectionProduction.simplex} kg
-            </span>
-            <span className="bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded text-xs font-medium">
-              Spinning: {summary.production.sectionProduction.spinning} kg
-            </span>
-            <span className="bg-pink-100 text-pink-800 px-2 py-0.5 rounded text-xs font-medium">
-              Autoconer: {summary.production.sectionProduction.autoconer} kg
-            </span>
-          </div>
-
-          {/* Machine Metrics Summary */}
-          <div className="mt-2">
-            <div className="flex gap-2 flex-wrap">
-              <span className="bg-gray-100 text-gray-800 px-2 py-0.5 rounded text-xs font-medium">
-                Avg Efficiency: {summary.production.machineMetrics[0]?.efficiency.average.toFixed(1)}%
-              </span>
-              <span className="bg-gray-100 text-gray-800 px-2 py-0.5 rounded text-xs font-medium">
-                Production Days: {summary.production.productionDays}
-              </span>
-              <span className="bg-gray-100 text-gray-800 px-2 py-0.5 rounded text-xs font-medium">
-                Total Machines: {summary.machines?.totalMachines}
-              </span>
+                  <div>
+                    <h3 className="font-bold text-lg text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                      {section.title}
+                    </h3>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      {section.subtitle}
+                    </p>
             </div>
           </div>
+                <div className="text-right">
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                    {section.value}
+                  </p>
+          </div>
+        </div>
 
-          {/* Quality & Downtime Summary */}
-          <div className="mt-2">
-            <div className="flex gap-2 flex-wrap">
-              <span className="bg-green-50 text-green-700 px-2 py-0.5 rounded text-xs font-medium">
-                Quality Issues: {summary.production.machineMetrics[0]?.quality_issues}
-              </span>
-              <span className="bg-red-50 text-red-700 px-2 py-0.5 rounded text-xs font-medium">
-                Downtime: {summary.production.machineMetrics[0]?.downtime_incidents}
-              </span>
+              {/* Metrics */}
+              {section.metrics.length > 0 && (
+                <div className="mb-4">
+                  <div className="flex flex-wrap gap-2">
+                    {section.metrics.map((metric, idx) => (
+                      <span
+                        key={idx}
+                        className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${colorClasses[metric.color as keyof typeof colorClasses]}`}
+                      >
+                        {metric.label}: {metric.value}
+            </span>
+                    ))}
+          </div>
+        </div>
+              )}
+
+              {/* Alerts */}
+              {section.alerts.length > 0 && (
+                <div className="mb-4">
+                  <div className="flex flex-wrap gap-2">
+                    {section.alerts.map((alert, idx) => (
+                      <span
+                        key={idx}
+                        className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${colorClasses[alert.color as keyof typeof colorClasses]}`}
+                      >
+                        {alert.label}: {alert.value}
+            </span>
+                    ))}
+          </div>
+        </div>
+              )}
+
+              {/* Details */}
+              {section.details.length > 0 && (
+                <div className="border-t border-gray-100 dark:border-gray-700 pt-4">
+                  <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Top Performers
+                  </h4>
+                  <div className="space-y-2">
+                    {section.details.map((detail, idx) => (
+                      <div key={idx} className="flex justify-between items-center text-sm">
+                        <span className="text-gray-600 dark:text-gray-400 truncate max-w-[120px]">
+                          {detail.label}
+            </span>
+                        <span className="text-gray-900 dark:text-white font-medium">
+                          {detail.value}
+            </span>
+          </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Click Indicator */}
+              <div className="mt-4 flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+                <span>Click for details</span>
+                <ArrowTrendingUpIcon className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </div>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Summary Stats */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+          className="mt-8 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl border border-blue-200 dark:border-blue-700"
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+                Quick Insights
+              </h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Key performance indicators at a glance
+              </p>
             </div>
+            <div className="flex gap-4 text-sm">
+              <div className="text-center">
+                <p className="text-gray-500 dark:text-gray-400">Efficiency</p>
+                <p className="font-bold text-green-600 dark:text-green-400">
+                  {summary.production.machineMetrics[0]?.efficiency.average.toFixed(1)}%
+                </p>
+              </div>
+              <div className="text-center">
+                <p className="text-gray-500 dark:text-gray-400">Attendance</p>
+                <p className="font-bold text-blue-600 dark:text-blue-400">
+                  {summary.workforce?.attendanceRateToday}%
+                </p>
           </div>
-        </div>
-
-        {/* Divider */}
-        <div className="col-span-full border-t border-gray-200 dark:border-gray-700 my-2" />
-
-        {/* Inventory & Supply Chain Section */}
-        <div
-          className="rounded-lg border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-5 shadow-sm flex flex-col gap-4 min-w-[220px] cursor-pointer"
-          tabIndex={0}
-          aria-label="View Inventory Details"
-          onClick={() => setModalSection('inventory')}
-        >
-          <div className="flex items-center gap-2">
-            <ShoppingBagIcon className="w-5 h-5 text-blue-500" />
-            <span className="font-semibold text-lg text-gray-900 dark:text-white">Inventory</span>
+              <div className="text-center">
+                <p className="text-gray-500 dark:text-gray-400">Production</p>
+                <p className="font-bold text-purple-600 dark:text-purple-400">
+                  {summary.production.totalProduction} kg
+                </p>
           </div>
-          <div className="text-3xl font-bold text-gray-900 dark:text-white">{summary.inventory?.lowStockItems} items</div>
-          <div className="flex gap-2 flex-wrap">
-            <span className="bg-red-100 text-red-800 px-2 py-0.5 rounded text-xs font-medium">
-              Low Stock: {summary.inventory?.lowStockItems}
-            </span>
-            <span className="bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded text-xs font-medium">
-              Pending Shortages: {summary.inventory?.pendingFiberShortages}
-            </span>
           </div>
-        </div>
-
-        {/* Workforce Section */}
-        <div
-          className="rounded-lg border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-5 shadow-sm flex flex-col gap-4 min-w-[220px] cursor-pointer"
-          tabIndex={0}
-          aria-label="View Workforce Details"
-          onClick={() => setModalSection('workforce')}
-        >
-          <div className="flex items-center gap-2">
-            <UserGroupIcon className="w-5 h-5 text-purple-500" />
-            <span className="font-semibold text-lg text-gray-900 dark:text-white">Workforce</span>
           </div>
-          <div className="text-3xl font-bold text-gray-900 dark:text-white">{summary.workforce?.totalEmployees} workers</div>
-          <div className="flex gap-2 flex-wrap">
-            <span className="bg-green-100 text-green-800 px-2 py-0.5 rounded text-xs font-medium">
-              Attendance Rate: {summary.workforce?.attendanceRateToday}%
-            </span>
-            <span className="bg-blue-100 text-blue-800 px-2 py-0.5 rounded text-xs font-medium">
-              Overtime: {summary.workforce?.attendanceOvertimeToday}%
-            </span>
-          </div>
-        </div>
-
-        {/* Machines Section */}
-        <div
-          className="rounded-lg border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-5 shadow-sm flex flex-col gap-4 min-w-[220px] cursor-pointer"
-          tabIndex={0}
-          aria-label="View Machines Details"
-          onClick={() => setModalSection('machines')}
-        >
-          <div className="flex items-center gap-2">
-            <Cog6ToothIcon className="w-5 h-5 text-gray-500" />
-            <span className="font-semibold text-lg text-gray-900 dark:text-white">Machines</span>
-          </div>
-          <div className="text-3xl font-bold text-gray-900 dark:text-white">{summary.machines?.totalMachines}</div>
-          <div className="flex gap-2 flex-wrap">
-            <span className="bg-green-100 text-green-800 px-2 py-0.5 rounded text-xs font-medium">
-              Running: {summary.machines?.runningMachines}
-            </span>
-            <span className="bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded text-xs font-medium">
-              Idle: {summary.machines?.idleMachines}
-            </span>
-            <span className="bg-red-100 text-red-800 px-2 py-0.5 rounded text-xs font-medium">
-              Maintenance: {summary.machines?.maintenanceMachines}
-            </span>
-            <span className="bg-gray-100 text-gray-800 px-2 py-0.5 rounded text-xs font-medium">
-              Offline: {summary.machines?.offlineMachines}
-            </span>
-          </div>
-        </div>
-
-        {/* Financials Section */}
-        <div
-          className="rounded-lg border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-5 shadow-sm flex flex-col gap-4 min-w-[220px] cursor-pointer"
-          tabIndex={0}
-          aria-label="View Financials Details"
-          onClick={() => setModalSection('financials')}
-        >
-          <div className="flex items-center gap-2">
-            <CurrencyRupeeIcon className="w-5 h-5 text-green-500" />
-            <span className="font-semibold text-lg text-gray-900 dark:text-white">Financials</span>
-          </div>
-          <div className="text-3xl font-bold text-gray-900 dark:text-white">
-            ₹{summary.financial?.receivables?.total?.toLocaleString() ?? '0'}
-          </div>
-          <div className="flex gap-2 flex-wrap">
-            <span className="bg-green-100 text-green-800 px-2 py-0.5 rounded text-xs font-medium">
-              Receivables: ₹{summary.financial?.receivables?.total?.toLocaleString() ?? '0'}
-            </span>
-            <span className="bg-red-100 text-red-800 px-2 py-0.5 rounded text-xs font-medium">
-              Overdue: ₹{summary.financial?.receivables?.overdue?.toLocaleString() ?? '0'}
-            </span>
-          </div>
-          <div className="flex gap-2 flex-wrap">
-            <span className="bg-blue-100 text-blue-800 px-2 py-0.5 rounded text-xs font-medium">
-              Payables: ₹{summary.financial?.payables?.total?.toLocaleString() ?? '0'}
-            </span>
-            <span className="bg-orange-100 text-orange-800 px-2 py-0.5 rounded text-xs font-medium">
-              Overdue: ₹{summary.financial?.payables?.overdue?.toLocaleString() ?? '0'}
-            </span>
-          </div>
-        </div>
+        </motion.div>
       </div>
 
-      {/* Modal Components */}
+             {/* Modals */}
+       <AnimatePresence>
+         {modalSection === 'orders' && (
       <OrdersSummaryModal 
-        open={modalSection === 'orders'} 
+             open={true}
         onClose={() => setModalSection(null)}
       />
+         )}
+         {modalSection === 'production' && (
       <ProductionSummaryModal 
-        isOpen={modalSection === 'production'} 
+             isOpen={true}
         onClose={() => setModalSection(null)}
         data={{
           totalProduction: summary.production.totalProduction,
           avgDailyProduction: 0,
-          sectionProduction: {
-            blow_room: summary.production.totalProduction,
-            carding: summary.production.sectionProduction.carding,
-            drawing: summary.production.sectionProduction.drawing,
-            framing: summary.production.sectionProduction.framing,
-            simplex: summary.production.sectionProduction.simplex,
-            spinning: summary.production.sectionProduction.spinning,
-            autoconer: summary.production.sectionProduction.autoconer,
-          },
+               sectionProduction: summary.production.sectionProduction,
           sectionQuality: {},
           sectionDowntime: {},
           machineMetrics: summary.production.machineMetrics,
@@ -277,45 +344,20 @@ const OperationsSummaryCard: React.FC<OperationsSummaryCardProps> = ({ summary }
           productionDays: summary.production.productionDays,
         }}
       />
+         )}
+         {modalSection === 'inventory' && (
       <InventorySummaryModal 
-        open={modalSection === 'inventory'} 
+             open={true}
         onClose={() => setModalSection(null)}
         data={{
           lowStockItems: summary.inventory?.lowStockItems ?? 0,
           pendingFiberShortages: summary.inventory?.pendingFiberShortages ?? 0,
-          topBuyers: summary.orders.topBuyers.map(b => ({
-            buyer_id: b.buyer_id,
-            buyer_name: b.name,
-            total_order_qty: b.total_quantity,
-          })),
-          topSuppliers: [], // TODO: Map from summary.topSuppliers if available
-        }}
-      />
-      {modalSection === 'machines' && summary.machines && (
-        <MachinesSummaryModal
-          open={true}
-          onClose={() => setModalSection(null)}
-          data={{
-            totalMachines: summary.machines.totalMachines ?? 0,
-            runningMachines: summary.machines.runningMachines ?? 0,
-            idleMachines: summary.machines.idleMachines ?? 0,
-            maintenanceMachines: summary.machines.maintenanceMachines ?? 0,
-            offlineMachines: summary.machines.offlineMachines ?? 0,
-            machineStatuses: summary.machines.machineStatuses ?? []
-          }}
-        />
-      )}
-      {modalSection === 'workforce' && summary.workforce && (
-        <WorkforceSummaryModal
-          open={true}
-          onClose={() => setModalSection(null)}
-          data={{
-            totalWorkers: summary.workforce.totalEmployees ?? 0,
-            presentWorkers: 0, // TODO: Map from summary.machineStatuses if available
-            absentWorkers: 0, // TODO: Map from summary.machineStatuses if available
-            attendanceRate: summary.workforce.attendanceRateToday ?? 0,
-            overtimeHours: summary.workforce.attendanceOvertimeToday ?? 0,
-            productivityScore: 0 // TODO: Map from summary.machineStatuses if available
+               topBuyers: summary.orders.topBuyers.map(buyer => ({
+                 buyer_id: buyer.buyer_id,
+                 buyer_name: buyer.name,
+                 total_order_qty: buyer.total_quantity,
+               })),
+               topSuppliers: [],
           }}
         />
       )}
@@ -328,12 +370,41 @@ const OperationsSummaryCard: React.FC<OperationsSummaryCardProps> = ({ summary }
             totalExpenses: summary.financial?.payables?.total ?? 0,
             netProfit: (summary.financial?.receivables?.total ?? 0) - (summary.financial?.payables?.total ?? 0),
             profitMargin: ((summary.financial?.receivables?.total ?? 0) - (summary.financial?.payables?.total ?? 0)) / ((summary.financial?.receivables?.total ?? 0) || 1) * 100,
-            revenueTrend: 0, // TODO: Add when available in API
-            expensesTrend: 0 // TODO: Add when available in API
+                 revenueTrend: 0,
+                 expensesTrend: 0,
+               }}
+           />
+         )}
+         {modalSection === 'workforce' && (
+           <WorkforceSummaryModal
+             open={true}
+             onClose={() => setModalSection(null)}
+             data={{
+               totalWorkers: summary.workforce?.totalEmployees ?? 0,
+               presentWorkers: 0,
+               absentWorkers: 0,
+               attendanceRate: summary.workforce?.attendanceRateToday ?? 0,
+               overtimeHours: summary.workforce?.attendanceOvertimeToday ?? 0,
+               productivityScore: 0,
+             }}
+           />
+         )}
+         {modalSection === 'machines' && (
+           <MachinesSummaryModal
+             open={true}
+             onClose={() => setModalSection(null)}
+             data={{
+               totalMachines: summary.machines?.totalMachines ?? 0,
+               runningMachines: summary.machines?.runningMachines ?? 0,
+               idleMachines: summary.machines?.idleMachines ?? 0,
+               maintenanceMachines: summary.machines?.maintenanceMachines ?? 0,
+               offlineMachines: summary.machines?.offlineMachines ?? 0,
+               machineStatuses: summary.machines?.machineStatuses ?? [],
           }}
         />
       )}
-    </div>
+       </AnimatePresence>
+    </motion.div>
   );
 };
 

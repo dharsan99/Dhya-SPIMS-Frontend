@@ -3,7 +3,7 @@ import { FiPlus } from 'react-icons/fi';
 import EmployeeModal from '../components/Employees/EmployeeModal';
 import EmployeeTable from '../components/Employees/EmployeeTable';
 import AttendanceTab from '../components/Employees/attendance/AttendanceTab';
-import { Employee } from '../types/employee';
+import { Employee, CreateEmployeeInput } from '../types/employee';
 import { toast } from 'react-hot-toast';
 import {
   getAllEmployees,
@@ -29,6 +29,7 @@ const Employees = () => {
     queryFn: getAllEmployees,
   });
 
+  console.log('employees', employees)
   
 
 
@@ -37,10 +38,20 @@ const Employees = () => {
     setEditingEmployee(emp);
     setModalOpen(true);
   };
-  const handleSave = async (data: Omit<Employee, 'id'>, id?: string) => {
+  const handleSave = async (data: CreateEmployeeInput, id?: string) => {
     try {
       if (id) {
-        await updateEmployee(id, data);
+        // For updates, we need to convert back to the old format since the API might still expect it
+        const updateData = {
+          name: data.name,
+          aadharNo: data.aadharNo,
+          bankAcc1: data.bankAcc1,
+          bankAcc2: data.bankAcc2,
+          department: data.department,
+          joinDate: data.joinDate,
+          shiftRate: data.shiftRate,
+        };
+        await updateEmployee(id, updateData);
         toast.success('Employee updated successfully');
       } else {
         await createEmployee(data);

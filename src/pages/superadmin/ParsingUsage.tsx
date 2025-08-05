@@ -15,54 +15,54 @@ export interface TenantEmailUsage {
 }
 
 const dummyStats: ParsingUsageStats = {
-  total_orders_parsed: 1240,
-  parsing_limit: 2000,
-  parsing_usage_percentage: 62,
-  successful_parses: 1200,
-  failed_parses: 40,
-  success_rate: 96.8,
-  average_processing_time: 18,
-  last_parsed_at: new Date().toISOString(),
-  monthly_parses: [
-    { month: 'Jan 2024', successful_parses: 180, failed_parses: 5, total_parses: 185 },
-    { month: 'Feb 2024', successful_parses: 200, failed_parses: 7, total_parses: 207 },
-    { month: 'Mar 2024', successful_parses: 210, failed_parses: 6, total_parses: 216 },
-    { month: 'Apr 2024', successful_parses: 220, failed_parses: 8, total_parses: 228 },
-    { month: 'May 2024', successful_parses: 190, failed_parses: 9, total_parses: 199 },
-    { month: 'Jun 2024', successful_parses: 200, failed_parses: 5, total_parses: 205 },
+  totalOrdersParsed: 1240,
+  parsingLimit: 2000,
+  parsingUsagePercentage: 62,
+  successfulParses: 1200,
+  failedParses: 40,
+  successRate: 96.8,
+  averageProcessingTime: 18,
+  lastParsedAt: new Date().toISOString(),
+  monthlyParses: [
+    { month: 'Jan 2024', successfulParses: 180, failedParses: 5, totalParses: 185 },
+    { month: 'Feb 2024', successfulParses: 200, failedParses: 7, totalParses: 207 },
+    { month: 'Mar 2024', successfulParses: 210, failedParses: 6, totalParses: 216 },
+    { month: 'Apr 2024', successfulParses: 220, failedParses: 8, totalParses: 228 },
+    { month: 'May 2024', successfulParses: 190, failedParses: 9, totalParses: 199 },
+    { month: 'Jun 2024', successfulParses: 200, failedParses: 5, totalParses: 205 },
   ],
-  tenant_usage: [
+  tenantUsage: [
     {
-      tenant_id: 'T001',
-      tenant_name: 'ABC Spinning Mills',
-      orders_parsed: 400,
-      parsing_limit: 600,
-      usage_percentage: 67,
-      last_parsed_at: new Date().toISOString(),
+      tenantId: 'T001',
+      tenantName: 'ABC Spinning Mills',
+      ordersParsed: 400,
+      parsingLimit: 600,
+      usagePercentage: 67,
+      lastParsedAt: new Date().toISOString(),
     },
     {
-      tenant_id: 'T002',
-      tenant_name: 'XYZ Textiles',
-      orders_parsed: 320,
-      parsing_limit: 500,
-      usage_percentage: 64,
-      last_parsed_at: new Date().toISOString(),
+      tenantId: 'T002',
+      tenantName: 'XYZ Textiles',
+      ordersParsed: 320,
+      parsingLimit: 500,
+      usagePercentage: 64,
+      lastParsedAt: new Date().toISOString(),
     },
     {
-      tenant_id: 'T003',
-      tenant_name: 'PQR Fabrics',
-      orders_parsed: 250,
-      parsing_limit: 400,
-      usage_percentage: 62.5,
-      last_parsed_at: new Date().toISOString(),
+      tenantId: 'T003',
+      tenantName: 'PQR Fabrics',
+      ordersParsed: 250,
+      parsingLimit: 400,
+      usagePercentage: 62.5,
+      lastParsedAt: new Date().toISOString(),
     },
     {
-      tenant_id: 'T004',
-      tenant_name: 'LMN Yarns',
-      orders_parsed: 270,
-      parsing_limit: 500,
-      usage_percentage: 54,
-      last_parsed_at: new Date().toISOString(),
+      tenantId: 'T004',
+      tenantName: 'LMN Yarns',
+      ordersParsed: 270,
+      parsingLimit: 500,
+      usagePercentage: 54,
+      lastParsedAt: new Date().toISOString(),
     },
   ],
 };
@@ -70,47 +70,47 @@ const dummyStats: ParsingUsageStats = {
 
 const dummyTenantEmailUsage = [
   {
-    tenant_id: 'T001',
-    tenant_name: 'ABC Spinning Mills',
-    emails_sent: 1200,
-    email_limit: 2000,
-    usage_percentage: 60,
-    last_sent_at: new Date().toISOString(),
+    tenantId: 'T001',
+    tenantName: 'ABC Spinning Mills',
+    emailsSent: 1200,
+    emailLimit: 2000,
+    usagePercentage: 60,
+    lastSentAt: new Date().toISOString(),
   },
   {
-    tenant_id: 'T002',
-    tenant_name: 'XYZ Textiles',
-    emails_sent: 1500,
-    email_limit: 2000,
-    usage_percentage: 75,
-    last_sent_at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2).toISOString(), // 2 days ago
+    tenantId: 'T002',
+    tenantName: 'XYZ Textiles',
+    emailsSent: 1500,
+    emailLimit: 2000,
+    usagePercentage: 75,
+    lastSentAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2).toISOString(), // 2 days ago
   },
   {
-    tenant_id: 'T003',
-    tenant_name: 'PQR Fabrics',
-    emails_sent: 1800,
-    email_limit: 2000,
-    usage_percentage: 90,
-    last_sent_at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5).toISOString(), // 5 days ago
+    tenantId: 'T003',
+    tenantName: 'PQR Fabrics',
+    emailsSent: 1800,
+    emailLimit: 2000,
+    usagePercentage: 90,
+    lastSentAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5).toISOString(), // 5 days ago
   },
   {
-    tenant_id: 'T004',
-    tenant_name: 'LMN Yarns',
-    emails_sent: 400,
-    email_limit: 1000,
-    usage_percentage: 40,
-    last_sent_at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 1).toISOString(), // 1 day ago
+    tenantId: 'T004',
+    tenantName: 'LMN Yarns',
+    emailsSent: 400,
+    emailLimit: 1000,
+    usagePercentage: 40,
+    lastSentAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 1).toISOString(), // 1 day ago
   },
 ];
 
 const dummyMetrics: ParsingMetrics = {
-  total_files_processed: 1500,
-  pdf_files: 1200,
-  image_files: 300,
-  average_file_size: 2.1 * 1024 * 1024, // 2.1 MB
-  total_processing_time: 54000, // 15 hours
-  ocr_usage_count: 320,
-  direct_text_extraction_count: 1180,
+  totalFilesProcessed: 1500,
+  pdfFiles: 1200,
+  imageFiles: 300,
+  averageFileSize: 2.1 * 1024 * 1024, // 2.1 MB
+  totalProcessingTime: 54000, // 15 hours
+  ocrUsageCount: 320,
+  directTextExtractionCount: 1180,
 };
 
 const dummyEmailStats = {
@@ -166,7 +166,7 @@ const ParsingUsage: React.FC = () => {
         <>
           <ParsingUsagePanel stats={dummyStats} metrics={dummyMetrics} />
           <div className="mt-8">
-            <TenantUsageBreakdown tenantUsage={dummyStats.tenant_usage} />
+            <TenantUsageBreakdown tenantUsage={dummyStats.tenantUsage} />
           </div>
         </>
       )}

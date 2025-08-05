@@ -137,7 +137,7 @@ const AddAttendanceModal: React.FC<AddAttendanceModalProps> = ({
 
   const employeeOptions = employeesOptions.map((emp) => ({
     value: emp.id,
-    label: `${emp.token_no} - ${emp.name}`, // Better UX
+    label: `${emp.tokenNo} - ${emp.name}`, // Better UX
   }));
 
   const isAbsent = status === 'ABSENT';
